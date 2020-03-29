@@ -1,4 +1,5 @@
 const Discord = require('discord.js')
+const exitHook = require('exit-hook');
 const bot = new Discord.Client()
 
 bot.on('ready', function () {
@@ -6,6 +7,10 @@ bot.on('ready', function () {
 })
 
 bot.login(require('./token.js'))
+
+exitHook(() => {
+  bot.destroy();
+});
 
 var N1;
 var N2;

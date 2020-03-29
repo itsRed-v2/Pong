@@ -4,7 +4,8 @@
   "description": "Discord bot test",
   "main": "index.js",
   "dependencies": {
-    "discord.js": "^12.1.1"
+    "discord.js": "^12.1.1",
+    "exit-hook": "^2.2.0"
   },
   "devDependencies": {},
   "scripts": {
