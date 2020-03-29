@@ -49,10 +49,19 @@ bot.on('message', message => {
       question(message);
     }
     else if (partie_en_cours && contenu.match(/^ping \d+$/)) {
-      message.reply("pong : Faux ! Tu as marqué " + affiche(points));
+      message.reply("pong : Faux ! Ton score final est de " + affiche(points));
       points=0;
       partie_en_cours = false;
 
     }
+  }
+});
+
+bot.on('message', message => {
+  if(message.content.toLocaleLowerCase() == 'ping règles') {
+    message.reply(`écris "ping" pour commencer une partie.
+    Je vais alors te poser une question. Réponds par 'ping <reponse>'
+    Si ta réponse est correcte tu gagne un point et je te pose une nouvelle question.
+    Si c'est faux, je te donne ton score et la partie se termine.`)
   }
 });
