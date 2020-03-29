@@ -12,20 +12,41 @@ exitHook(() => {
   bot.destroy();
 });
 
-var N1;
-var N2;
-var points = 0;
-var partie_en_cours = false;
+class Partie {
+  constructor() {
+    this.N1;
+    this.N2;
+    this.points = 0;
+  }
+  
+  tireAuSortDeuxNombres() {
+    var possibilites = 10 + this.points
+    this.N1 = Math.floor(Math.random() * possibilites) + this.points;
+    this.N2 = Math.floor(Math.random() * possibilites) + this.points;  
+  }
 
+  question() {
+    return this.N1 + '+' + this.N2;
+  }
 
-function question (message) {
-  N1 = Math.floor(Math.random() * 10);
-  N2 = Math.floor(Math.random() * 10);
-  message.reply('pong ' + N1 + '+' + N2 + ' !'); 
+  reponse() {
+    return this.N1 + this.N2;
+  }
+
+  score () {
+    return this.points + ' point' + (this.points > 1 ? 's':'')
+  }
+
+  marqueUnPoint() {
+    this.points++;
+  }
 }
 
-function affiche (points) {
-  return points + ' point' + (points > 1 ? 's':'')
+var parties = {};
+
+function pauseQuestion (message, partie) {
+  partie.tireAuSortDeuxNombres();
+  message.reply('pong ' + partie.question() + ' !'); 
 }
 
 bot.on('message', message => {
@@ -39,20 +60,25 @@ bot.on('message', message => {
   if(contenu.includes('ping')) {
     if (contenu === 'ping') {
       message.reply("Démarrage d'une nouvelle partie!");
-      points=0;
-      partie_en_cours = true;
-      question(message);
+      parties[message.author.username] = new Partie();
+      pauseQuestion(message, parties[message.author.username]);
     }
-    else if (contenu === 'ping ' + (N1+N2)) {
-      points++;
-      message.reply('Correct ! Tu as ' + affiche(points));
-      question(message);
-    }
-    else if (partie_en_cours && contenu.match(/^ping \d+$/)) {
-      message.reply("pong : Faux ! Ton score final est de " + affiche(points));
-      points=0;
-      partie_en_cours = false;
-
+    else {
+      var partie = parties[message.author.username];
+      if (partie) {
+        if (contenu === 'ping ' + partie.reponse()) {
+          partie.marqueUnPoint();
+          message.reply('Correct ! Tu as ' + partie.score());
+          pauseQuestion(message, partie);
+        }
+        else if (contenu.match(/^ping \d+$/)) {
+          message.reply("pong : Faux ! Ton score final est de " + partie.score());
+          partie = undefined;
+        }
+      }
+      else {
+        message.reply('Aucune partie en cours. Tape "ping" pour lancer une partie')
+      }
     }
   }
 });
