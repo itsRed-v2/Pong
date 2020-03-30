@@ -56,16 +56,21 @@ bot.on('message', message => {
   }
 
   var contenu = message.content.toLowerCase() 
-
+  var partie = parties[message.author.username];
+  
   if(contenu.includes('ping')) {
     if (contenu === 'ping') {
+      if (partie) {
+        message.reply('Une partie est déjà en cours, tu as ' + partie.score() + ` et la question est: ` + partie.question() + `
+Pour commencer une nouvelle partie, tape "ping nouveau"`)
+      }
+      else {
       message.reply("Démarrage d'une nouvelle partie!");
       parties[message.author.username] = new Partie();
       pauseQuestion(message, parties[message.author.username]);
+      }
     }
-    else {
-      var partie = parties[message.author.username];
-      if (partie) {
+    else if (partie) {
         if (contenu === 'ping ' + partie.reponse()) {
           partie.marqueUnPoint();
           message.reply('Correct ! Tu as ' + partie.score());
@@ -79,20 +84,34 @@ bot.on('message', message => {
         else if (contenu === 'ping ?') {
           message.reply('pong ' + partie.question() + ' !')
         }
-      }
-      else {
+
+        else if (contenu === 'ping nouveau') {
+          message.reply("Démarrage d'une nouvelle partie!");
+          parties[message.author.username] = new Partie();
+          pauseQuestion(message, parties[message.author.username]);
+        }
+    }
+    else if (contenu.match(/^ping \d+$/) || contenu === 'ping ?') {
         message.reply('Aucune partie en cours. Tape "ping" pour lancer une partie')
       }
-    }
   }
 });
 
 bot.on('message', message => {
-  if(message.content.toLocaleLowerCase() == 'ping règles') {
+  if (message.content.toLocaleLowerCase() == 'ping règles') {
     message.reply(`écris "ping" pour commencer une partie.
-    Je vais alors te poser une question. Réponds par 'ping <reponse>'
-    Si ta réponse est correcte tu gagne un point et je te pose une nouvelle question.
-    Si c'est faux, je te donne ton score et la partie se termine.
-    La difficulté augmente en fonction du nombre de points.`)
-  } 
+Je vais alors te poser une question. Réponds par 'ping <reponse>'
+Si ta réponse est correcte tu gagne un point et je te pose une nouvelle question.
+Si c'est faux, je te donne ton score et la partie se termine.
+La difficulté augmente en fonction du nombre de points.
+Écris "ping help" pour la liste des commandes`)
+  }
+  if (message.content.toLocaleLowerCase() === 'ping help') {
+    message.reply(`Liste des commandes:
+**ping règles** donne les règles du jeu
+**ping ?** repose la question en cours
+**ping nouveau** recommence une nouvelle partie et abandonne l'ancienne
+**ping** commence une partie (si aucune partie n'est en cours)
+**ping help** affiche cette liste`)
+  }
 });
