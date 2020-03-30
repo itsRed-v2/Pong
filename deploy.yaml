@@ -1,0 +1,21 @@
+---
+- hosts: all
+
+  vars:
+    chemin_racine: "{{ ansible_env.HOME }}"
+  tasks:
+    - name: copie index.js
+      copy:
+        src: "/Users/etienne/Dropbox/Paul/discord/pong/index.js"
+        dest: "/home/etienne/pong/index.js"
+    - name: copie package.json
+      copy:
+        src: "./package.json"
+        dest: "/home/etienne/pong/package.json"
+    - name: copie package-lock.json
+      copy:
+        src: "./package-lock.json"
+        dest: "/home/etienne/pong/package-lock.json"
+    - name: Install packages based on package.json.
+      npm:
+        path: /home/etienne/pong
