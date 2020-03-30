@@ -73,7 +73,11 @@ bot.on('message', message => {
         }
         else if (contenu.match(/^ping \d+$/)) {
           message.reply("pong : Faux ! Ton score final est de " + partie.score());
-          partie = undefined;
+          parties[message.author.username] = undefined;
+        }
+
+        else if (contenu === 'ping ?') {
+          message.reply('pong ' + partie.question() + ' !')
         }
       }
       else {
@@ -88,6 +92,7 @@ bot.on('message', message => {
     message.reply(`écris "ping" pour commencer une partie.
     Je vais alors te poser une question. Réponds par 'ping <reponse>'
     Si ta réponse est correcte tu gagne un point et je te pose une nouvelle question.
-    Si c'est faux, je te donne ton score et la partie se termine.`)
-  }
+    Si c'est faux, je te donne ton score et la partie se termine.
+    La difficulté augmente en fonction du nombre de points.`)
+  } 
 });
