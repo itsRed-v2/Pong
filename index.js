@@ -2,14 +2,40 @@ const fs = require('fs');
 const Discord = require('discord.js')
 const exitHook = require('exit-hook');
 const bot = new Discord.Client()
-const highscores = require('./highscores.js');
-console.log(highscores)
+const allHighscores = require('./highscores.js');
+console.log(allHighscores)
 
 bot.on('ready', function () {
   console.log(`Logged in as ${bot.user.tag}!`);
 })
 
 bot.login(require('./token.js'))
+
+function printMode(mode) {
+  if (mode == 'mode_plus') {
+    return '**Mode Addition**\n'
+  }
+  if (mode == 'mode_moins') {
+    return '**Mode Soustraction**\n'
+  }
+  if (mode == 'mode_double') {
+    return '**Mode Double**\n'
+  }
+}
+
+function printHighscores(allHighscores) {
+  var contenu = '\n';
+  for (var mode in allHighscores) {
+    contenu += '`' + printMode(mode) + '`';
+    var highscoresTriees = trieHighscores(allHighscores[mode]);
+    for (var index in highscoresTriees) {
+      var highscore = highscoresTriees[index];
+      var position = parseInt(index) + 1;
+      contenu += position + ") " +  highscore[1]  + " : " + highscore[0] +"\n";
+    }
+  }
+  return '`' + contenu + '`';
+}
 
 function contenuHighscores(highscores) {
   var contenu = '';
@@ -21,9 +47,13 @@ function contenuHighscores(highscores) {
   return contenu;
 }
 
-function enregistreHighScore(highscores) {
+function enregistreHighScore(allHighscores) {
   var contenu = "module.exports = {\n";
-  contenu += contenuHighscores(highscores);
+  for (var mode in allHighscores) {
+    contenu += mode + ': {\n'
+    contenu += contenuHighscores(allHighscores[mode]);
+    contenu += "},\n";
+  }
   contenu += "};";
 
   fs.writeFile("./highscores.js", contenu, function (err) {
@@ -86,9 +116,7 @@ function pauseQuestion (message, partie) {
   message.reply('pong ' + partie.question() + ' !'); 
 }
 
-var plus
-var moins
-var multiplie 
+var mode = 'mode_plus';
 
 bot.on('message', message => {
 
@@ -98,7 +126,7 @@ bot.on('message', message => {
 
   var contenu = message.content.toLowerCase()
   var partie = parties[message.author.username];
-  var highscore = highscores[message.author.username] || 0;
+  var highscore = allHighscores[mode][message.author.username] || 0;
   
   if(contenu.includes('ping')) {
     if (contenu === 'ping') {                                            // ping
@@ -117,13 +145,13 @@ Pour commencer une nouvelle partie, tape "ping nouveau"`)
           partie.marqueUnPoint();
           message.reply('Correct ! Tu as ' + partie.score() + (partie.points > highscore ? ' **Meilleur score!**':''));
           pauseQuestion(message, partie);
+          if (partie.points > highscore) {                               // maj highscore
+            allHighscores[mode][message.author.username] = partie.points;
+            enregistreHighScore(allHighscores);
+          }
         }
         else if (contenu.match(/^ping \d+$/)) {                          // test mauvaise réponse
           message.reply("pong : Faux ! Ton score final est de " + partie.score() + (partie.points > highscore ? ", c'est ton **meilleur score!**":''));
-          if (partie.points > highscore) {                              // maj highscore
-            highscores[message.author.username] = partie.points;
-            enregistreHighScore(highscores);
-          }
           parties[message.author.username] = undefined;
         }
 
@@ -151,6 +179,7 @@ Je vais alors te poser une question. Réponds par 'ping <reponse>'
 Si ta réponse est correcte tu gagne un point et je te pose une nouvelle question.
 Si c'est faux, je te donne ton score et la partie se termine.
 La difficulté augmente en fonction du nombre de points.
+C'est évident, la calculette est interdite ^^
 Écris "ping help" pour la liste des commandes`)
   }
   if (contenu === 'ping help') {                                         // ping help
@@ -162,33 +191,18 @@ La difficulté augmente en fonction du nombre de points.
 **ping help** affiche cette liste
 **ping highscores** affiche les meilleurs scores des joueurs`)
   }
-  if (contenu.match(/^ping option /)) {
-    if (contenu.includes('+')) {
-      plus = true
-    }
-    else {
-      plus = false
-    }
-    if (contenu.includes('-')) {
-      moins = true
-    }
-    else {
-      moins = false
-    }
-    if (contenu.includes('x') || contenu.includes('*')) {
-      multiplie = true
-    }
-    else {
-      multiplie = false
-    }
-    message.reply(plus + ' ' + moins + ' ' + multiplie)
+  if (contenu.match(/^ping mode/)) {
+    var plus = true;
+    var moins = false;
+    plus = contenu.includes('+');
+    moins = contenu.includes('-');
+    message.reply(plus + ' ' + moins);
     message.reply(`Opérations: 
-` + (plus = true ? 'plus, ':'') + ' ' + (moins = true ? 'moins, ':'') + ' ' + (multiplie = true ? 'multiplications, ':''))
+` + (plus ? 'plus, ':'') + (moins ? 'moins ':''));
+    mode = (plus && moins ? 'mode_double':(moins ? 'mode_moins':'mode_plus'))
+    message.reply(printMode(mode));
   }
   if (contenu === 'ping highscores') {
-    message.reply(contenuHighscores(highscores));
-  }
-  if (contenu === 'ping trie') {
-    message.reply(trieHighscores(highscores));
+    message.reply(printHighscores(allHighscores));
   }
 });
