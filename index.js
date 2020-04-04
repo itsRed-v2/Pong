@@ -3,7 +3,13 @@ const Discord = require('discord.js')
 const exitHook = require('exit-hook');
 const bot = new Discord.Client()
 const allHighscores = require('./highscores.js');
-console.log(allHighscores)
+console.log(allHighscores);
+
+const MODES = {
+  mode_plus: 'Mode Addition',
+  mode_moins: 'Mode Soustraction',
+  mode_double: 'Mode Double'
+};
 
 bot.on('ready', function () {
   console.log(`Logged in as ${bot.user.tag}!`);
@@ -12,21 +18,13 @@ bot.on('ready', function () {
 bot.login(require('./token.js'))
 
 function printMode(mode) {
-  if (mode == 'mode_plus') {
-    return '**Mode Addition**\n'
-  }
-  if (mode == 'mode_moins') {
-    return '**Mode Soustraction**\n'
-  }
-  if (mode == 'mode_double') {
-    return '**Mode Double**\n'
-  }
+  return MODES[mode];
 }
 
 function printHighscores(allHighscores) {
   var contenu = '\n';
   for (var mode in allHighscores) {
-    contenu += '`' + printMode(mode) + '`';
+    contenu += '`**' + printMode(mode) + '**\n`';
     var highscoresTriees = trieHighscores(allHighscores[mode]);
     for (var index in highscoresTriees) {
       var highscore = highscoresTriees[index];
@@ -79,24 +77,28 @@ exitHook(() => {
 
 //==================
 class Partie {
-  constructor() {
+  constructor(mode) {
     this.N1;
     this.N2;
     this.points = 0;
+    this.mode = mode
   }
   
   tireAuSortDeuxNombres() {
     var possibilites = 10 + this.points
     this.N1 = Math.floor(Math.random() * possibilites) + this.points;
-    this.N2 = Math.floor(Math.random() * possibilites) + this.points;  
+    this.N2 = Math.floor(Math.random() * possibilites) + this.points;
+    var signeAuHasard = Math.floor(Math.random() * 2) == 1 ? '+':'-';
+    this.operation = (this.mode == "mode_plus" ? '+':(this.mode == "mode_moins" ? '-':signeAuHasard));
   }
 
   question() {
-    return this.N1 + '+' + this.N2;
+    return this.N1 + this.operation + this.N2;
   }
 
   reponse() {
-    return this.N1 + this.N2;
+    if (this.operation == '+') return this.N1 + this.N2;
+    else return this.N1 - this.N2;
   }
 
   score () {
@@ -135,35 +137,35 @@ bot.on('message', message => {
 Pour commencer une nouvelle partie, tape "ping nouveau"`)
       }
       else {                                                             // ping nouvelle partie
-      message.reply("Démarrage d'une nouvelle partie!");
-      parties[message.author.username] = new Partie();
+      message.reply("Démarrage d'une nouvelle partie en **" + printMode(mode) + "** !");
+      parties[message.author.username] = new Partie(mode);
       pauseQuestion(message, parties[message.author.username]);
       }
     }
     else if (partie) {
-        if (contenu === 'ping ' + partie.reponse()) {                    // test bonne réponse
-          partie.marqueUnPoint();
-          message.reply('Correct ! Tu as ' + partie.score() + (partie.points > highscore ? ' **Meilleur score!**':''));
-          pauseQuestion(message, partie);
-          if (partie.points > highscore) {                               // maj highscore
-            allHighscores[mode][message.author.username] = partie.points;
-            enregistreHighScore(allHighscores);
-          }
+      if (contenu === 'ping ' + partie.reponse()) {                    // test bonne réponse
+        partie.marqueUnPoint();
+        message.reply('Correct ! Tu as ' + partie.score() + (partie.points > highscore ? ' **Meilleur score!**':''));
+        pauseQuestion(message, partie);
+        if (partie.points > highscore) {                               // maj highscore
+          allHighscores[mode][message.author.username] = partie.points;
+          enregistreHighScore(allHighscores);
         }
-        else if (contenu.match(/^ping \d+$/)) {                          // test mauvaise réponse
-          message.reply("pong : Faux ! Ton score final est de " + partie.score() + (partie.points > highscore ? ", c'est ton **meilleur score!**":''));
-          parties[message.author.username] = undefined;
-        }
+      }
+      else if (contenu.match(/^ping -?\d+$/)) {                          // test mauvaise réponse
+        message.reply("pong : Faux ! Ton score final est de " + partie.score() + (partie.points > highscore ? ", c'est ton **meilleur score!**":''));
+        parties[message.author.username] = undefined;
+      }
 
-        else if (contenu === 'ping ?') {                                 // ping ?
-          message.reply('pong ' + partie.question() + ' !')
-        }
+      else if (contenu === 'ping ?') {                                 // ping ?
+        message.reply('pong ' + partie.question() + ' ! (' + printMode(partie.mode) + ')')
+      }
 
-        else if (contenu === 'ping nouveau') {                           // ping nouveau
-          message.reply("Démarrage d'une nouvelle partie!");
-          parties[message.author.username] = new Partie();
-          pauseQuestion(message, parties[message.author.username]);
-        }
+      else if (contenu === 'ping nouveau') {                           // ping nouveau
+        message.reply("Démarrage d'une nouvelle partie!");
+        parties[message.author.username] = new Partie();
+        pauseQuestion(message, parties[message.author.username]);
+      }
     }
     else if (contenu.match(/^ping \d+$/) || contenu === 'ping ?') {      // réponse ou  "ping ?" mais aucune partie en cours
         message.reply('Aucune partie en cours. Tape "ping" pour lancer une partie')
@@ -179,6 +181,7 @@ Je vais alors te poser une question. Réponds par 'ping <reponse>'
 Si ta réponse est correcte tu gagne un point et je te pose une nouvelle question.
 Si c'est faux, je te donne ton score et la partie se termine.
 La difficulté augmente en fonction du nombre de points.
+Une partie commence avec un mode, et elle garde ce mode jusqu'a la fin de cette partie.
 C'est évident, la calculette est interdite ^^
 Écris "ping help" pour la liste des commandes`)
   }
@@ -189,16 +192,14 @@ C'est évident, la calculette est interdite ^^
 **ping nouveau** recommence une nouvelle partie et abandonne l'ancienne
 **ping** commence une partie (si aucune partie n'est en cours)
 **ping help** affiche cette liste
-**ping highscores** affiche les meilleurs scores des joueurs`)
+**ping highscores** affiche les meilleurs scores des joueurs
+**ping mode <signe(s)>** choisir le mode de jeu parmi +, -, ou double (+ et -)`)
   }
   if (contenu.match(/^ping mode/)) {
     var plus = true;
     var moins = false;
     plus = contenu.includes('+');
     moins = contenu.includes('-');
-    message.reply(plus + ' ' + moins);
-    message.reply(`Opérations: 
-` + (plus ? 'plus, ':'') + (moins ? 'moins ':''));
     mode = (plus && moins ? 'mode_double':(moins ? 'mode_moins':'mode_plus'))
     message.reply(printMode(mode));
   }

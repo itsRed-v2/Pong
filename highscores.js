@@ -8,8 +8,11 @@ mode_plus: {
 'itsRed_v2' : 2,
 },
 mode_moins: {
+'Nokari' : 50,
+'itsRed_v2' : 25,
 },
 mode_double: {
-'itsRed_v2' : 2,
+'Nokari' : 33,
+'itsRed_v2' : 4,
 },
 };
