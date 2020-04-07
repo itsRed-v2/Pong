@@ -110,17 +110,25 @@ class Partie {
 }
 //=========================
 
+class Joueur {
+  constructor() {
+    this.mode = 'mode_plus';
+  }
+
+  demarrerPartie(message) {
+    message.reply("Démarrage d'une nouvelle partie en **" + printMode(this.mode) + "** !");
+    this.partie = new Partie(this.mode);
+    pauseQuestion(message, this.partie);
+  }
+}
+
+//=========================
+
 var joueurs = {};
 
 function pauseQuestion (message, partie) {
   partie.tireAuSortDeuxNombres();
   message.reply('pong ' + partie.question() + ' !'); 
-}
-
-function demarrerPartie(message, joueur) {
-  message.reply("Démarrage d'une nouvelle partie en **" + printMode(joueur.mode) + "** !");
-  joueur.partie = new Partie(joueur.mode);
-  pauseQuestion(message, joueur.partie);
 }
 
 bot.on('message', message => {
@@ -132,14 +140,14 @@ bot.on('message', message => {
   var contenu = message.content.toLowerCase()
   var joueur = joueurs[message.author.username];
   if (joueur == undefined) {
-    joueur = { mode : 'mode_plus' };
+    joueur = new Joueur();
     joueurs[message.author.username] = joueur;
   }
   var partie = joueur.partie;
   var highscore = allHighscores[joueur.mode][message.author.username] || 0;
   
   if(contenu.includes('ping')) {
-    
+
     if (contenu.match(/^ping mode/)) {
       var plus = true;
       var moins = false;
@@ -155,7 +163,7 @@ bot.on('message', message => {
 Pour commencer une nouvelle partie, tape "ping nouveau"`)
       }
       else {  
-        demarrerPartie(message, joueur);
+        joueur.demarrerPartie(message);
       }
     }
     else if (partie) {
@@ -178,7 +186,7 @@ Pour commencer une nouvelle partie, tape "ping nouveau"`)
       }
 
       else if (contenu === 'ping nouveau') {                           // ping nouveau
-        demarrerPartie(message, joueur);
+        joueur.demarrerPartie(message);
       }
     }
     else if (contenu.match(/^ping \d+$/) || contenu === 'ping ?') {      // réponse ou  "ping ?" mais aucune partie en cours
