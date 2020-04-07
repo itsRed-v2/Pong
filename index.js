@@ -56,7 +56,6 @@ function enregistreHighScore(allHighscores) {
 
   fs.writeFile("./highscores.js", contenu, function (err) {
     if (err) return console.log(err);
-    console.log('Les meilleurs scores ont été sauvegardés');
   });
 }
 
@@ -111,14 +110,18 @@ class Partie {
 }
 //=========================
 
-var parties = {};
+var joueurs = {};
 
 function pauseQuestion (message, partie) {
   partie.tireAuSortDeuxNombres();
   message.reply('pong ' + partie.question() + ' !'); 
 }
 
-var mode = 'mode_plus';
+function demarrerPartie(message, joueur) {
+  message.reply("Démarrage d'une nouvelle partie en **" + printMode(joueur.mode) + "** !");
+  joueur.partie = new Partie(joueur.mode);
+  pauseQuestion(message, joueur.partie);
+}
 
 bot.on('message', message => {
 
@@ -127,19 +130,32 @@ bot.on('message', message => {
   }
 
   var contenu = message.content.toLowerCase()
-  var partie = parties[message.author.username];
-  var highscore = allHighscores[mode][message.author.username] || 0;
+  var joueur = joueurs[message.author.username];
+  if (joueur == undefined) {
+    joueur = { mode : 'mode_plus' };
+    joueurs[message.author.username] = joueur;
+  }
+  var partie = joueur.partie;
+  var highscore = allHighscores[joueur.mode][message.author.username] || 0;
   
   if(contenu.includes('ping')) {
+    
+    if (contenu.match(/^ping mode/)) {
+      var plus = true;
+      var moins = false;
+      plus = contenu.includes('+');
+      moins = contenu.includes('-');
+      joueur.mode = (plus && moins ? 'mode_double':(moins ? 'mode_moins':'mode_plus'))
+      message.reply(printMode(joueur.mode));
+    }
+
     if (contenu === 'ping') {                                            // ping
       if (partie) {                                                      // ping déja une partie
         message.reply('Une partie est déjà en cours, tu as ' + partie.score() + ` et la question est: ` + partie.question() + `
 Pour commencer une nouvelle partie, tape "ping nouveau"`)
       }
-      else {                                                             // ping nouvelle partie
-      message.reply("Démarrage d'une nouvelle partie en **" + printMode(mode) + "** !");
-      parties[message.author.username] = new Partie(mode);
-      pauseQuestion(message, parties[message.author.username]);
+      else {  
+        demarrerPartie(message, joueur);
       }
     }
     else if (partie) {
@@ -148,13 +164,13 @@ Pour commencer une nouvelle partie, tape "ping nouveau"`)
         message.reply('Correct ! Tu as ' + partie.score() + (partie.points > highscore ? ' **Meilleur score!**':''));
         pauseQuestion(message, partie);
         if (partie.points > highscore) {                               // maj highscore
-          allHighscores[mode][message.author.username] = partie.points;
+          allHighscores[joueur.mode][message.author.username] = partie.points;
           enregistreHighScore(allHighscores);
         }
       }
       else if (contenu.match(/^ping -?\d+$/)) {                          // test mauvaise réponse
         message.reply("pong : Faux ! Ton score final est de " + partie.score() + (partie.points > highscore ? ", c'est ton **meilleur score!**":''));
-        parties[message.author.username] = undefined;
+        joueur.partie = undefined;
       }
 
       else if (contenu === 'ping ?') {                                 // ping ?
@@ -162,14 +178,12 @@ Pour commencer une nouvelle partie, tape "ping nouveau"`)
       }
 
       else if (contenu === 'ping nouveau') {                           // ping nouveau
-        message.reply("Démarrage d'une nouvelle partie!");
-        parties[message.author.username] = new Partie();
-        pauseQuestion(message, parties[message.author.username]);
+        demarrerPartie(message, joueur);
       }
     }
     else if (contenu.match(/^ping \d+$/) || contenu === 'ping ?') {      // réponse ou  "ping ?" mais aucune partie en cours
-        message.reply('Aucune partie en cours. Tape "ping" pour lancer une partie')
-      }
+      message.reply('Aucune partie en cours. Tape "ping" pour lancer une partie')
+    }
   }
 });
 
@@ -194,14 +208,6 @@ C'est évident, la calculette est interdite ^^
 **ping help** affiche cette liste
 **ping highscores** affiche les meilleurs scores des joueurs
 **ping mode <signe(s)>** choisir le mode de jeu parmi +, -, ou double (+ et -)`)
-  }
-  if (contenu.match(/^ping mode/)) {
-    var plus = true;
-    var moins = false;
-    plus = contenu.includes('+');
-    moins = contenu.includes('-');
-    mode = (plus && moins ? 'mode_double':(moins ? 'mode_moins':'mode_plus'))
-    message.reply(printMode(mode));
   }
   if (contenu === 'ping highscores') {
     message.reply(printHighscores(allHighscores));
