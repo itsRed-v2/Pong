@@ -138,6 +138,7 @@ class Joueur {
     message.reply("Démarrage d'une nouvelle partie en **" + printMode(this.mode) + "** !");
     this.partie = new Partie(this.mode);
     pauseQuestion(message, this.partie);
+    return this.partie;
   }
 }
 //================================
@@ -157,11 +158,10 @@ bot.on('message', message => {
     joueurs[message.author.username] = joueur;
   }
   var partie = joueur.partie;
-  var highscore = allHighscores[joueur.mode][message.author.username] || 0;
   
   if(contenu.includes('ping')) {
 
-    if (contenu.match(/^ping mode/)) {
+    if (contenu.match(/^ping mode/)) {                                   // ping mode
       var plus = true;
       var moins = false;
       plus = contenu.includes('+');
@@ -175,34 +175,34 @@ bot.on('message', message => {
         message.reply('Une partie en ' + printMode(partie.mode) + ' est déjà en cours, tu as ' + partie.score() + ` et la question est: ` + partie.question() + `
 Pour commencer une nouvelle partie, tu dois d'abord perdre celle là!`)
       }
-      else {  
-        joueur.demarrerPartie(message);
+      else {
+        partie = joueur.demarrerPartie(message);
       }
     }
 
     else if (partie) {
       if (contenu === 'ping ' + partie.reponse()) {                      // test bonne réponse
+        var highscore = allHighscores[partie.mode][message.author.username] || 0;
         partie.marqueUnPoint();
         message.reply('Correct ! Tu as ' + partie.score() + (partie.points > highscore ? ' **Meilleur score!**':''));
         pauseQuestion(message, partie);
         if (partie.points > highscore) {                                 // maj highscore
-          allHighscores[joueur.mode][message.author.username] = partie.points;
+          allHighscores[partie.mode][message.author.username] = partie.points;
           enregistreHighScore(allHighscores);
-          if (estPremier(message.author.username,joueur.mode)) {
+          if (estPremier(message.author.username,partie.mode)) {
             var member = message.guild.members.cache.get(message.author.id);
-            
             var role = {};
-            if (joueur.mode = 'mode_plus') {
+            if (partie.mode = 'mode_plus') {
               role = message.guild.roles.cache.get('695325035392663612');
             }
-            else if (joueur.mode = 'mode_moins') {
+            else if (partie.mode = 'mode_moins') {
               role = message.guild.roles.cache.get('696057173423423589');
             }
             else {
               role = message.guild.roles.cache.get('696057317204033567');
             }
             member.roles.add(role).catch(console.error);
-            var deuxieme = trouveDeuxieme(joueur.mode);
+            var deuxieme = trouveDeuxieme(partie.mode);
             var deuxiemeMembre = Array.from(message.guild.members.cache.values()).find(member => member.user.username == deuxieme);
             deuxiemeMembre.roles.remove(role).catch(console.error);
           }
@@ -250,6 +250,7 @@ Une partie commence avec un mode, et elle garde ce mode jusqu'a la fin.
     //console.log (message.guild.members.cache.get(message.author.id).roles.cache);
     //console.log (message.guild.roles)                                   // pour avoir la liste des roles
     //deuxieme ('mode_moins')
-    let membreItsRedV2 = Array.from(message.guild.members.cache.values()).find(member => member.user.username == 'itsRed_v2');
+    //let membreItsRedV2 = Array.from(message.guild.members.cache.values()).find(member => member.user.username == 'itsRed_v2');
+    //console.log(membreItsRedV2);
   }
 });
