@@ -25,13 +25,13 @@ const MODES = {
 
 function estPremier (username,mode) {
   var highscoresTriees = trieHighscores(allHighscores[mode]);
-  console.log (highscoresTriees[0][0])
+  console.log ("premier: "+highscoresTriees[0][0])
   return username == highscoresTriees[0][0];
 }
 
 function trouveDeuxieme (mode) {
   var highscoresTriees = trieHighscores(allHighscores[mode]);
-  console.log (highscoresTriees[1][0])
+  console.log ("deuxième: "+highscoresTriees[1][0])
   return highscoresTriees[1][0];
 }
 
@@ -192,10 +192,10 @@ Pour commencer une nouvelle partie, tu dois d'abord perdre celle là!`)
           if (estPremier(message.author.username,partie.mode)) {
             var member = message.guild.members.cache.get(message.author.id);
             var role = {};
-            if (partie.mode = 'mode_plus') {
+            if (partie.mode == 'mode_plus') {
               role = message.guild.roles.cache.get('695325035392663612');
             }
-            else if (partie.mode = 'mode_moins') {
+            else if (partie.mode == 'mode_moins') {
               role = message.guild.roles.cache.get('696057173423423589');
             }
             else {
