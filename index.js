@@ -23,18 +23,6 @@ const MODES = {
 
 //================================ fonctions VV
 
-function estPremier (username,mode) {
-  var highscoresTriees = trieHighscores(allHighscores[mode]);
-  console.log ("premier: "+highscoresTriees[0][0])
-  return username == highscoresTriees[0][0];
-}
-
-function trouveDeuxieme (mode) {
-  var highscoresTriees = trieHighscores(allHighscores[mode]);
-  console.log ("deuxième: "+highscoresTriees[1][0])
-  return highscoresTriees[1][0];
-}
-
 function pauseQuestion (message, partie) {
   partie.tireAuSortDeuxNombres();
   message.reply('pong ' + partie.question() + ' !'); 
@@ -189,23 +177,6 @@ Pour commencer une nouvelle partie, tu dois d'abord perdre celle là!`)
         if (partie.points > highscore) {                                 // maj highscore
           allHighscores[partie.mode][message.author.username] = partie.points;
           enregistreHighScore(allHighscores);
-          if (estPremier(message.author.username,partie.mode)) {
-            var member = message.guild.members.cache.get(message.author.id);
-            var role = {};
-            if (partie.mode == 'mode_plus') {
-              role = message.guild.roles.cache.get('695325035392663612');
-            }
-            else if (partie.mode == 'mode_moins') {
-              role = message.guild.roles.cache.get('696057173423423589');
-            }
-            else {
-              role = message.guild.roles.cache.get('696057317204033567');
-            }
-            member.roles.add(role).catch(console.error);
-            var deuxieme = trouveDeuxieme(partie.mode);
-            var deuxiemeMembre = Array.from(message.guild.members.cache.values()).find(member => member.user.username == deuxieme);
-            deuxiemeMembre.roles.remove(role).catch(console.error);
-          }
         }
       }
       else if (contenu.match(/^ping -?\d+$/)) {                          // test mauvaise réponse
@@ -247,10 +218,138 @@ Une partie commence avec un mode, et elle garde ce mode jusqu'a la fin.
     message.channel.send(printHighscores(allHighscores));
   }
   if (contenu === 'test') {
-    //console.log (message.guild.members.cache.get(message.author.id).roles.cache);
-    //console.log (message.guild.roles)                                   // pour avoir la liste des roles
-    //deuxieme ('mode_moins')
     //let membreItsRedV2 = Array.from(message.guild.members.cache.values()).find(member => member.user.username == 'itsRed_v2');
     //console.log(membreItsRedV2);
+  }
+});
+
+const CODES = [
+  undefined,
+  '0',
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  ' ',
+  'a',
+  'b',
+  'c',
+  'd',
+  'e',
+  'f',
+  'g',
+  'h',
+  'i',
+  'j',
+  'k',
+  'l',
+  'm',
+  'n',
+  'o',
+  'p',
+  'q',
+  'r',
+  's',
+  't',
+  'u',
+  'v',
+  'w',
+  'x',
+  'y',
+  'z'
+]
+
+function toNumber(lettres) {
+  for (index = 0; index < lettres.length; index++) {
+    if (CODES.indexOf(lettres[index])==-1) {} else {
+      lettres[index] = CODES.indexOf(lettres[index])
+    }
+  }
+}
+
+function toString(lettres) {
+  var output = ''
+  for (index = 0; index < lettres.length; index++) {
+    if (!isNaN(lettres[index])) {
+      lettres[index] = CODES[lettres[index]]
+    }
+    output = (output + lettres[index])
+  }
+  return output
+}
+
+bot.on('message', message => {
+
+  if (message.author.bot) {
+    return
+  }
+
+  var contenu = message.content
+  var Codelength = CODES.length-1
+  var match = contenu.match(/^ping (code|decode) (\d*) (.*)/)
+  if(match) {
+    var cle = parseInt(match[2])
+    var msg = match[3]
+    var action = match[1]
+    var lettres = msg.split('')
+    message.channel.send("clé: " + cle + "\naction: " + action + "\nCODES.length: " + CODES.length)
+    toNumber(lettres)
+    console.log(lettres)
+
+
+    if (action === "code") {
+      for (index = 0; index < lettres.length; index++) {
+        if (lettres[index-1] === undefined) {
+          lettres[index] = (lettres[index]*cle)%CODES.length
+        } else {
+          if (!isNaN(lettres[index])) {
+            lettres[index] = (lettres[index]*lettres[index-1]+cle)%CODES.length
+          }
+        }
+      }
+
+
+    } else {
+      for (index = lettres.length-1; index >= 0; index = index-1) {
+        if (lettres[index-1] === undefined) {
+          for (i = 1; i<100;i++) {
+            //console.log((lettres[index]+CODES.length*i)/cle)
+            if (Number.isInteger((lettres[index]+CODES.length*i)/cle)%CODES.length) {
+              lettres[index] = ((lettres[index]+CODES.length*i)/cle)%CODES.length
+              i = 100
+              console.log("found")
+            }
+            //console.log(i)
+            if (i == 99) {
+              console.log("not found")
+            }
+          }
+        } else {
+          if (!isNaN(lettres[index])) {
+            var indexScle = (((lettres[index]-cle)%CODES.length)+CODES.length)%CODES.length
+            for (i = 1; i<100;i++) {
+              if (Number.isInteger((indexScle+CODES.length*i)/lettres[index-1])) {
+                lettres[index] = (indexScle+CODES.length*i)/lettres[index-1]
+                lettres[index] = lettres[index]%CODES.length
+                i = 100
+                console.log("1found")
+                console.log(lettres[index])
+              }
+              if (i == 99) {
+                console.log("not found")
+              }
+            }
+          }
+        }
+      }
+    }
+    console.log(lettres)
+    var output = toString(lettres)
+    message.channel.send("`"+output+"`")
   }
 });
