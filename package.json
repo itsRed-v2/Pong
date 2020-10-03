@@ -7,10 +7,13 @@
     "discord.js": "^12.1.1",
     "exit-hook": "^2.2.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^8.1.3"
+  },
   "scripts": {
-    "start" : "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "test": "mocha"
   },
   "author": "Paul Chargnon v2",
   "license": "ISC"

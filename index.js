@@ -223,65 +223,7 @@ Une partie commence avec un mode, et elle garde ce mode jusqu'a la fin.
   }
 });
 
-const CODES = [
-  undefined,
-  '0',
-  '1',
-  '2',
-  '3',
-  '4',
-  '5',
-  '6',
-  '7',
-  '8',
-  '9',
-  ' ',
-  'a',
-  'b',
-  'c',
-  'd',
-  'e',
-  'f',
-  'g',
-  'h',
-  'i',
-  'j',
-  'k',
-  'l',
-  'm',
-  'n',
-  'o',
-  'p',
-  'q',
-  'r',
-  's',
-  't',
-  'u',
-  'v',
-  'w',
-  'x',
-  'y',
-  'z'
-]
-
-function toNumber(lettres) {
-  for (index = 0; index < lettres.length; index++) {
-    if (CODES.indexOf(lettres[index])==-1) {} else {
-      lettres[index] = CODES.indexOf(lettres[index])
-    }
-  }
-}
-
-function toString(lettres) {
-  var output = ''
-  for (index = 0; index < lettres.length; index++) {
-    if (!isNaN(lettres[index])) {
-      lettres[index] = CODES[lettres[index]]
-    }
-    output = (output + lettres[index])
-  }
-  return output
-}
+var { toNumber, toString, code, decode, CODES_LENGTH } = require('./src/pong')
 
 bot.on('message', message => {
 
@@ -290,66 +232,22 @@ bot.on('message', message => {
   }
 
   var contenu = message.content
-  var Codelength = CODES.length-1
   var match = contenu.match(/^ping (code|decode) (\d*) (.*)/)
   if(match) {
     var cle = parseInt(match[2])
-    var msg = match[3]
+    var lettres = match[3]
     var action = match[1]
-    var lettres = msg.split('')
-    message.channel.send("clé: " + cle + "\naction: " + action + "\nCODES.length: " + CODES.length)
-    toNumber(lettres)
-    console.log(lettres)
+    message.channel.send("clé: " + cle + "\naction: " + action + "\nCODES_LENGTH: " + CODES_LENGTH)
+    var nombres = toNumber(lettres)
+    console.log(nombres)
 
 
     if (action === "code") {
-      for (index = 0; index < lettres.length; index++) {
-        if (lettres[index-1] === undefined) {
-          lettres[index] = (lettres[index]*cle)%CODES.length
-        } else {
-          if (!isNaN(lettres[index])) {
-            lettres[index] = (lettres[index]*lettres[index-1]+cle)%CODES.length
-          }
-        }
-      }
-
-
+      nombres = code(nombres,cle)
     } else {
-      for (index = lettres.length-1; index >= 0; index = index-1) {
-        if (lettres[index-1] === undefined) {
-          for (i = 1; i<100;i++) {
-            //console.log((lettres[index]+CODES.length*i)/cle)
-            if (Number.isInteger((lettres[index]+CODES.length*i)/cle)%CODES.length) {
-              lettres[index] = ((lettres[index]+CODES.length*i)/cle)%CODES.length
-              i = 100
-              console.log("found")
-            }
-            //console.log(i)
-            if (i == 99) {
-              console.log("not found")
-            }
-          }
-        } else {
-          if (!isNaN(lettres[index])) {
-            var indexScle = (((lettres[index]-cle)%CODES.length)+CODES.length)%CODES.length
-            for (i = 1; i<100;i++) {
-              if (Number.isInteger((indexScle+CODES.length*i)/lettres[index-1])) {
-                lettres[index] = (indexScle+CODES.length*i)/lettres[index-1]
-                lettres[index] = lettres[index]%CODES.length
-                i = 100
-                console.log("1found")
-                console.log(lettres[index])
-              }
-              if (i == 99) {
-                console.log("not found")
-              }
-            }
-          }
-        }
-      }
+      nombres = decode(nombres,cle)
     }
-    console.log(lettres)
-    var output = toString(lettres)
-    message.channel.send("`"+output+"`")
+    console.log(nombres)
+    message.channel.send("`"+toString(nombres)+"`")
   }
 });
