@@ -18,6 +18,10 @@
       copy:
         src: "./run.sh"
         dest: "/home/etienne/pong/run.sh"
+    - name: copie pong lib
+      copy:
+        src: "./src/pong.js"
+        dest: "/home/etienne/pong/src/pong.js"
     - name: Install packages based on package.json.
       npm:
         path: /home/etienne/pong
