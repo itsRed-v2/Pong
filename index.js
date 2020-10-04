@@ -180,7 +180,7 @@ Pour commencer une nouvelle partie, tu dois d'abord perdre celle là!`)
         }
       }
       else if (contenu.match(/^ping -?\d+$/)) {                          // test mauvaise réponse
-        message.reply("pong : Faux ! Ton score final est de " + partie.score() + (partie.points > highscore ? ", c'est ton **meilleur score!**":''));
+        message.reply("Faux ! Ton score final est de " + partie.score() + (partie.points > highscore ? ", c'est ton **meilleur score!**":''));
         joueur.partie = undefined;
       }
       else if (contenu === 'ping ?') {                                   // ping ?
@@ -223,7 +223,8 @@ Une partie commence avec un mode, et elle garde ce mode jusqu'a la fin.
   }
 });
 
-var { toNumber, toString, code, decode, CODES_LENGTH } = require('./src/pong')
+var { code, decode } = require('./src/pong')
+var uuencode = require ('uuencode');
 
 bot.on('message', message => {
 
@@ -231,23 +232,20 @@ bot.on('message', message => {
     return
   }
 
-  var contenu = message.content
-  var match = contenu.match(/^ping (code|decode) (\d*) (.*)/)
+  var contenu = message.content.split('\n').join()
+  var match = contenu.match(/^ping (code|decode) ([^ ]+) (.*)/)
   if(match) {
-    var cle = parseInt(match[2])
-    var lettres = match[3]
+    var cle = match[2]
+    var msg = match[3]
     var action = match[1]
-    message.channel.send("clé: " + cle + "\naction: " + action + "\nCODES_LENGTH: " + CODES_LENGTH)
-    var nombres = toNumber(lettres)
-    console.log(nombres)
-
+    message.channel.send("clé: " + cle + "\naction: " + action)
 
     if (action === "code") {
-      nombres = code(nombres,cle)
+      var nombres = code(msg, cle)
+      console.log(uuencode.encode(nombres))
+      message.channel.send("`" + uuencode.encode(nombres) + "`")
     } else {
-      nombres = decode(nombres,cle)
+      message.channel.send("`" + decode(uuencode.decode(msg), cle) + "`")
     }
-    console.log(nombres)
-    message.channel.send("`"+toString(nombres)+"`")
   }
 });

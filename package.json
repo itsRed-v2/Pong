@@ -5,7 +5,8 @@
   "main": "index.js",
   "dependencies": {
     "discord.js": "^12.1.1",
-    "exit-hook": "^2.2.0"
+    "exit-hook": "^2.2.0",
+    "uuencode": "0.0.4"
   },
   "devDependencies": {
     "chai": "^4.2.0",
