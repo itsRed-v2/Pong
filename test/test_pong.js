@@ -1,6 +1,5 @@
 var expect = require('chai').expect;
 var { code, decode, litCode} = require('../src/pong')
-var uuencode = require ('uuencode');
 
 describe('Pong', function () {
   
@@ -24,18 +23,5 @@ describe('Pong', function () {
       expect(decode([3, 0, 1, 6], 'b')).to.eql('abcd');
     });
   });
-
-
-  describe('#enTexte', function () {
-    it("uuencode un tableau de nombre", function () {
-      expect(uuencode.decode(uuencode.encode('Bonjour Paul')).toString())
-      .to.eql('Bonjour Paul')
-
-      var decoded = uuencode.decode(uuencode.encode([3, 4]))
-      expect(decoded.length).to.eql(2)
-      expect(decoded[0]).to.eql(3)
-      expect(decoded[1]).to.eql(4)
-    })
-  })
 
 });

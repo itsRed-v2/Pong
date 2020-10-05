@@ -224,7 +224,6 @@ Une partie commence avec un mode, et elle garde ce mode jusqu'a la fin.
 });
 
 var { code, decode } = require('./src/pong')
-var uuencode = require ('uuencode');
 
 bot.on('message', message => {
 
@@ -232,20 +231,20 @@ bot.on('message', message => {
     return
   }
 
-  var contenu = message.content.split('\n').join()
-  var match = contenu.match(/^ping (code|decode) ([^ ]+) (.*)/)
-  if(match) {
+  var contenu = message.content.split('\n')
+  var match = contenu[0].match(/^ping (code|decode) (.+)/)
+  if(match && contenu[1]) {
     var cle = match[2]
-    var msg = match[3]
+    contenu.shift()
+    var msg = contenu.join('\n')
     var action = match[1]
-    message.channel.send("clé: " + cle + "\naction: " + action)
+    message.channel.send(`clé:\n\`${cle}\`\nmessage:`)
 
     if (action === "code") {
       var nombres = code(msg, cle)
-      console.log(uuencode.encode(nombres))
-      message.channel.send("`" + uuencode.encode(nombres) + "`")
+      message.channel.send("```\n" + Buffer.from(nombres).toString('base64') + "\n```")
     } else {
-      message.channel.send("`" + decode(uuencode.decode(msg), cle) + "`")
+      message.channel.send("```\n" + decode(Buffer.from(msg, 'base64'), cle) + "\n```")
     }
   }
 });

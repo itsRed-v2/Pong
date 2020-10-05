@@ -10,8 +10,6 @@ function code(message, cle) {
     return messageCode
 }
 
-//console.log(String.fromCharCode(messagecodeAscii));
-
 function decode(messagecode,cle) {
     var messageDecode = ""
     for (var index = 0, icle = 0; index < messagecode.length; index++, icle++) {
@@ -24,25 +22,4 @@ function decode(messagecode,cle) {
     return messageDecode
 }
 
-function enTexte(nombres) {
-    // const { Readable } = require("stream")
-    // const readable = Readable.from(nombres)
-    
-    // return new Promise((resolve, reject) => {
-    //     var resultat = ""
-    //     readable
-    //         .pipe(new uuencode({encoder: true}))
-    //         .on("data", (nombre_encode) => {
-    //             resultat += nombre_encode
-    //         })
-    //     readable.on('end', function(){
-    //         resolve(resultat)
-    //     })
-    // })
-}
-
-function litCode() {
-    
-}
-
-module.exports = { code, decode, litCode }
+module.exports = { code, decode }
