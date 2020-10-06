@@ -196,23 +196,30 @@ Pour commencer une nouvelle partie, tu dois d'abord perdre celle là!`)
 
 bot.on('message', message => {
   var contenu = message.content.toLowerCase()
-  if (contenu == 'ping règles') {                                        // ping règles
-    message.channel.send(`Écris "ping" pour commencer une partie.
-Je vais alors te poser une question. Réponds par 'ping <reponse>'
+  if (contenu == 'ping règles' || contenu == 'ping regles') {                                        // ping règles
+    message.channel.send(`Écris \`ping\` pour commencer une partie.
+Je vais alors te poser une question. Réponds par \`ping <reponse>\`
 Si ta réponse est correcte tu gagne un point et je te pose une nouvelle question.
 Si c'est faux, je te donne ton score et la partie se termine.
 La difficulté augmente en fonction du nombre de points.
 Une partie commence avec un mode, et elle garde ce mode jusqu'a la fin.
 Écris "ping help" pour la liste des commandes`)
   }
-  if (contenu === 'ping help') {                                         // ping help
-    message.channel.send(`Liste des commandes:
-**ping règles** donne les règles du jeu
-**ping ?** repose la question en cours
-**ping** commence une partie (si aucune partie n'est en cours)
-**ping help** affiche cette liste
-**ping highscores** affiche les meilleurs scores des joueurs
-**ping mode <signe(s)>** choisir le mode de jeu parmi +, -, ou double (+ et -)`)
+  if (contenu === 'ping help') {
+    message.channel.send(`**Liste des commandes**
+  **Jeu:**
+\`ping règles\` donne les règles du jeu
+\`ping ?\` repose la question en cours
+\`ping\` commence une partie (si aucune partie n'est en cours)
+\`ping help\` affiche cette liste
+\`ping highscores\` affiche les meilleurs scores des joueurs
+\`ping mode <signe(s)>\` choisir le mode de jeu parmi \`+\`, \`-\`, ou double (\`+-\`)
+
+  **Cryptage:**
+\`\`\`
+ping (code|decode) <clé (1er ligne)>
+<message (a partir de la 2e ligne)>
+\`\`\` permet de crypter/décripter un message à partir d'une clé de cryptage`)
   }
   if (contenu === 'ping highscores') {
     message.channel.send(printHighscores(allHighscores));
@@ -232,12 +239,12 @@ bot.on('message', message => {
   }
 
   var contenu = message.content.split('\n')
-  var match = contenu[0].match(/^ping (code|decode) (.+)/)
+  var match = contenu[0].match(/^ping (code|decode) (.+)/i)
   if(match && contenu[1]) {
     var cle = match[2]
     contenu.shift()
     var msg = contenu.join('\n')
-    var action = match[1]
+    var action = match[1].toLowerCase()
     message.channel.send(`clé:\n\`${cle}\`\nmessage:`)
 
     if (action === "code") {
