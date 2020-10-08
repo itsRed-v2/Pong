@@ -15,22 +15,10 @@ exitHook(() => {
   bot.destroy();
 });
 
-const MODES = {
-  mode_plus: 'Mode Addition',
-  mode_moins: 'Mode Soustraction',
-  mode_double: 'Mode Double'
-};
-
 //================================ fonctions VV
 
-function pauseQuestion (message, partie) {
-  partie.tireAuSortDeuxNombres();
-  message.reply('pong ' + partie.question() + ' !'); 
-}
-
-function printMode(mode) {
-  return MODES[mode];
-}
+var { newJoueur } = require('./src/joueur')
+var { code, decode, liste, printMode, pauseQuestion } = require('./src/pong')
 
 function printHighscores(allHighscores) {
   var contenu = '';
@@ -81,56 +69,6 @@ function trieHighscores(highscores) {
   return sortable;
 }
 
-//================================ classes VV
-class Partie {
-  constructor(mode) {
-    this.N1;
-    this.N2;
-    this.points = 0;
-    this.mode = mode
-  }
-  
-  tireAuSortDeuxNombres() {
-    var possibilites = 10 + this.points
-    this.N1 = Math.floor(Math.random() * possibilites) + this.points;
-    this.N2 = Math.floor(Math.random() * possibilites) + this.points;
-    var signeAuHasard = Math.floor(Math.random() * 2) == 1 ? '+':'-';
-    this.operation = (this.mode == "mode_plus" ? '+':(this.mode == "mode_moins" ? '-':signeAuHasard));
-  }
-
-  question() {
-    return this.N1 + this.operation + this.N2;
-  }
-
-  reponse() {
-    if (this.operation == '+') return this.N1 + this.N2;
-    else return this.N1 - this.N2;
-  }
-
-  score () {
-    return this.points + ' point' + (this.points > 1 ? 's':'')
-  }
-
-  marqueUnPoint() {
-    this.points++;
-  }
-}
-//===========
-
-class Joueur {
-  constructor() {
-    this.mode = 'mode_plus';
-  }
-
-  demarrerPartie(message) {
-    message.reply("Démarrage d'une nouvelle partie en **" + printMode(this.mode) + "** !");
-    this.partie = new Partie(this.mode);
-    pauseQuestion(message, this.partie);
-    return this.partie;
-  }
-}
-//================================
-
 var joueurs = {};
 
 bot.on('message', message => {
@@ -142,7 +80,7 @@ bot.on('message', message => {
   var contenu = message.content.toLowerCase()
   var joueur = joueurs[message.author.username];
   if (joueur == undefined) {
-    joueur = new Joueur();
+    joueur = newJoueur();
     joueurs[message.author.username] = joueur;
   }
   var partie = joueur.partie;
@@ -165,6 +103,7 @@ Pour commencer une nouvelle partie, tu dois d'abord perdre celle là!`)
       }
       else {
         partie = joueur.demarrerPartie(message);
+        bot.channels.cache.get('763372739238559774').send(':white_check_mark:  **' + message.author.username + '** a commencé une partie en **' + printMode(partie.mode) + '**')
       }
     }
 
@@ -181,6 +120,7 @@ Pour commencer une nouvelle partie, tu dois d'abord perdre celle là!`)
       }
       else if (contenu.match(/^ping -?\d+$/)) {                          // test mauvaise réponse
         message.reply("Faux ! Ton score final est de " + partie.score() + (partie.points > highscore ? ", c'est ton **meilleur score!**":''));
+        bot.channels.cache.get('763372739238559774').send(':x:  **' + message.author.username + '** a perdu une partie à **' + partie.score() + '** (' + printMode(partie.mode) + ')')
         joueur.partie = undefined;
       }
       else if (contenu === 'ping ?') {                                   // ping ?
@@ -191,12 +131,18 @@ Pour commencer une nouvelle partie, tu dois d'abord perdre celle là!`)
     else if (contenu.match(/^ping \d+$/) || contenu === 'ping ?') {      // réponse ou  "ping ?" mais aucune partie en cours
       message.reply('Aucune partie en cours. Tape "ping" pour lancer une partie')
     }
+    if (message.channel.id == 763373453318684734 && contenu === 'ping list') {
+      message.channel.send('yeey!')
+      liste(joueurs)
+      console.log(joueurs)
+      console.log(joueurs[message.author.username])
+    }
   }
 });
 
 bot.on('message', message => {
   var contenu = message.content.toLowerCase()
-  if (contenu == 'ping règles' || contenu == 'ping regles') {                                        // ping règles
+  if (contenu == 'ping règles' || contenu == 'ping regles') {           // ping règles
     message.channel.send(`Écris \`ping\` pour commencer une partie.
 Je vais alors te poser une question. Réponds par \`ping <reponse>\`
 Si ta réponse est correcte tu gagne un point et je te pose une nouvelle question.
@@ -230,8 +176,6 @@ ping (code|decode) <clé (1er ligne)>
   }
 });
 
-var { code, decode } = require('./src/pong')
-
 bot.on('message', message => {
 
   if (message.author.bot) {
@@ -240,7 +184,7 @@ bot.on('message', message => {
 
   var contenu = message.content.split('\n')
   var match = contenu[0].match(/^ping (code|decode) (.+)/i)
-  if(match && contenu[1]) {
+  if (match && contenu[1]) {
     var cle = match[2]
     contenu.shift()
     var msg = contenu.join('\n')
@@ -253,5 +197,11 @@ bot.on('message', message => {
     } else {
       message.channel.send("```\n" + decode(Buffer.from(msg, 'base64'), cle) + "\n```")
     }
+  } else if (contenu[0].match(/^ping (code|decode)/)) {
+    message.channel.send(`Commande mal formée. Syntaxe:
+\`\`\`
+ping (code|decode) <clé (1er ligne)>
+<message (a partir de la 2e ligne)>
+\`\`\``)
   }
 });

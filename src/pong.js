@@ -22,4 +22,31 @@ function decode(messagecode,cle) {
     return messageDecode
 }
 
-module.exports = { code, decode }
+function liste(joueurs) {
+    joueurs.forEach(joueur => {
+        console.log(hey)
+    });
+    // var message = ''
+    // Object.values(joueurs).foreach((joueur) => {
+    //   if (partie) {
+    //     message = message + joueur.username + 'hey'
+    //   }
+    // })
+}
+
+function printMode(mode) {
+    return MODES[mode];
+}
+  
+const MODES = {
+    mode_plus: 'Mode Addition',
+    mode_moins: 'Mode Soustraction',
+    mode_double: 'Mode Double'
+};
+
+function pauseQuestion (message, partie) {
+    partie.tireAuSortDeuxNombres();
+    message.reply('pong ' + partie.question() + ' !'); 
+  }
+  
+module.exports = { code, decode, liste, printMode, MODES, pauseQuestion }

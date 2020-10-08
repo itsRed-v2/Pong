@@ -13,8 +13,8 @@ mode_moins: {
 'itsRed_v2' : 27,
 },
 mode_double: {
+'Nokari' : 41,
 'itsRed_v2' : 36,
-'Nokari' : 33,
 'Étienne C🌀' : 8,
 },
 };

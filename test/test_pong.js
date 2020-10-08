@@ -1,5 +1,6 @@
 var expect = require('chai').expect;
-var { code, decode, litCode} = require('../src/pong')
+var { newJoueur } = require('../src/joueur')
+var { code, decode, liste} = require('../src/pong')
 
 describe('Pong', function () {
   
@@ -21,6 +22,12 @@ describe('Pong', function () {
     });
     it("décrypter plusieurs lettres", function () {
       expect(decode([3, 0, 1, 6], 'b')).to.eql('abcd');
+    });
+  });
+
+  describe('#list()', function () {
+    it("affiche la liste des joueurs", function () {
+      expect(liste({'nom': newJoueur()})).to.eql('a');
     });
   });
 
