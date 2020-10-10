@@ -1,7 +1,7 @@
 var expect = require('chai').expect;
 var { newJoueur } = require('../src/joueur')
 var { newPartie } = require('../src/partie')
-var { code, decode, liste} = require('../src/pong')
+var { code, decode, afficheliste} = require('../src/pong')
 
 describe('Pong', function () {
   
@@ -26,7 +26,7 @@ describe('Pong', function () {
     });
   });
 
-  describe('#list()', function () {
+  describe('#afficheliste()', function () {
     it("affiche la liste des joueurs qui ont une partie en cours", function () {
       var joueurAvecPartie = newJoueur();
       joueurAvecPartie.partie = newPartie('mode_plus');
@@ -34,7 +34,7 @@ describe('Pong', function () {
         'joueurSansPartie': newJoueur(),
         'joueurAvecPartie': joueurAvecPartie,
       };
-      expect(liste(joueurs)).to.eql([
+      expect(afficheliste(joueurs)).to.eql([
         '1 partie est en cours:', 
         '`joueurAvecPartie` - 0 point, Mode Addition'
       ]);
@@ -42,7 +42,7 @@ describe('Pong', function () {
     
     it("affiche si aucune partie en cours", function () {
       var joueurs = {}
-      expect(liste(joueurs)).to.eql(["Aucune partie n'est en cours"]);
+      expect(afficheliste(joueurs)).to.eql(["Aucune partie n'est en cours"]);
     });
 
     it("affiche la liste des joueurs qui ont une partie en cours", function () {
@@ -52,7 +52,7 @@ describe('Pong', function () {
         'joueurAvecPartie2': joueurAvecPartie,
         'joueurAvecPartie': joueurAvecPartie,
       };
-      expect(liste(joueurs)).to.eql([
+      expect(afficheliste(joueurs)).to.eql([
         '2 parties sont en cours:', 
         '`joueurAvecPartie2` - 0 point, Mode Addition',
         '`joueurAvecPartie` - 0 point, Mode Addition'

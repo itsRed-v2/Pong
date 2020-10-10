@@ -24,13 +24,8 @@ function decode(messagecode,cle) {
     return messageDecode
 }
 
-function liste(joueurs) {
-    var liste = []
-    Object.keys(joueurs).forEach(nom => {
-        if (joueurs[nom].partie) {
-            liste.push(`\`${nom}\` - ${joueurs[nom].partie.score()}, ${printMode(joueurs[nom].partie.mode)}`)
-        }
-    });
+function afficheliste(joueurs) {
+    var liste = listeJoueursActifs(joueurs)
     if (liste.length > 1) {
         liste.unshift(`${liste.length} parties sont en cours:`)
     } else if (liste.length == 1) {
@@ -38,6 +33,16 @@ function liste(joueurs) {
     } else {
         liste.unshift(`Aucune partie n'est en cours`)
     }
+    return liste
+}
+
+function listeJoueursActifs(joueurs) {
+    var liste = []
+    Object.keys(joueurs).forEach(nom => {
+        if (joueurs[nom].partie) {
+            liste.push(`\`${nom}\` - ${joueurs[nom].partie.score()}, ${printMode(joueurs[nom].partie.mode)}`)
+        }
+    });
     return liste
 }
 
@@ -56,4 +61,4 @@ function pauseQuestion (message, partie) {
     message.reply('pong ' + partie.question() + ' !'); 
   }
   
-module.exports = { code, decode, liste, printMode, pauseQuestion }
+module.exports = { code, decode, listeJoueursActifs, afficheliste, printMode, pauseQuestion }

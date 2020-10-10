@@ -18,7 +18,7 @@ exitHook(() => {
 //================================ fonctions VV
 
 var { newJoueur } = require('./src/joueur')
-var { code, decode, liste, printMode, pauseQuestion } = require('./src/pong')
+var { code, decode, listeJoueursActifs, afficheliste, printMode, pauseQuestion } = require('./src/pong')
 
 function printHighscores(allHighscores) {
   var contenu = '';
@@ -68,6 +68,8 @@ function trieHighscores(highscores) {
   });
   return sortable;
 }
+
+//================================
 
 var joueurs = {};
 
@@ -132,7 +134,24 @@ Pour commencer une nouvelle partie, tu dois d'abord perdre celle là!`)
       message.reply('Aucune partie en cours. Tape "ping" pour lancer une partie')
     }
     if (contenu === 'ping list') {
-      message.channel.send(liste(joueurs))
+      message.channel.send(afficheliste(joueurs))
+    }
+    if (contenu === 'ping reload' && message.author.id == 364820614990528522) {
+      if (!listeJoueursActifs(joueurs)[0]) {
+        message.channel.send('Reloading!').then(() => {
+          process.exit()
+        })
+      } else {
+        var msg = afficheliste(joueurs)
+        msg.push('Vous pouvez forcer le reload avec `ping reload force`')
+        message.channel.send(msg)
+        console.log(message.id)
+      }
+    }
+    if (contenu === 'ping reload force' && message.author.id == 364820614990528522) {
+      message.channel.send('Reloading!').then(() => {
+        process.exit()
+      })
     }
   }
 });
