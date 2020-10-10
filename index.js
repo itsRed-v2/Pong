@@ -131,18 +131,15 @@ Pour commencer une nouvelle partie, tu dois d'abord perdre celle là!`)
     else if (contenu.match(/^ping \d+$/) || contenu === 'ping ?') {      // réponse ou  "ping ?" mais aucune partie en cours
       message.reply('Aucune partie en cours. Tape "ping" pour lancer une partie')
     }
-    if (message.channel.id == 763373453318684734 && contenu === 'ping list') {
-      message.channel.send('yeey!')
-      liste(joueurs)
-      console.log(joueurs)
-      console.log(joueurs[message.author.username])
+    if (contenu === 'ping list') {
+      message.channel.send(liste(joueurs))
     }
   }
 });
 
 bot.on('message', message => {
   var contenu = message.content.toLowerCase()
-  if (contenu == 'ping règles' || contenu == 'ping regles') {           // ping règles
+  if (contenu == 'ping règles' || contenu == 'ping regles') {            // ping règles
     message.channel.send(`Écris \`ping\` pour commencer une partie.
 Je vais alors te poser une question. Réponds par \`ping <reponse>\`
 Si ta réponse est correcte tu gagne un point et je te pose une nouvelle question.
@@ -160,6 +157,7 @@ Une partie commence avec un mode, et elle garde ce mode jusqu'a la fin.
 \`ping help\` affiche cette liste
 \`ping highscores\` affiche les meilleurs scores des joueurs
 \`ping mode <signe(s)>\` choisir le mode de jeu parmi \`+\`, \`-\`, ou double (\`+-\`)
+\`ping list\` liste toutes les parties en cours
 
   **Cryptage:**
 \`\`\`
@@ -170,10 +168,10 @@ ping (code|decode) <clé (1er ligne)>
   if (contenu === 'ping highscores') {
     message.channel.send(printHighscores(allHighscores));
   }
-  if (contenu === 'test') {
-    //let membreItsRedV2 = Array.from(message.guild.members.cache.values()).find(member => member.user.username == 'itsRed_v2');
-    //console.log(membreItsRedV2);
-  }
+  // if (contenu === 'test') {
+  //   //let membreItsRedV2 = Array.from(message.guild.members.cache.values()).find(member => member.user.username == 'itsRed_v2');
+  //   //console.log(membreItsRedV2);
+  // }
 });
 
 bot.on('message', message => {

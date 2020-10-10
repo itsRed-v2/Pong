@@ -1,5 +1,6 @@
 var expect = require('chai').expect;
 var { newJoueur } = require('../src/joueur')
+var { newPartie } = require('../src/partie')
 var { code, decode, liste} = require('../src/pong')
 
 describe('Pong', function () {
@@ -26,8 +27,36 @@ describe('Pong', function () {
   });
 
   describe('#list()', function () {
-    it("affiche la liste des joueurs", function () {
-      expect(liste({'nom': newJoueur()})).to.eql('a');
+    it("affiche la liste des joueurs qui ont une partie en cours", function () {
+      var joueurAvecPartie = newJoueur();
+      joueurAvecPartie.partie = newPartie('mode_plus');
+      var joueurs = {
+        'joueurSansPartie': newJoueur(),
+        'joueurAvecPartie': joueurAvecPartie,
+      };
+      expect(liste(joueurs)).to.eql([
+        '1 partie est en cours:', 
+        '`joueurAvecPartie` - 0 point, Mode Addition'
+      ]);
+    });
+    
+    it("affiche si aucune partie en cours", function () {
+      var joueurs = {}
+      expect(liste(joueurs)).to.eql(["Aucune partie n'est en cours"]);
+    });
+
+    it("affiche la liste des joueurs qui ont une partie en cours", function () {
+      var joueurAvecPartie = newJoueur();
+      joueurAvecPartie.partie = newPartie('mode_plus');
+      var joueurs = {
+        'joueurAvecPartie2': joueurAvecPartie,
+        'joueurAvecPartie': joueurAvecPartie,
+      };
+      expect(liste(joueurs)).to.eql([
+        '2 parties sont en cours:', 
+        '`joueurAvecPartie2` - 0 point, Mode Addition',
+        '`joueurAvecPartie` - 0 point, Mode Addition'
+      ]);
     });
   });
 

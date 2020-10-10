@@ -1,3 +1,5 @@
+const joueur = require("./joueur")
+
 function code(message, cle) {
     var messageCode = []
     for (var index = 0, icle = 0; index < message.length; index++, icle++) {
@@ -23,15 +25,20 @@ function decode(messagecode,cle) {
 }
 
 function liste(joueurs) {
-    joueurs.forEach(joueur => {
-        console.log(hey)
+    var liste = []
+    Object.keys(joueurs).forEach(nom => {
+        if (joueurs[nom].partie) {
+            liste.push(`\`${nom}\` - ${joueurs[nom].partie.score()}, ${printMode(joueurs[nom].partie.mode)}`)
+        }
     });
-    // var message = ''
-    // Object.values(joueurs).foreach((joueur) => {
-    //   if (partie) {
-    //     message = message + joueur.username + 'hey'
-    //   }
-    // })
+    if (liste.length > 1) {
+        liste.unshift(`${liste.length} parties sont en cours:`)
+    } else if (liste.length == 1) {
+        liste.unshift(`1 partie est en cours:`)
+    } else {
+        liste.unshift(`Aucune partie n'est en cours`)
+    }
+    return liste
 }
 
 function printMode(mode) {
@@ -49,4 +56,4 @@ function pauseQuestion (message, partie) {
     message.reply('pong ' + partie.question() + ' !'); 
   }
   
-module.exports = { code, decode, liste, printMode, MODES, pauseQuestion }
+module.exports = { code, decode, liste, printMode, pauseQuestion }

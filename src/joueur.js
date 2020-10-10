@@ -7,8 +7,8 @@ class Joueur {
   }
   
   demarrerPartie(message) {
-    message.reply("Démarrage d'une nouvelle partie en **" + printMode(this.mode) + "** !");
     this.partie = newPartie(this.mode);
+    message.reply("Démarrage d'une nouvelle partie en **" + printMode(this.mode) + "** !");
     pauseQuestion(message, this.partie);
     return this.partie;
   }
