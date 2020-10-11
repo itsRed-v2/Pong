@@ -14,19 +14,15 @@
       copy:
         src: "./package-lock.json"
         dest: "/home/etienne/pong/package-lock.json"
-    - name: copie run.sh
-      copy:
-        src: "./run.sh"
-        dest: "/home/etienne/pong/run.sh"
     - name: copie pong lib
       copy:
-        src: "./src/pong.js"
-        dest: "/home/etienne/pong/src/pong.js"
+        src: "./src"
+        dest: "/home/etienne/pong/"
     - name: Install packages based on package.json.
       npm:
         path: /home/etienne/pong
     - name: Run the bot
-      shell: ./run.sh
+      shell: npm run restart
       args:
         chdir: /home/etienne/pong
 

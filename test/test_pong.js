@@ -1,7 +1,15 @@
 var expect = require('chai').expect;
 var { newJoueur } = require('../src/joueur')
 var { newPartie } = require('../src/partie')
-var { code, decode, afficheliste} = require('../src/pong')
+var {
+  code,
+  decode,
+  afficheliste,
+  matchTp,
+  changeScore,
+  matchHs,
+  changeHs
+} = require('../src/pong')
 
 describe('Pong', function () {
   
@@ -57,6 +65,84 @@ describe('Pong', function () {
         '`joueurAvecPartie2` - 0 point, Mode Addition',
         '`joueurAvecPartie` - 0 point, Mode Addition'
       ]);
+    });
+  });
+
+  describe('#matchTp()', function () {
+    it("extraire informations", function () {
+      expect(matchTp('ping tp Nokari 56')).to.eql(['ping tp Nokari 56','Nokari','56']);
+    });
+    it("renvoie null si matche pas", function () {
+      expect(matchTp('ping tp Nokari d56')).to.eql(null);
+    });
+    it("fonctionne avec des maj", function () {
+      expect(matchTp('PinG tp Nokari 56')).not.to.eql(null);
+    });
+  });
+
+  describe('#changeScore()', function () {
+    it("change le score d'un joueur si présent dans la liste", function () {
+      var Nokari = newJoueur();
+      Nokari.partie = newPartie('mode_plus');
+      var joueurs = {
+        'joueurSansPartie': newJoueur(),
+        'Nokari': Nokari,
+      };
+      expect(changeScore('Nokari',56,joueurs)).to.eql(true);
+    });
+    it("message erreur si aucun joueur correspond", function () {
+      var Joueur1 = newJoueur();
+      Joueur1.partie = newPartie('mode_plus');
+      var joueurs = {
+        'joueurSansPartie': newJoueur(),
+        'Joueur1': Joueur1,
+      };
+      expect(changeScore('Nokari',56,joueurs)).to.eql(false);
+    });
+  });
+
+  describe('#matchHs()', function () {
+    it("extraire informations", function () {
+      expect(matchHs('ping seths Nokari 56 plus')).to.eql(['ping seths Nokari 56 plus','Nokari','56','plus']);
+    });
+    it("renvoie null si matche pas", function () {
+      expect(matchHs('ping seths Nokari d56 plus')).to.eql(null);
+    });
+    it("fonctionne avec des maj", function () {
+      expect(matchHs('PinG seths Nokari 56 plUs')).not.to.eql(null);
+    });
+  });
+
+  describe('#changeHs()', function () {
+    it("change le score d'un joueur si présent dans la liste", function () {
+      allHighscores = {
+        mode_plus: {
+        'itsRed_v2' : 10,
+        },
+        mode_moins: {},
+        mode_double: {},
+      }
+      expect(changeHs('itsRed_v2',20,'plus',allHighscores)).to.eql(true);
+    });
+    it("message erreur si aucun joueur correspond", function () {
+      allHighscores = {
+        mode_plus: {
+        'itsRed_v2' : 10,
+        },
+        mode_moins: {},
+        mode_double: {},
+      }
+      expect(changeHs('Nokari',20,'plus',allHighscores)).to.eql(false);
+    });
+    it("message erreur si aucun joueur correspond dans le mode séléctionné", function () {
+      allHighscores = {
+        mode_plus: {
+        'itsRed_v2' : 10,
+        },
+        mode_moins: {},
+        mode_double: {},
+      }
+      expect(changeHs('itsRed_v2',20,'moins',allHighscores)).to.eql(false);
     });
   });
 

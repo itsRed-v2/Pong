@@ -1,7 +1,8 @@
 module.exports = {
 mode_plus: {
 'itsRed_v2' : 155,
-'Nokari' : 107,
+'Nokari' : 127,
+'Xana' : 39,
 'nijou_' : 13,
 'Celler' : 10,
 'Craftman2868' : 9,

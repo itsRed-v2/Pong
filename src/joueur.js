@@ -18,6 +18,4 @@ function newJoueur(){
   return new Joueur()
 }
 
-module.exports = { 
-  newJoueur
-}
+module.exports = { newJoueur }

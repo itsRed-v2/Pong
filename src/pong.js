@@ -59,6 +59,46 @@ const MODES = {
 function pauseQuestion (message, partie) {
     partie.tireAuSortDeuxNombres();
     message.reply('pong ' + partie.question() + ' !'); 
-  }
-  
-module.exports = { code, decode, listeJoueursActifs, afficheliste, printMode, pauseQuestion }
+}
+
+function matchTp(commande) {
+    return commande.match(/^ping tp (.+) (\d*)$/i)
+}
+
+function changeScore(nom, score, joueurs) {
+    if (joueurs[nom] && joueurs[nom].partie) {
+        joueurs[nom].partie.points = score
+        return true
+    } else {
+        return false
+    }
+}
+
+function matchHs(commande) {
+    return commande.match(/^ping seths (.+) (\d*) (plus|moins|double)$/i)
+}
+
+function changeHs(nom, score, mode, allHighscores) {
+    const clemode = 'mode_'+mode
+    if (allHighscores[clemode][nom]) {
+        allHighscores[clemode][nom] = score
+        return true
+    } else {
+        return false
+    }
+    //allHighscores[partie.mode][message.author.username] = partie.points
+    //enregistreHighScore(allHighscores)
+}
+
+module.exports = {
+    code,
+    decode,
+    listeJoueursActifs,
+    afficheliste,
+    printMode,
+    pauseQuestion,
+    matchTp,
+    changeScore,
+    matchHs,
+    changeHs
+}

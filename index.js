@@ -5,6 +5,27 @@ const bot = new Discord.Client()
 const allHighscores = require('./highscores.js');
 console.log(allHighscores);
 
+const AIDE_UTILISATEUR=`**Liste des commandes**
+**Jeu:**
+\`ping règles\` donne les règles du jeu
+\`ping ?\` repose la question en cours
+\`ping\` commence une partie (si aucune partie n'est en cours)
+\`ping help\` affiche cette liste
+\`ping highscores\` / \`ping hs\` affiche les meilleurs scores des joueurs
+\`ping mode <signe(s)>\` choisir le mode de jeu parmi \`+\`, \`-\`, ou double (\`+-\`)
+\`ping list\` liste toutes les parties en cours
+
+**Cryptage:**
+\`\`\`
+ping (code|decode) <clé (1er ligne)>
+<message (a partir de la 2e ligne)>
+\`\`\`permet de crypter/décripter un message à partir d'une clé de cryptage`
+
+const AIDE_ADMIN=`**Admin:**
+\`ping reload\` recharge le code de pong
+\`ping tp <pseudo> <score>\` set le score du joueur spécifié
+\`ping seths <pseudo> <highscore> <plus|moins|double>\` set le highscore du joueur spécifié dans le mode spécifié`
+
 bot.on('ready', function () {
   console.log(`Logged in as ${bot.user.tag}!`);
 })
@@ -18,7 +39,18 @@ exitHook(() => {
 //================================ fonctions VV
 
 var { newJoueur } = require('./src/joueur')
-var { code, decode, listeJoueursActifs, afficheliste, printMode, pauseQuestion } = require('./src/pong')
+var {
+  code,
+  decode,
+  listeJoueursActifs,
+  afficheliste,
+  printMode,
+  pauseQuestion,
+  matchTp,
+  changeScore,
+  matchHs,
+  changeHs
+} = require('./src/pong');
 
 function printHighscores(allHighscores) {
   var contenu = '';
@@ -111,13 +143,13 @@ Pour commencer une nouvelle partie, tu dois d'abord perdre celle là!`)
 
     else if (partie) {
       if (contenu === 'ping ' + partie.reponse()) {                      // test bonne réponse
-        var highscore = allHighscores[partie.mode][message.author.username] || 0;
-        partie.marqueUnPoint();
-        message.reply('Correct ! Tu as ' + partie.score() + (partie.points > highscore ? ' **Meilleur score!**':''));
-        pauseQuestion(message, partie);
+        var highscore = allHighscores[partie.mode][message.author.username] || 0
+        partie.marqueUnPoint()
+        message.reply('Correct ! Tu as ' + partie.score() + (partie.points > highscore ? ' **Meilleur score!**':''))
+        pauseQuestion(message, partie)
         if (partie.points > highscore) {                                 // maj highscore
-          allHighscores[partie.mode][message.author.username] = partie.points;
-          enregistreHighScore(allHighscores);
+          allHighscores[partie.mode][message.author.username] = partie.points
+          enregistreHighScore(allHighscores)
         }
       }
       else if (contenu.match(/^ping -?\d+$/)) {                          // test mauvaise réponse
@@ -136,6 +168,7 @@ Pour commencer une nouvelle partie, tu dois d'abord perdre celle là!`)
     if (contenu === 'ping list') {
       message.channel.send(afficheliste(joueurs))
     }
+    //ping reload VV
     if (contenu === 'ping reload' && message.author.id == 364820614990528522) {
       if (!listeJoueursActifs(joueurs)[0]) {
         message.channel.send('Reloading!').then(() => {
@@ -157,7 +190,13 @@ Pour commencer une nouvelle partie, tu dois d'abord perdre celle là!`)
 });
 
 bot.on('message', message => {
+
+  if (message.author.bot) {
+    return
+  }
+  
   var contenu = message.content.toLowerCase()
+
   if (contenu == 'ping règles' || contenu == 'ping regles') {            // ping règles
     message.channel.send(`Écris \`ping\` pour commencer une partie.
 Je vais alors te poser une question. Réponds par \`ping <reponse>\`
@@ -167,24 +206,15 @@ La difficulté augmente en fonction du nombre de points.
 Une partie commence avec un mode, et elle garde ce mode jusqu'a la fin.
 Écris "ping help" pour la liste des commandes`)
   }
-  if (contenu === 'ping help') {
-    message.channel.send(`**Liste des commandes**
-  **Jeu:**
-\`ping règles\` donne les règles du jeu
-\`ping ?\` repose la question en cours
-\`ping\` commence une partie (si aucune partie n'est en cours)
-\`ping help\` affiche cette liste
-\`ping highscores\` affiche les meilleurs scores des joueurs
-\`ping mode <signe(s)>\` choisir le mode de jeu parmi \`+\`, \`-\`, ou double (\`+-\`)
-\`ping list\` liste toutes les parties en cours
 
-  **Cryptage:**
-\`\`\`
-ping (code|decode) <clé (1er ligne)>
-<message (a partir de la 2e ligne)>
-\`\`\` permet de crypter/décripter un message à partir d'une clé de cryptage`)
+  if (contenu === 'ping help') {
+    if (message.author.id == 364820614990528522) {
+      message.channel.send(AIDE_UTILISATEUR + '\n\n' + AIDE_ADMIN)
+    } else {
+      message.channel.send(AIDE_UTILISATEUR)
+    }
   }
-  if (contenu === 'ping highscores') {
+  if (contenu === 'ping highscores' || contenu === 'ping hs') {
     message.channel.send(printHighscores(allHighscores));
   }
   // if (contenu === 'test') {
@@ -221,4 +251,35 @@ ping (code|decode) <clé (1er ligne)>
 <message (a partir de la 2e ligne)>
 \`\`\``)
   }
+});
+
+bot.on('message', message => {
+
+  if (message.author.bot) {
+    return
+  }
+
+  var contenu = message.content
+
+  if (matchTp(contenu) && message.author.id == 364820614990528522) {
+    var msg = matchTp(contenu)
+    if (changeScore(msg[1],msg[2],joueurs)) {
+      message.channel.send(`Le score de ${msg[1]} est maintenant ${msg[2]}`)
+    } else {
+      message.channel.send(`Le joueur ${msg[1]} n'existe pas ou n'a pas de partie en cours.`)
+    }
+  }
+  
+  if (matchHs(contenu) && message.author.id == 364820614990528522) {
+    var msg = matchHs(contenu)
+    if (changeHs(msg[1], msg[2], msg[3], allHighscores)) {
+      message.channel.send(`Le highscore de ${msg[1]} en ${printMode('mode_'+msg[3])} est maintenant ${msg[2]}`)
+    } else {
+      message.channel.send(`Le joueur ${msg[1]} n'existe pas ou n'a pas de highscore dans le mode spécifié`)
+    }
+    enregistreHighScore(allHighscores)
+    //allHighscores[partie.mode][message.author.username] = partie.points
+    //enregistreHighScore(allHighscores)
+  }
+  //if (contenu.match(/.*?(?=< >|$)/i))
 });

@@ -36,6 +36,4 @@ function newPartie(mode) {
     return new Partie(mode)
   }
 
-module.exports = { 
-    newPartie
-  }
+module.exports = { newPartie }

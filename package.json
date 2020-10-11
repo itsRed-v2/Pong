@@ -13,7 +13,8 @@
     "mocha": "^8.1.3"
   },
   "scripts": {
-    "start": "pm2 restart --name pong index.js",
+    "start": "pm2 start --name pong index.js",
+    "restart": "pm2 restart --name pong index.js",
     "pm2": "pm2",
     "stop": "pm2 stop pong",
     "logs": "pm2 logs pong",
