@@ -1,11 +1,11 @@
-const fs = require('fs');
+const fs = require('fs')
 const Discord = require('discord.js')
-const exitHook = require('exit-hook');
+const exitHook = require('exit-hook')
 const bot = new Discord.Client()
-const allHighscores = require('./highscores.js');
-console.log(allHighscores);
+const allHighscores = require('./highscores.js')
+console.log(allHighscores)
 
-const AIDE_UTILISATEUR=`**Liste des commandes**
+const AIDE_UTILISATEUR = `**Liste des commandes**
 **Jeu:**
 \`ping règles\` donne les règles du jeu
 \`ping ?\` repose la question en cours
@@ -21,20 +21,21 @@ ping (code|decode) <clé (1er ligne)>
 <message (a partir de la 2e ligne)>
 \`\`\`permet de crypter/décripter un message à partir d'une clé de cryptage`
 
-const AIDE_ADMIN=`**Admin:**
+const AIDE_ADMIN = `**Admin:**
 \`ping reload\` recharge le code de pong
 \`ping tp <pseudo> <score>\` set le score du joueur spécifié
-\`ping seths <pseudo> <highscore> <plus|moins|double>\` set le highscore du joueur spécifié dans le mode spécifié`
+\`ping seths <id> <highscore> <plus|moins|double>\` set le highscore du joueur spécifié dans le mode spécifié
+\`ping highscore info\` / \`ping hs info\` affiche les meilleurs scores et l'id des joueurs`
 
 bot.on('ready', function () {
-  console.log(`Logged in as ${bot.user.tag}!`);
+  console.log(`Logged in as ${bot.user.tag}!`)
 })
 
 bot.login(require('./token.js'))
 
 exitHook(() => {
-  bot.destroy();
-});
+  bot.destroy()
+})
 
 //================================ fonctions VV
 
@@ -50,60 +51,65 @@ var {
   changeScore,
   matchHs,
   changeHs
-} = require('./src/pong');
+} = require('./src/pong')
 
-function printHighscores(allHighscores) {
-  var contenu = '';
+function printHighscores(allHighscores,afficheId) {
+  var contenu = ''
   for (var mode in allHighscores) {
-    contenu += '**' + printMode(mode) + '**\n';
-    var highscoresTriees = trieHighscores(allHighscores[mode]);
+    contenu += '**' + printMode(mode) + '**\n'
+    var highscoresTriees = trieHighscores(allHighscores[mode])
     for (var index in highscoresTriees) {
-      var highscore = highscoresTriees[index];
-      var position = parseInt(index) + 1;
-      contenu += '`' + position + ") " +  highscore[1]  + " : " + highscore[0] + '`' +"\n";
+      var highscore = highscoresTriees[index]
+      if (bot.users.cache.get(highscore[0])) {
+        highscore[2] = bot.users.cache.get(highscore[0]).username
+      } else {
+        highscore[2] = 'PLAYER_NOT_FOUND'
+      }
+      var position = parseInt(index) + 1
+      contenu += `\`${position}) ${highscore[1]} : ${highscore[2]}\`${afficheId ? `  \`${highscore[0]}\``:''}\n`
     }
   }
-  return contenu;
+  return contenu
 }
 
 function contenuHighscores(highscores) {
-  var contenu = '';
-  var highscoresTriees = trieHighscores(highscores);
+  var contenu = ''
+  var highscoresTriees = trieHighscores(highscores)
   for (var position in highscoresTriees) {
-    var highscore = highscoresTriees[position];
-    contenu += "'" + highscore[0] + "' : " + highscore[1] +",\n";
+    var highscore = highscoresTriees[position]
+    contenu += "'" + highscore[0] + "' : " + highscore[1] +",\n"
   }
-  return contenu;
+  return contenu
 }
 
 function enregistreHighScore(allHighscores) {
-  var contenu = "module.exports = {\n";
+  var contenu = "module.exports = {\n"
   for (var mode in allHighscores) {
     contenu += mode + ': {\n'
-    contenu += contenuHighscores(allHighscores[mode]);
-    contenu += "},\n";
+    contenu += contenuHighscores(allHighscores[mode])
+    contenu += "},\n"
   }
-  contenu += "};";
+  contenu += "};"
 
   fs.writeFile("./highscores.js", contenu, function (err) {
-    if (err) return console.log(err);
+    if (err) return console.log(err)
   });
 }
 
 function trieHighscores(highscores) {
-  var sortable = [];
-  for (var username in highscores) {
-    sortable.push([username, highscores[username]]);
+  var sortable = []
+  for (var id in highscores) {
+    sortable.push([id, highscores[id]])
   }
   sortable.sort(function(a, b) {
-    return b[1] - a[1];
+    return b[1] - a[1]
   });
-  return sortable;
+  return sortable
 }
 
 //================================
 
-var joueurs = {};
+var joueurs = {}
 
 bot.on('message', message => {
 
@@ -112,50 +118,49 @@ bot.on('message', message => {
   }
 
   var contenu = message.content.toLowerCase()
-  var joueur = joueurs[message.author.username];
+  var joueur = joueurs[message.author.id]
   if (joueur == undefined) {
-    joueur = newJoueur();
-    joueurs[message.author.username] = joueur;
+    joueur = newJoueur()
+    joueurs[message.author.id] = joueur
   }
-  var partie = joueur.partie;
+  var partie = joueur.partie
   
   if(contenu.includes('ping')) {
 
     if (contenu.match(/^ping mode/)) {                                   // ping mode
-      var plus = true;
-      var moins = false;
-      plus = contenu.includes('+');
-      moins = contenu.includes('-');
+      var plus = true
+      var moins = false
+      plus = contenu.includes('+')
+      moins = contenu.includes('-')
       joueur.mode = (plus && moins ? 'mode_double':(moins ? 'mode_moins':'mode_plus'))
-      message.reply(printMode(joueur.mode));
+      message.reply(printMode(joueur.mode))
     }
 
     if (contenu === 'ping') {                                            // ping
       if (partie) {                                                      // ping déja une partie
-        message.reply('Une partie en ' + printMode(partie.mode) + ' est déjà en cours, tu as ' + partie.score() + ` et la question est: ` + partie.question() + `
-Pour commencer une nouvelle partie, tu dois d'abord perdre celle là!`)
+        message.reply('Une partie en ' + printMode(partie.mode) + ' est déjà en cours, tu as ' + partie.score() + ` et la question est: ` + partie.question() + `\nPour commencer une nouvelle partie, tu dois d'abord perdre celle là!`)
       }
       else {
-        partie = joueur.demarrerPartie(message);
+        partie = joueur.demarrerPartie(message)
         bot.channels.cache.get('763372739238559774').send(':white_check_mark:  **' + message.author.username + '** a commencé une partie en **' + printMode(partie.mode) + '**')
       }
     }
 
     else if (partie) {
       if (contenu === 'ping ' + partie.reponse()) {                      // test bonne réponse
-        var highscore = allHighscores[partie.mode][message.author.username] || 0
+        var highscore = allHighscores[partie.mode][message.author.id] || 0
         partie.marqueUnPoint()
         message.reply('Correct ! Tu as ' + partie.score() + (partie.points > highscore ? ' **Meilleur score!**':''))
         pauseQuestion(message, partie)
         if (partie.points > highscore) {                                 // maj highscore
-          allHighscores[partie.mode][message.author.username] = partie.points
+          allHighscores[partie.mode][message.author.id] = partie.points
           enregistreHighScore(allHighscores)
         }
       }
       else if (contenu.match(/^ping -?\d+$/)) {                          // test mauvaise réponse
-        message.reply("Faux ! Ton score final est de " + partie.score() + (partie.points > highscore ? ", c'est ton **meilleur score!**":''));
+        message.reply("Faux ! Ton score final est de " + partie.score() + (partie.points > highscore ? ", c'est ton **meilleur score!**":''))
         bot.channels.cache.get('763372739238559774').send(':x:  **' + message.author.username + '** a perdu une partie à **' + partie.score() + '** (' + printMode(partie.mode) + ')')
-        joueur.partie = undefined;
+        joueur.partie = undefined
       }
       else if (contenu === 'ping ?') {                                   // ping ?
         message.reply('pong ' + partie.question() + ' ! (' + printMode(partie.mode) + ')')
@@ -166,16 +171,16 @@ Pour commencer une nouvelle partie, tu dois d'abord perdre celle là!`)
       message.reply('Aucune partie en cours. Tape "ping" pour lancer une partie')
     }
     if (contenu === 'ping list') {
-      message.channel.send(afficheliste(joueurs))
+      message.channel.send(afficheliste(joueurs,bot))
     }
     //ping reload VV
     if (contenu === 'ping reload' && message.author.id == 364820614990528522) {
-      if (!listeJoueursActifs(joueurs)[0]) {
+      if (!listeJoueursActifs(joueurs,bot)[0]) {
         message.channel.send('Reloading!').then(() => {
           process.exit()
         })
       } else {
-        var msg = afficheliste(joueurs)
+        var msg = afficheliste(joueurs,bot)
         msg.push('Vous pouvez forcer le reload avec `ping reload force`')
         message.channel.send(msg)
         console.log(message.id)
@@ -215,12 +220,14 @@ Une partie commence avec un mode, et elle garde ce mode jusqu'a la fin.
     }
   }
   if (contenu === 'ping highscores' || contenu === 'ping hs') {
-    message.channel.send(printHighscores(allHighscores));
+    message.channel.send(printHighscores(allHighscores,false))
   }
-  // if (contenu === 'test') {
-  //   //let membreItsRedV2 = Array.from(message.guild.members.cache.values()).find(member => member.user.username == 'itsRed_v2');
-  //   //console.log(membreItsRedV2);
-  // }
+  if ((contenu === 'ping highscores info' || contenu === 'ping hs info') && message.author.id == 364820614990528522) {
+    message.channel.send(printHighscores(allHighscores,true))
+  }
+  if (contenu === 'test') {
+    console.log(joueurs)
+  }
 });
 
 bot.on('message', message => {
@@ -273,13 +280,10 @@ bot.on('message', message => {
   if (matchHs(contenu) && message.author.id == 364820614990528522) {
     var msg = matchHs(contenu)
     if (changeHs(msg[1], msg[2], msg[3], allHighscores)) {
-      message.channel.send(`Le highscore de ${msg[1]} en ${printMode('mode_'+msg[3])} est maintenant ${msg[2]}`)
+      message.channel.send(`Le highscore du joueur d'id \`${msg[1]}\` en ${printMode('mode_'+msg[3])} est maintenant ${msg[2]}`)
     } else {
-      message.channel.send(`Le joueur ${msg[1]} n'existe pas ou n'a pas de highscore dans le mode spécifié`)
+      message.channel.send(`L'id \`${msg[1]}\` ne correspond à aucun joueur dans le mode spécifié`)
     }
     enregistreHighScore(allHighscores)
-    //allHighscores[partie.mode][message.author.username] = partie.points
-    //enregistreHighScore(allHighscores)
   }
-  //if (contenu.match(/.*?(?=< >|$)/i))
 });

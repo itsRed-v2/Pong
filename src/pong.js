@@ -1,5 +1,3 @@
-const joueur = require("./joueur")
-
 function code(message, cle) {
     var messageCode = []
     for (var index = 0, icle = 0; index < message.length; index++, icle++) {
@@ -24,8 +22,8 @@ function decode(messagecode,cle) {
     return messageDecode
 }
 
-function afficheliste(joueurs) {
-    var liste = listeJoueursActifs(joueurs)
+function afficheliste(joueurs,bot) {
+    var liste = listeJoueursActifs(joueurs,bot)
     if (liste.length > 1) {
         liste.unshift(`${liste.length} parties sont en cours:`)
     } else if (liste.length == 1) {
@@ -36,11 +34,12 @@ function afficheliste(joueurs) {
     return liste
 }
 
-function listeJoueursActifs(joueurs) {
+function listeJoueursActifs(joueurs,bot) {
     var liste = []
-    Object.keys(joueurs).forEach(nom => {
-        if (joueurs[nom].partie) {
-            liste.push(`\`${nom}\` - ${joueurs[nom].partie.score()}, ${printMode(joueurs[nom].partie.mode)}`)
+    Object.keys(joueurs).forEach(id => {
+        if (joueurs[id].partie) {
+            var nom = bot.users.cache.get(id).username
+            liste.push(`\`${nom}\` - ${joueurs[id].partie.score()}, ${printMode(joueurs[id].partie.mode)}`)
         }
     });
     return liste
@@ -78,10 +77,10 @@ function matchHs(commande) {
     return commande.match(/^ping seths (.+) (\d*) (plus|moins|double)$/i)
 }
 
-function changeHs(nom, score, mode, allHighscores) {
+function changeHs(id, score, mode, allHighscores) {
     const clemode = 'mode_'+mode
-    if (allHighscores[clemode][nom]) {
-        allHighscores[clemode][nom] = score
+    if (allHighscores[clemode][id]) {
+        allHighscores[clemode][id] = score
         return true
     } else {
         return false
