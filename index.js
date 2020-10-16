@@ -25,6 +25,8 @@ const AIDE_ADMIN = `**Admin:**
 \`ping reload\` recharge le code de pong
 \`ping tp <pseudo> <score>\` set le score du joueur spécifié
 \`ping seths <id> <highscore> <plus|moins|double>\` set le highscore du joueur spécifié dans le mode spécifié
+\`ping addhs <id> <highscore> <plus|moins|double>\` ajoute le joueur à la liste dans le mode spécifié avec le score spécifié
+\`ping rmhs <id> <plus|moins|double>\` supprime le joueur de la liste dans le mode spécifié
 \`ping highscore info\` / \`ping hs info\` affiche les meilleurs scores et l'id des joueurs`
 
 bot.on('ready', function () {
@@ -50,7 +52,10 @@ var {
   matchTp,
   changeScore,
   matchHs,
-  changeHs
+  matchRmHs,
+  changeHs,
+  ajouteHs,
+  removeHs
 } = require('./src/pong')
 
 function printHighscores(allHighscores,afficheId) {
@@ -260,30 +265,66 @@ ping (code|decode) <clé (1er ligne)>
   }
 });
 
-bot.on('message', message => {
-
+bot.on('message', commandesAdmin);
+function commandesAdmin (message) {
+  
   if (message.author.bot) {
+    return
+  }
+  if (message.author.id != 364820614990528522) {
     return
   }
 
   var contenu = message.content
 
-  if (matchTp(contenu) && message.author.id == 364820614990528522) {
+  if (matchTp(contenu)) {
     var msg = matchTp(contenu)
     if (changeScore(msg[1],msg[2],joueurs)) {
-      message.channel.send(`Le score de ${msg[1]} est maintenant ${msg[2]}`)
+      var pseudo = bot.users.cache.get(msg[1]).username
+      message.channel.send(`Le score du joueur \`${pseudo}\` (\`${msg[1]}\`) est maintenant ${msg[2]}`)
     } else {
-      message.channel.send(`Le joueur ${msg[1]} n'existe pas ou n'a pas de partie en cours.`)
+      message.channel.send(`Le joueur d'id \`${msg[1]}\` n'existe pas ou n'a pas de partie en cours.`)
     }
   }
-  
-  if (matchHs(contenu) && message.author.id == 364820614990528522) {
+  // modération highscores
+  if (matchHs(contenu)) {
     var msg = matchHs(contenu)
-    if (changeHs(msg[1], msg[2], msg[3], allHighscores)) {
-      message.channel.send(`Le highscore du joueur d'id \`${msg[1]}\` en ${printMode('mode_'+msg[3])} est maintenant ${msg[2]}`)
+    if (bot.users.cache.get(msg[2])) {
+      var pseudo = bot.users.cache.get(msg[2]).username
+    }
+    if (msg[1] == 'seths') {
+      // ping seths
+      if (changeHs(msg[2], msg[3], msg[4], allHighscores)) {
+        message.channel.send(`Le highscore du joueur \`${pseudo}\` (\`${msg[2]}\`) en ${printMode('mode_'+msg[4])} est maintenant ${msg[3]}`)
+      } else {
+        message.channel.send(`L'id \`${msg[2]}\` ne correspond à aucun joueur dans le mode spécifié`)
+      }
     } else {
-      message.channel.send(`L'id \`${msg[1]}\` ne correspond à aucun joueur dans le mode spécifié`)
+      // ping addhs
+      if (bot.users.cache.get(msg[2])) {
+        if (ajouteHs(msg[2], msg[3], msg[4], allHighscores)) {
+          message.channel.send(`Le highscore du joueur \`${pseudo}\` (\`${msg[2]}\`) en ${printMode('mode_'+msg[4])} est maintenant ${msg[3]}`)
+        } else {
+          message.channel.send(`Un joueur d'id \`${msg[2]}\` (\`${pseudo}\`) est déja présent dans la liste`)
+        }
+      } else {
+        message.channel.send(`Personne n'a été trouvé avec l'id \`${msg[2]}\``)
+      }
     }
     enregistreHighScore(allHighscores)
   }
-});
+  if (matchRmHs(contenu)) {
+    var msg = matchRmHs(contenu)
+    if (bot.users.cache.get(msg[1])) {
+      var pseudo = bot.users.cache.get(msg[1]).username
+      if (removeHs(msg[1], msg[2], allHighscores)) {
+        message.channel.send(`Le highscore du joueur \`${pseudo}\` (\`${msg[1]}\`) en ${printMode('mode_'+msg[2])} a été supprimé`)
+      } else {
+        message.channel.send(`Le joueur \`${pseudo}\` (\`${msg[1]}\`) n'est présent dans la liste du ${printMode('mode_'+msg[2])}`)
+      }
+      enregistreHighScore(allHighscores)
+    } else {
+      message.channel.send(`Personne n'a été trouvé avec l'id \`${msg[1]}\``)
+    }
+  }
+};

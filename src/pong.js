@@ -64,9 +64,9 @@ function matchTp(commande) {
     return commande.match(/^ping tp (.+) (\d*)$/i)
 }
 
-function changeScore(nom, score, joueurs) {
-    if (joueurs[nom] && joueurs[nom].partie) {
-        joueurs[nom].partie.points = score
+function changeScore(id, score, joueurs) {
+    if (joueurs[id] && joueurs[id].partie) {
+        joueurs[id].partie.points = score
         return true
     } else {
         return false
@@ -74,7 +74,11 @@ function changeScore(nom, score, joueurs) {
 }
 
 function matchHs(commande) {
-    return commande.match(/^ping seths (.+) (\d*) (plus|moins|double)$/i)
+    return commande.match(/^ping (seths|addhs) (.+) (\d*) (plus|moins|double)$/i)
+}
+
+function matchRmHs(commande) {
+    return commande.match(/^ping rmhs (.+) (plus|moins|double)$/i)
 }
 
 function changeHs(id, score, mode, allHighscores) {
@@ -85,8 +89,26 @@ function changeHs(id, score, mode, allHighscores) {
     } else {
         return false
     }
-    //allHighscores[partie.mode][message.author.username] = partie.points
-    //enregistreHighScore(allHighscores)
+}
+
+function ajouteHs(id, score, mode, allHighscores) {
+    const clemode = 'mode_'+mode
+    if (!allHighscores[clemode][id]) {
+        allHighscores[clemode][id] = score
+        return true
+    } else {
+        return false
+    }
+}
+
+function removeHs(id, mode, allHighscores) {
+    const clemode = 'mode_'+mode
+    if (allHighscores[clemode][id]) {
+        delete allHighscores[clemode][id]
+        return true
+    } else {
+        return false
+    }
 }
 
 module.exports = {
@@ -99,5 +121,8 @@ module.exports = {
     matchTp,
     changeScore,
     matchHs,
-    changeHs
+    matchRmHs,
+    changeHs,
+    ajouteHs,
+    removeHs
 }

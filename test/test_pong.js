@@ -8,7 +8,10 @@ var {
   matchTp,
   changeScore,
   matchHs,
-  changeHs
+  matchRmHs,
+  changeHs,
+  ajouteHs,
+  removeHs
 } = require('../src/pong')
 
 describe('Pong', function () {
@@ -103,13 +106,25 @@ describe('Pong', function () {
 
   describe('#matchHs()', function () {
     it("extraire informations", function () {
-      expect(matchHs('ping seths Nokari 56 plus')).to.eql(['ping seths Nokari 56 plus','Nokari','56','plus']);
+      expect(matchHs('ping seths Nokari 56 plus')).to.eql(['ping seths Nokari 56 plus','seths','Nokari','56','plus']);
     });
     it("renvoie null si matche pas", function () {
       expect(matchHs('ping seths Nokari d56 plus')).to.eql(null);
     });
     it("fonctionne avec des maj", function () {
       expect(matchHs('PinG seths Nokari 56 plUs')).not.to.eql(null);
+    });
+  });
+
+  describe('#matchRmHs()', function () {
+    it("extraire informations", function () {
+      expect(matchRmHs('ping rmhs Nokari plus')).to.eql(['ping rmhs Nokari plus','Nokari','plus']);
+    });
+    it("renvoie null si matche pas", function () {
+      expect(matchRmHs('ping rmhs Nokari eplus')).to.eql(null);
+    });
+    it("fonctionne avec des maj", function () {
+      expect(matchRmHs('PinG rMHs Nokari plUs')).not.to.eql(null);
     });
   });
 
@@ -143,6 +158,52 @@ describe('Pong', function () {
         mode_double: {},
       }
       expect(changeHs('itsRed_v2',20,'moins',allHighscores)).to.eql(false);
+    });
+  });
+
+  describe('#ajouteHs()', function () {
+    it("ajoute un joueur à la liste si il n'y est pas", function () {
+      allHighscores = {
+        mode_plus: {
+        '364820614990528522' : 10,
+        },
+        mode_moins: {},
+        mode_double: {},
+      }
+      expect(ajouteHs('384139959059087362',20,'plus',allHighscores)).to.eql(true);
+    });
+    it("message erreur si le joueur est déja dans la liste", function () {
+      allHighscores = {
+        mode_plus: {
+        '364820614990528522' : 10,
+        },
+        mode_moins: {},
+        mode_double: {},
+      }
+      expect(ajouteHs('364820614990528522',20,'plus',allHighscores)).to.eql(false);
+    });
+  });
+
+  describe('#removeHs()', function () {
+    it("supprime un joueur de la liste si il y est", function () {
+      allHighscores = {
+        mode_plus: {
+        '364820614990528522' : 10,
+        },
+        mode_moins: {},
+        mode_double: {},
+      }
+      expect(removeHs('364820614990528522','plus',allHighscores)).to.eql(true);
+    });
+    it("message erreur si le joueur n'est pas dans la liste", function () {
+      allHighscores = {
+        mode_plus: {
+        '364820614990528522' : 10,
+        },
+        mode_moins: {},
+        mode_double: {},
+      }
+      expect(removeHs('384139959059087362','plus',allHighscores)).to.eql(false);
     });
   });
 
