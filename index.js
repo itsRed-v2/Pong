@@ -130,73 +130,88 @@ bot.on('message', message => {
   }
   var partie = joueur.partie
   
-  if(contenu.includes('ping')) {
+  if (!contenu.startsWith('ping')) {
+    return
+  }
 
-    if (contenu.match(/^ping mode/)) {                                   // ping mode
-      var plus = true
-      var moins = false
-      plus = contenu.includes('+')
-      moins = contenu.includes('-')
-      joueur.mode = (plus && moins ? 'mode_double':(moins ? 'mode_moins':'mode_plus'))
-      message.reply(printMode(joueur.mode))
+  //contenu = contenu sans ping  devant
+
+  if (contenu.match(/^ping mode/)) {                                   // ping mode
+    var plus = true
+    var moins = false
+    plus = contenu.includes('+')
+    moins = contenu.includes('-')
+    joueur.mode = (plus && moins ? 'mode_double' : (moins ? 'mode_moins' : 'mode_plus'))
+    message.reply(printMode(joueur.mode))
+  }
+
+  if (contenu === 'ping') {                                            // ping
+    if (partie) {                                                      // ping déja une partie
+      message.reply('Une partie en ' + printMode(partie.mode) + ' est déjà en cours, tu as ' + partie.score() + ` et la question est: ` + partie.question() + `\nPour commencer une nouvelle partie, tu dois d'abord perdre celle là!`)
     }
-
-    if (contenu === 'ping') {                                            // ping
-      if (partie) {                                                      // ping déja une partie
-        message.reply('Une partie en ' + printMode(partie.mode) + ' est déjà en cours, tu as ' + partie.score() + ` et la question est: ` + partie.question() + `\nPour commencer une nouvelle partie, tu dois d'abord perdre celle là!`)
-      }
-      else {
-        partie = joueur.demarrerPartie(message)
-        bot.channels.cache.get('763372739238559774').send(':white_check_mark:  **' + message.author.username + '** a commencé une partie en **' + printMode(partie.mode) + '**')
-      }
+    else {
+      partie = joueur.demarrerPartie(message)
+      bot.channels.cache.get('763372739238559774').send(':white_check_mark:  **' + message.author.username + '** a commencé une partie en **' + printMode(partie.mode) + '**')
     }
+  }
 
-    else if (partie) {
-      if (contenu === 'ping ' + partie.reponse()) {                      // test bonne réponse
-        var highscore = allHighscores[partie.mode][message.author.id] || 0
-        partie.marqueUnPoint()
-        message.reply('Correct ! Tu as ' + partie.score() + (partie.points > highscore ? ' **Meilleur score!**':''))
-        pauseQuestion(message, partie)
-        if (partie.points > highscore) {                                 // maj highscore
-          allHighscores[partie.mode][message.author.id] = partie.points
-          enregistreHighScore(allHighscores)
-        }
-      }
-      else if (contenu.match(/^ping -?\d+$/)) {                          // test mauvaise réponse
-        message.reply("Faux ! Ton score final est de " + partie.score() + (partie.points > highscore ? ", c'est ton **meilleur score!**":''))
-        bot.channels.cache.get('763372739238559774').send(':x:  **' + message.author.username + '** a perdu une partie à **' + partie.score() + '** (' + printMode(partie.mode) + ')')
-        joueur.partie = undefined
-      }
-      else if (contenu === 'ping ?') {                                   // ping ?
-        message.reply('pong ' + partie.question() + ' ! (' + printMode(partie.mode) + ')')
+  else if (partie) {
+    if (contenu === 'ping ' + partie.reponse()) {                      // test bonne réponse
+      var highscore = allHighscores[partie.mode][message.author.id] || 0
+      partie.marqueUnPoint()
+      message.reply('Correct ! Tu as ' + partie.score() + (partie.points > highscore ? ' **Meilleur score!**' : ''))
+      pauseQuestion(message, partie)
+      if (partie.points > highscore) {                                 // maj highscore
+        allHighscores[partie.mode][message.author.id] = partie.points
+        enregistreHighScore(allHighscores)
       }
     }
 
-    else if (contenu.match(/^ping \d+$/) || contenu === 'ping ?') {      // réponse ou  "ping ?" mais aucune partie en cours
-      message.reply('Aucune partie en cours. Tape "ping" pour lancer une partie')
+    else if (contenu.match(/^ping -?\d+$/)) {                          // test mauvaise réponse
+      message.reply("Faux ! Ton score final est de " + partie.score() + (partie.points > highscore ? ", c'est ton **meilleur score!**" : ''))
+      bot.channels.cache.get('763372739238559774').send(':x:  **' + message.author.username + '** a perdu une partie à **' + partie.score() + '** (' + printMode(partie.mode) + ')')
+      joueur.partie = undefined
     }
-    if (contenu === 'ping list') {
-      message.channel.send(afficheliste(joueurs,bot))
+
+    else if (contenu === 'ping ?') {                                   // ping ?
+      message.reply('pong ' + partie.question() + ' ! (' + printMode(partie.mode) + ')')
     }
-    //ping reload VV
-    if (contenu === 'ping reload' && message.author.id == 364820614990528522) {
-      if (!listeJoueursActifs(joueurs,bot)[0]) {
-        message.channel.send('Reloading!').then(() => {
-          process.exit()
-        })
-      } else {
-        var msg = afficheliste(joueurs,bot)
-        msg.push('Vous pouvez forcer le reload avec `ping reload force`')
-        message.channel.send(msg)
-        console.log(message.id)
-      }
-    }
-    if (contenu === 'ping reload force' && message.author.id == 364820614990528522) {
+  }
+   
+  else if (contenu.match(/^ping \d+$/) || contenu === 'ping ?') {      // réponse ou  "ping ?" mais aucune partie en cours
+    message.reply('Aucune partie en cours. Tape "ping" pour lancer une partie')
+  }
+
+  
+  // function getNom
+  function getNom(id) {
+    return bot.users.cache.get(id).username
+  }
+
+  // ping list
+  if (contenu === 'ping list') {
+    message.channel.send(afficheliste(listeJoueursActifs(joueurs, getNom)))
+  }
+
+  //ping reload VV
+  if (contenu === 'ping reload' && message.author.id == 364820614990528522) {
+    if (!listeJoueursActifs(joueurs, getNom)[0]) {
       message.channel.send('Reloading!').then(() => {
         process.exit()
       })
+    } else {
+      var msg = afficheliste(listeJoueursActifs(joueurs, getNom))
+      msg.push('Vous pouvez forcer le reload avec `ping reload force`')
+      message.channel.send(msg)
+      console.log(message.id)
     }
   }
+  if (contenu === 'ping reload force' && message.author.id == 364820614990528522) {
+    message.channel.send('Reloading!').then(() => {
+      process.exit()
+    })
+  }
+
 });
 
 bot.on('message', message => {
@@ -204,7 +219,7 @@ bot.on('message', message => {
   if (message.author.bot) {
     return
   }
-  
+
   var contenu = message.content.toLowerCase()
 
   if (contenu == 'ping règles' || contenu == 'ping regles') {            // ping règles

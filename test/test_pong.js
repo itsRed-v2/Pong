@@ -11,7 +11,8 @@ var {
   matchRmHs,
   changeHs,
   ajouteHs,
-  removeHs
+  removeHs,
+  listeJoueursActifs
 } = require('../src/pong')
 
 describe('Pong', function () {
@@ -38,33 +39,65 @@ describe('Pong', function () {
   });
 
   describe('#afficheliste()', function () {
-    it("affiche la liste des joueurs qui ont une partie en cours", function () {
-      var joueurAvecPartie = newJoueur();
-      joueurAvecPartie.partie = newPartie('mode_plus');
-      var joueurs = {
-        'joueurSansPartie': newJoueur(),
-        'joueurAvecPartie': joueurAvecPartie,
-      };
-      expect(afficheliste(joueurs)).to.eql([
+    it("affiche une liste de 1 joueur", function () {
+      var liste = ['`joueurAvecPartie` - 0 point, Mode Addition'];
+      expect(afficheliste(liste)).to.eql([
         '1 partie est en cours:', 
         '`joueurAvecPartie` - 0 point, Mode Addition'
       ]);
     });
     
     it("affiche si aucune partie en cours", function () {
-      var joueurs = {}
-      expect(afficheliste(joueurs)).to.eql(["Aucune partie n'est en cours"]);
+      expect(afficheliste([])).to.eql(["Aucune partie n'est en cours"]);
     });
 
-    it("affiche la liste des joueurs qui ont une partie en cours", function () {
+    it("affiche plusieurs parties en cours", function () {
+      var liste = [
+        '`joueurAvecPartie2` - 0 point, Mode Addition',
+        '`joueurAvecPartie` - 0 point, Mode Addition'
+      ];
+      expect(afficheliste(liste)).to.eql([
+        '2 parties sont en cours:', 
+        '`joueurAvecPartie2` - 0 point, Mode Addition',
+        '`joueurAvecPartie` - 0 point, Mode Addition'
+      ]);
+    });
+  });
+
+  describe('#listeJoueursActifs()', function () {
+    it("liste les joueurs qui ont une partie en cours", function () {
       var joueurAvecPartie = newJoueur();
       joueurAvecPartie.partie = newPartie('mode_plus');
       var joueurs = {
-        'joueurAvecPartie2': joueurAvecPartie,
-        'joueurAvecPartie': joueurAvecPartie,
+        'id1': newJoueur(),
+        'id2': joueurAvecPartie,
       };
-      expect(afficheliste(joueurs)).to.eql([
-        '2 parties sont en cours:', 
+      expect(listeJoueursActifs(joueurs, (id)=> {
+        expect(id).to.eql('id2')
+        return 'joueurAvecPartie'
+      })).to.eql([
+        '`joueurAvecPartie` - 0 point, Mode Addition'
+      ]);
+    });
+    
+    it("affiche si aucune partie en cours", function () {
+      expect(listeJoueursActifs({})).to.eql([]);
+    });
+
+    it("affiche la liste de plusieurs joueurs qui ont une partie en cours", function () {
+      var joueurAvecPartie = newJoueur();
+      joueurAvecPartie.partie = newPartie('mode_plus');
+      var joueurs = {
+        'id1': joueurAvecPartie,
+        'id2': joueurAvecPartie
+      };
+      const noms = {
+        'id1': 'joueurAvecPartie2',
+        'id2': 'joueurAvecPartie'
+      }
+      expect(listeJoueursActifs(joueurs, (id)=> {
+        return noms[id]
+      })).to.eql([
         '`joueurAvecPartie2` - 0 point, Mode Addition',
         '`joueurAvecPartie` - 0 point, Mode Addition'
       ]);

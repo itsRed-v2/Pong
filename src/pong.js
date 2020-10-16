@@ -22,8 +22,7 @@ function decode(messagecode,cle) {
     return messageDecode
 }
 
-function afficheliste(joueurs,bot) {
-    var liste = listeJoueursActifs(joueurs,bot)
+function afficheliste(liste) {
     if (liste.length > 1) {
         liste.unshift(`${liste.length} parties sont en cours:`)
     } else if (liste.length == 1) {
@@ -34,11 +33,11 @@ function afficheliste(joueurs,bot) {
     return liste
 }
 
-function listeJoueursActifs(joueurs,bot) {
+function listeJoueursActifs(joueurs,getNom) {
     var liste = []
     Object.keys(joueurs).forEach(id => {
         if (joueurs[id].partie) {
-            var nom = bot.users.cache.get(id).username
+            var nom = getNom(id)
             liste.push(`\`${nom}\` - ${joueurs[id].partie.score()}, ${printMode(joueurs[id].partie.mode)}`)
         }
     });
