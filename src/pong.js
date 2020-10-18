@@ -33,11 +33,11 @@ function afficheliste(liste) {
     return liste
 }
 
-function listeJoueursActifs(joueurs,getNom) {
+function listeJoueursActifs(joueurs,getUsername) {
     var liste = []
     Object.keys(joueurs).forEach(id => {
         if (joueurs[id].partie) {
-            var nom = getNom(id)
+            var nom = getUsername(id)
             liste.push(`\`${nom}\` - ${joueurs[id].partie.score()}, ${printMode(joueurs[id].partie.mode)}`)
         }
     });
@@ -59,8 +59,8 @@ function pauseQuestion (message, partie) {
     message.reply('pong ' + partie.question() + ' !'); 
 }
 
-function matchTp(commande) {
-    return commande.match(/^ping tp (.+) (\d*)$/i)
+function matchTp(arguments) {
+    return arguments.match(/^tp (.+) (\d*)$/i)
 }
 
 function changeScore(id, score, joueurs) {
@@ -72,12 +72,12 @@ function changeScore(id, score, joueurs) {
     }
 }
 
-function matchHs(commande) {
-    return commande.match(/^ping (seths|addhs) (.+) (\d*) (plus|moins|double)$/i)
+function matchHs(arguments) {
+    return arguments.match(/^(seths|addhs) (.+) (\d*) (plus|moins|double)$/i)
 }
 
-function matchRmHs(commande) {
-    return commande.match(/^ping rmhs (.+) (plus|moins|double)$/i)
+function matchRmHs(arguments) {
+    return arguments.match(/^rmhs (.+) (plus|moins|double)$/i)
 }
 
 function changeHs(id, score, mode, allHighscores) {
@@ -110,6 +110,19 @@ function removeHs(id, mode, allHighscores) {
     }
 }
 
+function matchPing(contenu) {
+    lignes = contenu.split('\n')
+    match = lignes[0].match(/^(ping|p)( (.+))?/i)
+    if (!match) return null
+    if (match[3]) {
+        lignes.shift()
+        lignes.unshift(match[3])
+        return lignes.join('\n')
+    }
+    return ''
+    // pas de else car return termine la fonction
+}
+
 module.exports = {
     code,
     decode,
@@ -123,5 +136,6 @@ module.exports = {
     matchRmHs,
     changeHs,
     ajouteHs,
-    removeHs
+    removeHs,
+    matchPing
 }

@@ -12,7 +12,8 @@ var {
   changeHs,
   ajouteHs,
   removeHs,
-  listeJoueursActifs
+  listeJoueursActifs,
+  matchPing
 } = require('../src/pong')
 
 describe('Pong', function () {
@@ -106,13 +107,13 @@ describe('Pong', function () {
 
   describe('#matchTp()', function () {
     it("extraire informations", function () {
-      expect(matchTp('ping tp Nokari 56')).to.eql(['ping tp Nokari 56','Nokari','56']);
+      expect(matchTp('tp Nokari 56')).to.eql(['tp Nokari 56','Nokari','56']);
     });
     it("renvoie null si matche pas", function () {
-      expect(matchTp('ping tp Nokari d56')).to.eql(null);
+      expect(matchTp('tp Nokari d56')).to.eql(null);
     });
     it("fonctionne avec des maj", function () {
-      expect(matchTp('PinG tp Nokari 56')).not.to.eql(null);
+      expect(matchTp('tp Nokari 56')).not.to.eql(null);
     });
   });
 
@@ -139,25 +140,25 @@ describe('Pong', function () {
 
   describe('#matchHs()', function () {
     it("extraire informations", function () {
-      expect(matchHs('ping seths Nokari 56 plus')).to.eql(['ping seths Nokari 56 plus','seths','Nokari','56','plus']);
+      expect(matchHs('seths Nokari 56 plus')).to.eql(['seths Nokari 56 plus','seths','Nokari','56','plus']);
     });
     it("renvoie null si matche pas", function () {
-      expect(matchHs('ping seths Nokari d56 plus')).to.eql(null);
+      expect(matchHs('seths Nokari d56 plus')).to.eql(null);
     });
     it("fonctionne avec des maj", function () {
-      expect(matchHs('PinG seths Nokari 56 plUs')).not.to.eql(null);
+      expect(matchHs('seths Nokari 56 plUs')).not.to.eql(null);
     });
   });
 
   describe('#matchRmHs()', function () {
     it("extraire informations", function () {
-      expect(matchRmHs('ping rmhs Nokari plus')).to.eql(['ping rmhs Nokari plus','Nokari','plus']);
+      expect(matchRmHs('rmhs Nokari plus')).to.eql(['rmhs Nokari plus','Nokari','plus']);
     });
     it("renvoie null si matche pas", function () {
-      expect(matchRmHs('ping rmhs Nokari eplus')).to.eql(null);
+      expect(matchRmHs('rmhs Nokari eplus')).to.eql(null);
     });
     it("fonctionne avec des maj", function () {
-      expect(matchRmHs('PinG rMHs Nokari plUs')).not.to.eql(null);
+      expect(matchRmHs('rMHs Nokari plUs')).not.to.eql(null);
     });
   });
 
@@ -237,6 +238,35 @@ describe('Pong', function () {
         mode_double: {},
       }
       expect(removeHs('384139959059087362','plus',allHighscores)).to.eql(false);
+    });
+  });
+
+  describe('#matchPing()', function () {
+    it("extraire les arguments", function () {
+      expect(matchPing('ping <argument> <avec des espaces>'))
+      .to.eql('<argument> <avec des espaces>');
+    });
+
+    it("extraire les arguments plus les autres lignes", function () {
+      expect(matchPing(`ping code cle
+message
+ligne2 du message`))
+      .to.eql('code cle\nmessage\nligne2 du message');
+    });
+
+    it("renvoie null si matche pas", function () {
+      expect(matchPing('hey salut')).to.eql(null);
+    });
+    it("fonctionne avec des maj", function () {
+      expect(matchPing('PinG <argument> <avec des espaces>'))
+      .to.eql('<argument> <avec des espaces>');
+    });
+    it("fonctionne avec que ping", function () {
+      expect(matchPing('ping')).to.eql('');
+    });
+    it("fonctionne avec le prefix p", function () {
+      expect(matchPing('p <argument> <avec des espaces>'))
+      .to.eql('<argument> <avec des espaces>');
     });
   });
 
