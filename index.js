@@ -33,7 +33,7 @@ bot.on('ready', function () {
   console.log(`Logged in as ${bot.user.tag}!`)
 })
 
-bot.login(require('./token.js'))
+bot.login(require('./token'))
 
 exitHook(() => {
   bot.destroy()
