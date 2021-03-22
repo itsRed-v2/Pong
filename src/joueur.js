@@ -1,21 +1,26 @@
-var { printMode, pauseQuestion } = require('./pong')
-var { newPartie } = require('./partie')
-
-class Joueur {
-  constructor() {
-    this.mode = 'mode_plus';
-  }
-  
-  demarrerPartie(message) {
-    this.partie = newPartie(this.mode);
-    message.reply("Démarrage d'une nouvelle partie en **" + printMode(this.mode) + "** !");
-    pauseQuestion(message, this.partie);
-    return this.partie;
+function newJoueur(pseudo, discriminator) {
+  return {
+    "mode": "mode_plus",
+    "pseudo": pseudo,
+    "discriminator": discriminator
   }
 }
-  
-function newJoueur(){
-  return new Joueur()
+
+function findOrCreateJoueur(id, pseudo, discriminator, joueurs, newJoueur) {
+  var joueur = joueurs[id]
+  if (joueur == undefined) {
+      joueur = newJoueur(pseudo, discriminator)
+      joueurs[id] = joueur
+      return true
+  } else if (pseudo !== joueur["pseudo"] || discriminator !== joueur["discriminator"]) {
+      joueur["pseudo"] = pseudo
+      joueur["discriminator"] = discriminator
+      return true
+  }
+  return false
 }
 
-module.exports = { newJoueur }
+module.exports = {
+  newJoueur,
+  findOrCreateJoueur
+}

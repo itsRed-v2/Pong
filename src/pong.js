@@ -1,3 +1,5 @@
+const { tireAuSortDeuxNombres } = require('./partie.js')
+
 function code(message, cle) {
     var messageCode = []
     for (var index = 0, icle = 0; index < message.length; index++, icle++) {
@@ -33,12 +35,12 @@ function afficheliste(liste) {
     return liste
 }
 
-function listeJoueursActifs(joueurs,getUsername) {
+function listeJoueursActifs(joueurs, getUsername, info, getDiscriminator) {
     var liste = []
     Object.keys(joueurs).forEach(id => {
         if (joueurs[id].partie) {
             var nom = getUsername(id)
-            liste.push(`\`${nom}\` - ${joueurs[id].partie.score()}, ${printMode(joueurs[id].partie.mode)}`)
+            liste.push(`\`${nom}${info ? '#'+getDiscriminator(id):''}\`${info ? ' \`'+id+'\`' : ''} - ${score(joueurs[id].partie)}, ${printMode(joueurs[id].partie.mode)}`)
         }
     });
     return liste
@@ -47,16 +49,15 @@ function listeJoueursActifs(joueurs,getUsername) {
 function printMode(mode) {
     return MODES[mode];
 }
-  
 const MODES = {
     mode_plus: 'Mode Addition',
     mode_moins: 'Mode Soustraction',
     mode_double: 'Mode Double'
-};
+}
 
 function pauseQuestion (message, partie) {
-    partie.tireAuSortDeuxNombres();
-    message.reply('pong ' + partie.question() + ' !'); 
+    tireAuSortDeuxNombres(partie);
+    message.reply('pong ' + question(partie) + ' !'); 
 }
 
 function matchTp(arguments) {
@@ -65,8 +66,9 @@ function matchTp(arguments) {
 
 function changeScore(id, score, joueurs) {
     if (joueurs[id] && joueurs[id].partie) {
+        var oldpts = joueurs[id].partie.points
         joueurs[id].partie.points = score
-        return true
+        return oldpts
     } else {
         return false
     }
@@ -83,7 +85,7 @@ function matchRmHs(arguments) {
 function changeHs(id, score, mode, allHighscores) {
     const clemode = 'mode_'+mode
     if (allHighscores[clemode][id]) {
-        allHighscores[clemode][id] = score
+        allHighscores[clemode][id] = parseInt(score)
         return true
     } else {
         return false
@@ -93,7 +95,7 @@ function changeHs(id, score, mode, allHighscores) {
 function ajouteHs(id, score, mode, allHighscores) {
     const clemode = 'mode_'+mode
     if (!allHighscores[clemode][id]) {
-        allHighscores[clemode][id] = score
+        allHighscores[clemode][id] = parseInt(score)
         return true
     } else {
         return false
@@ -123,6 +125,63 @@ function matchPing(contenu) {
     // pas de else car return termine la fonction
 }
 
+function reload(message, channel, getUsername, joueurs, fs) {
+    message.channel.send(':repeat: Reloading!')
+    fs.writeFile("./data/players.js", stringifyForExport(joueurs), function (err) {
+        if (err) return console.log(err)
+    });
+    msg = msgReload(joueurs, getUsername)
+    channel.send(msg).then(() => {
+        process.exit()
+    })
+}
+
+function msgReload(joueurs, getUsername) {
+    var liste = []
+    Object.keys(joueurs).forEach(id => {
+        if (joueurs[id].partie) {
+            var nom = getUsername(id)
+            liste.push(`:small_orange_diamond: La partie de \`${nom}\` (${score(joueurs[id].partie)}, ${printMode(joueurs[id].partie.mode)}) a été stoppée par le reload`)
+        }
+    })
+    liste.unshift(':repeat: Reloading')
+    return liste
+}
+
+function trieHighscores(highscores) {
+    var sortable = []
+    for (var id in highscores) {
+        sortable.push([id, highscores[id]])
+    }
+
+    sortable.sort((hs1, hs2) => { return hs2[1] - hs1[1] });
+    return sortable
+}
+
+function stringifyForExport(object) {
+    return "module.exports = " + JSON.stringify(object, null, "  ") + ";"
+}
+
+function printHighscores(allHighscores, printInfo, getUsername, getDiscriminator) {
+    var contenu = ''
+    for (var mode in allHighscores) {
+      contenu += '**' + printMode(mode) + '**\n'
+      var highscoresTriees = trieHighscores(allHighscores[mode])
+      for (var index in highscoresTriees) {
+        var highscore = highscoresTriees[index]
+        pseudo = getUsername(highscore[0])
+        discriminator = getDiscriminator(highscore[0])
+        var position = parseInt(index) + 1
+        contenu += `\`${position}) ${highscore[1]} : ${pseudo}${printInfo ? '#'+discriminator : ''}\`${printInfo ? `  \`${highscore[0]}\``:''}\n`
+      }
+    }
+    return contenu
+}
+
+
+
+
+
 module.exports = {
     code,
     decode,
@@ -137,5 +196,10 @@ module.exports = {
     changeHs,
     ajouteHs,
     removeHs,
-    matchPing
+    matchPing,
+    reload,
+    msgReload,
+    trieHighscores,
+    stringifyForExport,
+    printHighscores
 }
