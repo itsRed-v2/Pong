@@ -53,15 +53,15 @@ const {
   demarrerPartie,
   reponse,
   score,
-  question
+  question,
+  pauseQuestion,
+  printMode
 } = require('./src/partie.js')
 const {
   code,
   decode,
   listeJoueursActifs,
   afficheliste,
-  printMode,
-  pauseQuestion,
   matchTp,
   changeScore,
   matchHs,

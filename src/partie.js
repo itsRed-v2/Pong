@@ -38,11 +38,28 @@ function tireAuSortDeuxNombres(partie) {
   partie.operation = (partie.mode == "mode_plus" ? '+':(partie.mode == "mode_moins" ? '-':signeAuHasard));
 }
 
+// NON TESTÉ
+function pauseQuestion (message, partie) {
+  tireAuSortDeuxNombres(partie);
+  message.reply('pong ' + question(partie) + ' !'); 
+}
+
+function printMode(mode) {
+  return MODES[mode];
+}
+const MODES = {
+  mode_plus: 'Mode Addition',
+  mode_moins: 'Mode Soustraction',
+  mode_double: 'Mode Double'
+}
+
 module.exports = {
   newPartie,
   demarrerPartie,
   reponse,
   score,
   question,
-  tireAuSortDeuxNombres
+  tireAuSortDeuxNombres,
+  pauseQuestion,
+  printMode
 }

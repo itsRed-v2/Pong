@@ -1,4 +1,7 @@
-const { tireAuSortDeuxNombres } = require('./partie.js')
+const {
+    score,
+    printMode
+} = require('./partie')
 
 function code(message, cle) {
     var messageCode = []
@@ -12,7 +15,7 @@ function code(message, cle) {
     return messageCode
 }
 
-function decode(messagecode,cle) {
+function decode(messagecode, cle) {
     var messageDecode = ""
     for (var index = 0, icle = 0; index < messagecode.length; index++, icle++) {
         icle = icle % cle.length
@@ -46,19 +49,7 @@ function listeJoueursActifs(joueurs, getUsername, info, getDiscriminator) {
     return liste
 }
 
-function printMode(mode) {
-    return MODES[mode];
-}
-const MODES = {
-    mode_plus: 'Mode Addition',
-    mode_moins: 'Mode Soustraction',
-    mode_double: 'Mode Double'
-}
 
-function pauseQuestion (message, partie) {
-    tireAuSortDeuxNombres(partie);
-    message.reply('pong ' + question(partie) + ' !'); 
-}
 
 function matchTp(arguments) {
     return arguments.match(/^tp (.+) (\d*)$/i)
@@ -185,21 +176,19 @@ function printHighscores(allHighscores, printInfo, getUsername, getDiscriminator
 module.exports = {
     code,
     decode,
-    listeJoueursActifs,
-    afficheliste,
-    printMode,
-    pauseQuestion,
-    matchTp,
+    listeJoueursActifs, // ==> partie? joueur?
+    afficheliste, // ==> partie? joueur?
+    matchTp, //==> match
     changeScore,
-    matchHs,
-    matchRmHs,
-    changeHs,
-    ajouteHs,
-    removeHs,
-    matchPing,
+    matchHs, //==> match
+    matchRmHs, //==> match
+    changeHs, // ==> hsfunctions
+    ajouteHs, // ==> hsfunctions
+    removeHs, // ==> hsfunctions
+    matchPing, //==> match
     reload,
     msgReload,
-    trieHighscores,
+    trieHighscores, // ==> hsfunctions
     stringifyForExport,
     printHighscores
 }

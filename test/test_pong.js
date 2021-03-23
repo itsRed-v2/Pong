@@ -1,9 +1,9 @@
-var expect = require('chai').expect;
-var {
+const expect = require('chai').expect;
+const {
   newJoueur,
   findOrCreateJoueur
 } = require('../src/joueur')
-var {
+const {
   newPartie,
   demarrerPartie,
   reponse,
@@ -11,7 +11,7 @@ var {
   question,
   tireAuSortDeuxNombres
 } = require('../src/partie')
-var {
+const {
   code,
   decode,
   afficheliste,
