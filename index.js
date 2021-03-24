@@ -66,14 +66,16 @@ const {
   changeScore,
   matchHs,
   matchRmHs,
-  changeHs,
-  ajouteHs,
-  removeHs,
   matchPing,
   reload,
   stringifyForExport,
-  printHighscores
 } = require('./src/pong')
+const {
+  changeHs,
+  ajouteHs,
+  removeHs,
+  printHighscores
+} = require('./src/highscore')
 const { stringify } = require('querystring')
 const { finished } = require('stream')
 const { getuid } = require('process')
@@ -300,17 +302,6 @@ function commandesAdmin (message) {
   }
 
   //ping reload
-  // if (arguments === 'reload') {
-  //   if (!listeJoueursActifs(joueurs, getUsername)[0]) {
-  //     reload(message, bot.channels.cache.get('763372739238559774'), getUsername, joueurs, fs)
-  //   } else {
-  //     var msg = afficheliste(listeJoueursActifs(joueurs, getUsername))
-  //     msg.push('Forcer le reload: `ping reload force`')
-  //     message.channel.send(msg)
-  //     console.log(message.id)
-  //   }
-  // }
-  // ping reload force
   if (arguments === 'reload') {
     reload(message, bot.channels.cache.get('763372739238559774'), getUsername, joueurs, fs)
   }

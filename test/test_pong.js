@@ -19,16 +19,17 @@ const {
   changeScore,
   matchHs,
   matchRmHs,
+  listeJoueursActifs,
+  matchPing,
+  stringifyForExport
+} = require('../src/pong')
+const {
   changeHs,
   ajouteHs,
   removeHs,
-  listeJoueursActifs,
-  matchPing,
-  msgReload,
   trieHighscores,
-  stringifyForExport,
   printHighscores
-} = require('../src/pong')
+} = require('../src/highscore')
 
 describe('Pong', function () {
   
@@ -377,46 +378,6 @@ ligne2 du message`))
     it("fonctionne avec le prefix p", function () {
       expect(matchPing('p <argument> <avec des espaces>'))
       .to.eql('<argument> <avec des espaces>');
-    });
-  });
-
-  describe('#msgReload()', function () {
-    it("liste les joueurs qui ont une partie en cours", function () {
-      var joueurAvecPartie = newJoueur();
-      joueurAvecPartie.partie = newPartie('mode_plus');
-      var joueurs = {
-        'id1': newJoueur(),
-        'id2': joueurAvecPartie,
-      };
-      expect(msgReload(joueurs, (id)=> {
-        expect(id).to.eql('id2')
-        return 'joueurAvecPartie'
-      })).to.eql([
-        ':repeat: Reloading',
-        ':small_orange_diamond: La partie de `joueurAvecPartie` (0 point, Mode Addition) a été stoppée par le reload'
-      ]);
-    });
-    it("affiche si aucune partie en cours", function () {
-      expect(msgReload({})).to.eql([':repeat: Reloading']);
-    });
-    it("liste plusieurs joueurs qui ont une partie en cours", function () {
-      var joueurAvecPartie = newJoueur();
-      joueurAvecPartie.partie = newPartie('mode_plus');
-      var joueurs = {
-        'id1': joueurAvecPartie,
-        'id2': joueurAvecPartie
-      };
-      const noms = {
-        'id1': 'joueurAvecPartie2',
-        'id2': 'joueurAvecPartie'
-      }
-      expect(msgReload(joueurs, (id)=> {
-        return noms[id]
-      })).to.eql([
-        ':repeat: Reloading',
-        ':small_orange_diamond: La partie de `joueurAvecPartie2` (0 point, Mode Addition) a été stoppée par le reload',
-        ':small_orange_diamond: La partie de `joueurAvecPartie` (0 point, Mode Addition) a été stoppée par le reload'
-      ]);
     });
   });
 

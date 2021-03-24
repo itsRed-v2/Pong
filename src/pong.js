@@ -73,36 +73,6 @@ function matchRmHs(arguments) {
     return arguments.match(/^rmhs (.+) (plus|moins|double)$/i)
 }
 
-function changeHs(id, score, mode, allHighscores) {
-    const clemode = 'mode_'+mode
-    if (allHighscores[clemode][id]) {
-        allHighscores[clemode][id] = parseInt(score)
-        return true
-    } else {
-        return false
-    }
-}
-
-function ajouteHs(id, score, mode, allHighscores) {
-    const clemode = 'mode_'+mode
-    if (!allHighscores[clemode][id]) {
-        allHighscores[clemode][id] = parseInt(score)
-        return true
-    } else {
-        return false
-    }
-}
-
-function removeHs(id, mode, allHighscores) {
-    const clemode = 'mode_'+mode
-    if (allHighscores[clemode][id]) {
-        delete allHighscores[clemode][id]
-        return true
-    } else {
-        return false
-    }
-}
-
 function matchPing(contenu) {
     lignes = contenu.split('\n')
     match = lignes[0].match(/^(ping|p)( (.+))?/i)
@@ -121,52 +91,13 @@ function reload(message, channel, getUsername, joueurs, fs) {
     fs.writeFile("./data/players.js", stringifyForExport(joueurs), function (err) {
         if (err) return console.log(err)
     });
-    msg = msgReload(joueurs, getUsername)
-    channel.send(msg).then(() => {
+    channel.send(':repeat: Reloading').then(() => {
         process.exit()
     })
 }
 
-function msgReload(joueurs, getUsername) {
-    var liste = []
-    Object.keys(joueurs).forEach(id => {
-        if (joueurs[id].partie) {
-            var nom = getUsername(id)
-            liste.push(`:small_orange_diamond: La partie de \`${nom}\` (${score(joueurs[id].partie)}, ${printMode(joueurs[id].partie.mode)}) a été stoppée par le reload`)
-        }
-    })
-    liste.unshift(':repeat: Reloading')
-    return liste
-}
-
-function trieHighscores(highscores) {
-    var sortable = []
-    for (var id in highscores) {
-        sortable.push([id, highscores[id]])
-    }
-
-    sortable.sort((hs1, hs2) => { return hs2[1] - hs1[1] });
-    return sortable
-}
-
 function stringifyForExport(object) {
     return "module.exports = " + JSON.stringify(object, null, "  ") + ";"
-}
-
-function printHighscores(allHighscores, printInfo, getUsername, getDiscriminator) {
-    var contenu = ''
-    for (var mode in allHighscores) {
-      contenu += '**' + printMode(mode) + '**\n'
-      var highscoresTriees = trieHighscores(allHighscores[mode])
-      for (var index in highscoresTriees) {
-        var highscore = highscoresTriees[index]
-        pseudo = getUsername(highscore[0])
-        discriminator = getDiscriminator(highscore[0])
-        var position = parseInt(index) + 1
-        contenu += `\`${position}) ${highscore[1]} : ${pseudo}${printInfo ? '#'+discriminator : ''}\`${printInfo ? `  \`${highscore[0]}\``:''}\n`
-      }
-    }
-    return contenu
 }
 
 
@@ -182,13 +113,7 @@ module.exports = {
     changeScore,
     matchHs, //==> match
     matchRmHs, //==> match
-    changeHs, // ==> hsfunctions
-    ajouteHs, // ==> hsfunctions
-    removeHs, // ==> hsfunctions
     matchPing, //==> match
     reload,
-    msgReload,
-    trieHighscores, // ==> hsfunctions
-    stringifyForExport,
-    printHighscores
+    stringifyForExport
 }
