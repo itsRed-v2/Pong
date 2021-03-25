@@ -15,7 +15,7 @@ exitHook(() => {
   bot.destroy()
 })
 
-//================================ constantes =
+//================================ constantes
 
 const AIDE_UTILISATEUR = `**Liste des commandes**
 **Jeu:**
@@ -105,11 +105,20 @@ function getDiscriminator(id) {
 //================================
 
 var joueurs = require('./data/players.js')
+const { mode_plus } = require('./data/highscores.js')
 
 bot.on('message', message => {
 
   if (message.author.bot) {
     return
+  }
+
+  if (allHighscores["mode_plus"][message.author.id]) {
+    if(findOrCreateJoueur(message.author.id, getUsername(message.author.id), getDiscriminator(message.author.id), joueurs, newJoueur)) {
+      fs.writeFile("./data/players.js", stringifyForExport(joueurs), function (err) {
+        if (err) return console.log(err)
+      });
+    }
   }
 
   var contenu = message.content.toLowerCase()
@@ -141,7 +150,7 @@ bot.on('message', message => {
   // ping
   if (contenu === 'ping') {
     if (partie) {
-      message.reply('Une partie en ' + printMode(partie.mode) + ' est déjà en cours, tu as ' + score(partie) + ` et la question est: ` + question(partie) + `\nPour commencer une nouvelle partie, tu dois d'abord perdre celle là!`)
+      message.reply('Une partie en ' + printMode(partie.mode) + ' est déjà en cours, tu as ' + score(partie) + ` et la question est: ` + question(partie) + `\nTu ne peux pas avoir plusieurs parties en même temps. Arrêter une partie en cours: \`ping stop\``)
     }
     else {
       partie = demarrerPartie(message, joueur, newPartie)
@@ -227,9 +236,9 @@ Une partie commence avec un mode, et elle garde ce mode jusqu'a la fin.
 
   // ping highscores
   if (arguments === 'highscores' || arguments === 'hs') {
-    message.channel.send(printHighscores(allHighscores, false, getUsername, getDiscriminator))
+    message.channel.send(printHighscores(allHighscores, joueurs, false, getUsername, getDiscriminator))
   } else if ((arguments === 'highscores info' || arguments === 'hs info')) {
-    message.channel.send(printHighscores(allHighscores, true, getUsername, getDiscriminator))
+    message.channel.send(printHighscores(allHighscores, joueurs, true, getUsername, getDiscriminator))
   }
 
   // log joueurs
@@ -239,9 +248,9 @@ Une partie commence avec un mode, et elle garde ce mode jusqu'a la fin.
 
   // ping list
   if (arguments === 'list') {
-    message.channel.send(afficheliste(listeJoueursActifs(joueurs, getUsername, false)))
+    message.channel.send(afficheliste(listeJoueursActifs(joueurs, false)))
   } else if (arguments === 'list info') {
-    message.channel.send(afficheliste(listeJoueursActifs(joueurs, getUsername, true, getDiscriminator)))
+    message.channel.send(afficheliste(listeJoueursActifs(joueurs, true)))
   }
 });
 
@@ -303,14 +312,12 @@ function commandesAdmin (message) {
 
   //ping reload
   if (arguments === 'reload') {
-    reload(message, bot.channels.cache.get('763372739238559774'), getUsername, joueurs, fs)
+    reload(message, bot.channels.cache.get('763372739238559774'), joueurs, fs)
   }
 
   // ping tp
   if (matchTp(arguments)) {
     var msg = matchTp(arguments)
-
-    console.log(joueurs)
     var oldpts = changeScore(msg[1],parseInt(msg[2]),joueurs)
     if (oldpts || oldpts == 0) {
       var pseudo = bot.users.cache.get(msg[1]).username

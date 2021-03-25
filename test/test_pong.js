@@ -82,69 +82,94 @@ describe('Pong', function () {
 
   describe('#listeJoueursActifs()', function () {
     it("liste les joueurs qui ont une partie en cours", function () {
-      var joueurAvecPartie = newJoueur();
-      joueurAvecPartie.partie = newPartie('mode_plus');
       var joueurs = {
-        'id1': newJoueur(),
-        'id2': joueurAvecPartie,
+        'id1': {
+          "mode": "mode_plus",
+          "pseudo": "name1",
+          "discriminator": "1111"
+        },
+        'id2': {
+          "mode": "mode_plus",
+          "pseudo": "name2",
+          "discriminator": "2222",
+          "partie": {
+            "points": 1,
+            "mode": "mode_plus"
+          }
+        }
       };
-      expect(listeJoueursActifs(joueurs, (id)=> {
-        expect(id).to.eql('id2')
-        return 'joueurAvecPartie'
-      }, false)).to.eql([
-        '`joueurAvecPartie` - 0 point, Mode Addition'
+      expect(listeJoueursActifs(joueurs, false)).to.eql([
+        '`name2` - 1 point, Mode Addition'
       ]);
     });
     
     it("affiche si aucune partie en cours", function () {
       var joueurs = {
-        'id1': newJoueur(),
-        'id2': newJoueur(),
+        'id1': {
+          "mode": "mode_plus",
+          "pseudo": "name1",
+          "discriminator": "1111"
+        },
+        'id2': {
+          "mode": "mode_plus",
+          "pseudo": "name2",
+          "discriminator": "2222"
+        }
       };
-      expect(listeJoueursActifs(joueurs, () => {}, false)).to.eql([]);
+      expect(listeJoueursActifs(joueurs, false)).to.eql([]);
     });
 
     it("affiche la liste de plusieurs joueurs qui ont une partie en cours", function () {
-      var joueurAvecPartie = newJoueur();
-      joueurAvecPartie.partie = newPartie('mode_plus');
       var joueurs = {
-        'id1': joueurAvecPartie,
-        'id2': joueurAvecPartie
+        'id1': {
+          "mode": "mode_plus",
+          "pseudo": "name1",
+          "discriminator": "1111",
+          "partie": {
+            "points": 3,
+            "mode": "mode_moins"
+          }
+        },
+        'id2': {
+          "mode": "mode_plus",
+          "pseudo": "name2",
+          "discriminator": "2222",
+          "partie": {
+            "points": 1,
+            "mode": "mode_plus"
+          }
+        }
       };
-      const noms = {
-        'id1': 'joueurAvecPartie2',
-        'id2': 'joueurAvecPartie'
-      }
-      expect(listeJoueursActifs(joueurs, (id)=> {
-        return noms[id]
-      }, false)).to.eql([
-        '`joueurAvecPartie2` - 0 point, Mode Addition',
-        '`joueurAvecPartie` - 0 point, Mode Addition'
+      expect(listeJoueursActifs(joueurs, false)).to.eql([
+        '`name1` - 3 points, Mode Soustraction',
+        '`name2` - 1 point, Mode Addition'
       ]);
     });
 
     it("affiche la liste en mode info", function () {
-      var joueurAvecPartie = newJoueur();
-      joueurAvecPartie.partie = newPartie('mode_plus');
       var joueurs = {
-        'id1': joueurAvecPartie,
-        'id2': joueurAvecPartie
-      };
-      const noms = {
-        'id1': 'joueurAvecPartie2',
-        'id2': 'joueurAvecPartie'
+        'id1': {
+          "mode": "mode_plus",
+          "pseudo": "name1",
+          "discriminator": "1111",
+          "partie": {
+            "points": 0,
+            "mode": "mode_plus"
+          }
+        },
+        'id2': {
+          "mode": "mode_plus",
+          "pseudo": "name2",
+          "discriminator": "2222",
+          "partie": {
+            "points": 0,
+            "mode": "mode_plus"
+          }
+        }
       }
-      const discrims = {
-        'id1': '1234',
-        'id2': '5678'
-      }
-      expect(listeJoueursActifs(joueurs, (id)=> {
-        return noms[id]
-      }, true, (id)=> {
-        return discrims[id]
-      })).to.eql([
-        '`joueurAvecPartie2#1234` `id1` - 0 point, Mode Addition',
-        '`joueurAvecPartie#5678` `id2` - 0 point, Mode Addition'
+      expect(listeJoueursActifs(joueurs, true)).to.eql([
+        '`name1#1111` `id1` - 0 point, Mode Addition',
+        '`name2#2222` `id2` - 0 point, Mode Addition'
       ]);
     });
   });
@@ -454,8 +479,9 @@ ligne2 du message`))
         'id1' : 50,
         'id2' : 27,
         },
-        }
-      expect(printHighscores(allhighscores, false, (id) => {return 'name_'+id}, () => {} )).to.eql(`**Mode Addition**
+      }
+      var joueurs = {}
+      expect(printHighscores(allhighscores, joueurs, false, (id) => {return 'name_'+id}, () => {} )).to.eql(`**Mode Addition**
 \`1) 155 : name_id1\`
 \`2) 120 : name_id2\`
 \`3) 83 : name_id3\`
@@ -475,14 +501,50 @@ ligne2 du message`))
         'id1' : 50,
         'id2' : 27,
         },
-        }
-      expect(printHighscores(allhighscores, true, (id) => {return 'name_'+id}, (id) => {return id+'000'} )).to.eql(`**Mode Addition**
-\`1) 155 : name_id1#id1000\`  \`id1\`
-\`2) 120 : name_id2#id2000\`  \`id2\`
-\`3) 83 : name_id3#id3000\`  \`id3\`
+      }
+      var joueurs = {}
+      expect(printHighscores(allhighscores, joueurs, true, (id) => {return 'name_'+id}, (id) => {return id+'000'} )).to.eql(`**Mode Addition**
+\`1) 155 : name_id1#id1000\`    \`id1\`  ✓
+\`2) 120 : name_id2#id2000\`    \`id2\`  ✓
+\`3) 83 : name_id3#id3000\`    \`id3\`  ✓
 **Mode Soustraction**
-\`1) 50 : name_id1#id1000\`  \`id1\`
-\`2) 27 : name_id2#id2000\`  \`id2\`
+\`1) 50 : name_id1#id1000\`    \`id1\`  ✓
+\`2) 27 : name_id2#id2000\`    \`id2\`  ✓
+`);
+    });
+    it("utilise players.js pour les joueurs qui ne sont pas dans le cache", function () {
+      var allhighscores = {
+        mode_plus: {
+        'id1' : 155,
+        'id2' : 120,
+        'id3' : 83,
+        'id4' : 20
+        }
+      }
+      var names = {
+        id1: "name1",
+        id2: "name2",
+        id3: "UNKNOWN",
+        id4: "UNKNOWN"
+      }
+      var discriminators = {
+        id1: "1111",
+        id2: "2222",
+        id3: "----",
+        id4: "----"
+      }
+      var joueurs = {
+        "id3": {
+          "mode": "mode_plus",
+          "pseudo": "name3",
+          "discriminator": "3333"
+        }
+      }
+      expect(printHighscores(allhighscores, joueurs, true, (id) => {return names[id]}, (id) => {return discriminators[id]} )).to.eql(`**Mode Addition**
+\`1) 155 : name1#1111\`    \`id1\`  ✓
+\`2) 120 : name2#2222\`    \`id2\`  ✓
+\`3) 83 : name3#3333\`    \`id3\`
+\`4) 20 : UNKNOWN#----\`    \`id4\`
 `);
     });
   });

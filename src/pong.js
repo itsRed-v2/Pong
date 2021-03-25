@@ -38,12 +38,11 @@ function afficheliste(liste) {
     return liste
 }
 
-function listeJoueursActifs(joueurs, getUsername, info, getDiscriminator) {
+function listeJoueursActifs(joueurs, info) {
     var liste = []
     Object.keys(joueurs).forEach(id => {
         if (joueurs[id].partie) {
-            var nom = getUsername(id)
-            liste.push(`\`${nom}${info ? '#'+getDiscriminator(id):''}\`${info ? ' \`'+id+'\`' : ''} - ${score(joueurs[id].partie)}, ${printMode(joueurs[id].partie.mode)}`)
+            liste.push(`\`${joueurs[id].pseudo}${info ? '#'+joueurs[id].discriminator:''}\`${info ? ' \`'+id+'\`' : ''} - ${score(joueurs[id].partie)}, ${printMode(joueurs[id].partie.mode)}`)
         }
     });
     return liste
@@ -86,7 +85,7 @@ function matchPing(contenu) {
     // pas de else car return termine la fonction
 }
 
-function reload(message, channel, getUsername, joueurs, fs) {
+function reload(message, channel, joueurs, fs) {
     message.channel.send(':repeat: Reloading!')
     fs.writeFile("./data/players.js", stringifyForExport(joueurs), function (err) {
         if (err) return console.log(err)
@@ -99,10 +98,6 @@ function reload(message, channel, getUsername, joueurs, fs) {
 function stringifyForExport(object) {
     return "module.exports = " + JSON.stringify(object, null, "  ") + ";"
 }
-
-
-
-
 
 module.exports = {
     code,

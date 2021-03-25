@@ -1,8 +1,8 @@
 function newJoueur(pseudo, discriminator) {
   return {
-    "mode": "mode_plus",
     "pseudo": pseudo,
-    "discriminator": discriminator
+    "discriminator": discriminator,
+    "mode": "mode_plus"
   }
 }
 
