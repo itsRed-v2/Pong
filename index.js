@@ -102,10 +102,15 @@ function getDiscriminator(id) {
   }
 }
 
+function saveJoueurs(joueurs) {
+  fs.writeFile("./data/players.js", stringifyForExport(joueurs), function (err) {
+    if (err) return console.log(err)
+  });
+}
+
 //================================
 
 var joueurs = require('./data/players.js')
-const { mode_plus } = require('./data/highscores.js')
 
 bot.on('message', message => {
 
@@ -115,9 +120,7 @@ bot.on('message', message => {
 
   if (allHighscores["mode_plus"][message.author.id]) {
     if(findOrCreateJoueur(message.author.id, getUsername(message.author.id), getDiscriminator(message.author.id), joueurs, newJoueur)) {
-      fs.writeFile("./data/players.js", stringifyForExport(joueurs), function (err) {
-        if (err) return console.log(err)
-      });
+      saveJoueurs(joueurs)
     }
   }
 
@@ -129,9 +132,7 @@ bot.on('message', message => {
 
   
   if(findOrCreateJoueur(message.author.id, getUsername(message.author.id), getDiscriminator(message.author.id), joueurs, newJoueur)) {
-    fs.writeFile("./data/players.js", stringifyForExport(joueurs), function (err) {
-      if (err) return console.log(err)
-    });
+    saveJoueurs(joueurs)
   }
   joueur = joueurs[message.author.id]
 
@@ -163,6 +164,7 @@ bot.on('message', message => {
     if (arguments == reponse(partie)) {
       var highscore = allHighscores[partie.mode][message.author.id] || 0
       partie.points++
+      saveJoueurs(joueurs)
       message.reply(`Correct ! Tu as ${score(partie)}${partie.points > highscore ? ' **Meilleur score!**' : ''}`)
       pauseQuestion(message, partie)
       // maj highscore
@@ -177,6 +179,7 @@ bot.on('message', message => {
       message.reply(`Faux ! La réponse était ${reponse(partie)}. Ton score final est de ${score(partie)}${partie.points > highscore ? ", c'est ton **meilleur score!**" : ''}`)
       bot.channels.cache.get('763372739238559774').send(':x:  `' + message.author.username + '` a perdu une partie à **' + score(partie) + '** (' + printMode(partie.mode) + ')')
       joueur.partie = undefined
+      saveJoueurs(joueurs)
     }
 
     // ping ?
@@ -187,6 +190,7 @@ bot.on('message', message => {
     // ping stop
     else if (arguments === 'stop') {
       joueur.partie = undefined
+      saveJoueurs(joueurs)
       message.channel.send('Partie terminée')
       bot.channels.cache.get('763372739238559774').send(`:orange_circle:  \`${message.author.username}\` a arrêté une partie à **${score(partie)}** (${printMode(partie.mode)})`)
     }
