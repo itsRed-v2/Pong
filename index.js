@@ -2,11 +2,6 @@ const fs = require('fs')
 const { Client, Intents } = require('discord.js')
 const exitHook = require('exit-hook')
 const bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES]})
-const DATA_PATH = process.env.PONG_DATA_PATH;
-const HIGHSCORE_PATH = DATA_PATH + '/highscores.js';
-const PLAYERS_PATH = DATA_PATH + '/players.js';
-const allHighscores = require(HIGHSCORE_PATH);
-console.log(allHighscores)
 
 bot.on('ready', function () {
   console.log(`Logged in as ${bot.user.tag}!`)
@@ -20,6 +15,11 @@ exitHook(() => {
 
 //================================ constantes
 
+const DATA_PATH = process.env.PONG_DATA_PATH;
+const HIGHSCORE_PATH = DATA_PATH + '/highscores.js';
+const PLAYERS_PATH = DATA_PATH + '/players.js';
+const allHighscores = require(HIGHSCORE_PATH);
+
 const AIDE_UTILISATEUR = `**Liste des commandes**
 **Jeu:**
 \`ping règles\` donne les règles du jeu
@@ -29,13 +29,13 @@ const AIDE_UTILISATEUR = `**Liste des commandes**
 \`ping highscores\` / \`ping hs\` affiche les meilleurs scores des joueurs
 \`ping mode <mode>\` choisir le mode de jeu parmi \`plus\`, \`moins\`, ou \`double\`
 \`ping list\` liste toutes les parties en cours
-\`ping stop\` termine la partie en cours
+\`ping stop\` termine la partie en cours`
 
-**Cryptage:**
-\`\`\`
-ping (code|decode) <clé (1er ligne)>
-<message (a partir de la 2e ligne)>
-\`\`\`permet de crypter/décripter un message à partir d'une clé de cryptage`
+// **Cryptage:**
+// \`\`\`
+// ping (code|decode) <clé (1er ligne)>
+// <message (a partir de la 2e ligne)>
+// \`\`\`permet de crypter/décripter un message à partir d'une clé de cryptage`
 
 const AIDE_ADMIN = `**Admin:**
 \`ping reload\` recharge le code de pong (nécéssite de stopper toutes les parties)
@@ -79,12 +79,15 @@ const {
   removeHs,
   printHighscores
 } = require('./src/highscore')
-const { stringify } = require('querystring')
-const { finished } = require('stream')
-const { getuid } = require('process')
 
-function enregistreHighScore(allHighscores) {
+function saveHighScores(allHighscores) {
   fs.writeFile(HIGHSCORE_PATH, stringifyForExport(allHighscores), function (err) {
+    if (err) return console.log(err)
+  });
+}
+
+function saveJoueurs(joueurs) {
+  fs.writeFile(PLAYERS_PATH, stringifyForExport(joueurs), function (err) {
     if (err) return console.log(err)
   });
 }
@@ -103,12 +106,6 @@ function getDiscriminator(id) {
   } else {
     return '----'
   }
-}
-
-function saveJoueurs(joueurs) {
-  fs.writeFile(PLAYERS_PATH, stringifyForExport(joueurs), function (err) {
-    if (err) return console.log(err)
-  });
 }
 
 //================================
@@ -166,7 +163,7 @@ bot.on('messageCreate', message => {
       // maj highscore
       if (partie.points > highscore) {
         allHighscores[partie.mode][message.author.id] = partie.points
-        enregistreHighScore(allHighscores)
+        saveHighScores(allHighscores)
       }
     }
 
@@ -197,22 +194,9 @@ bot.on('messageCreate', message => {
     message.reply('Aucune partie en cours. Tape `ping` pour lancer une partie')
   }
 
-});
-
-
-
-// COMMANDES INFORMATIVES
-bot.on('messageCreate', message => {
-
-  if (message.author.bot) {
-    return
-  }
-
-  var contenu = message.content.toLowerCase()
-  var arguments = matchPing(contenu)
-  if (arguments === null) {
-    return
-  }
+  // ******************************
+  // *** COMMANDES INFORMATIVES ***
+  // ******************************
 
   // ping règles
   if (arguments == 'règles' || arguments == 'regles') {
@@ -241,11 +225,6 @@ Une partie commence avec un mode, et elle garde ce mode jusqu'a la fin.
     message.channel.send(printHighscores(allHighscores, joueurs, true, getUsername, getDiscriminator))
   }
 
-  // log joueurs
-  if (arguments === 'log') {
-    message.channel.send('```json\n'+JSON.stringify(joueurs, null, "   ")+'\n```')
-  }
-
   // ping list
   if (arguments === 'list') {
     message.channel.send(afficheliste(listeJoueursActifs(joueurs, false)))
@@ -253,7 +232,6 @@ Une partie commence avec un mode, et elle garde ce mode jusqu'a la fin.
     message.channel.send(afficheliste(listeJoueursActifs(joueurs, true)))
   }
 });
-
 
 
 // PING CODE/DECODE
@@ -353,7 +331,7 @@ function commandesAdmin (message) {
         message.channel.send(`Personne n'a été trouvé avec l'id \`${msg[2]}\``)
       }
     }
-    enregistreHighScore(allHighscores)
+    saveHighScores(allHighscores)
   }
   // ping rmhs
   if (matchRmHs(arguments)) {
@@ -365,9 +343,14 @@ function commandesAdmin (message) {
       } else {
         message.channel.send(`Le joueur \`${pseudo}\` (\`${msg[1]}\`) n'est pas présent dans la liste du ${printMode('mode_'+msg[2])}`)
       }
-      enregistreHighScore(allHighscores)
+      saveHighScores(allHighscores)
     } else {
       message.channel.send(`Personne n'a été trouvé avec l'id \`${msg[1]}\``)
     }
+  }
+
+  // log joueurs
+  if (arguments === 'log') {
+    message.channel.send('```json\n'+JSON.stringify(joueurs, null, "   ")+'\n```')
   }
 };
