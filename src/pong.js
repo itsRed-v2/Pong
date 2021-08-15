@@ -82,7 +82,6 @@ function matchPing(contenu) {
         return lignes.join('\n')
     }
     return ''
-    // pas de else car return termine la fonction
 }
 
 function reload(message, channel, joueurs, fs) {

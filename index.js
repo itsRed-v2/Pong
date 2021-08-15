@@ -118,18 +118,11 @@ bot.on('message', message => {
     return
   }
 
-  if (allHighscores["mode_plus"][message.author.id]) {
-    if(findOrCreateJoueur(message.author.id, getUsername(message.author.id), getDiscriminator(message.author.id), joueurs, newJoueur)) {
-      saveJoueurs(joueurs)
-    }
-  }
-
   var contenu = message.content.toLowerCase()
   var arguments = matchPing(contenu)
   if (arguments === null) {
     return
   }
-
   
   if(findOrCreateJoueur(message.author.id, getUsername(message.author.id), getDiscriminator(message.author.id), joueurs, newJoueur)) {
     saveJoueurs(joueurs)
