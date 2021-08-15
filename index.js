@@ -2,7 +2,10 @@ const fs = require('fs')
 const Discord = require('discord.js')
 const exitHook = require('exit-hook')
 const bot = new Discord.Client()
-const allHighscores = require('./data/highscores.js')
+const DATA_PATH = process.env.PONG_DATA_PATH;
+const HIGHSCORE_PATH = DATA_PATH + '/highscores.js';
+const PLAYERS_PATH = DATA_PATH + '/players.js';
+const allHighscores = require(HIGHSCORE_PATH);
 console.log(allHighscores)
 
 bot.on('ready', function () {
@@ -81,7 +84,7 @@ const { finished } = require('stream')
 const { getuid } = require('process')
 
 function enregistreHighScore(allHighscores) {
-  fs.writeFile("./data/highscores.js", stringifyForExport(allHighscores), function (err) {
+  fs.writeFile(HIGHSCORE_PATH, stringifyForExport(allHighscores), function (err) {
     if (err) return console.log(err)
   });
 }
@@ -103,14 +106,14 @@ function getDiscriminator(id) {
 }
 
 function saveJoueurs(joueurs) {
-  fs.writeFile("./data/players.js", stringifyForExport(joueurs), function (err) {
+  fs.writeFile(PLAYERS_PATH, stringifyForExport(joueurs), function (err) {
     if (err) return console.log(err)
   });
 }
 
 //================================
 
-var joueurs = require('./data/players.js')
+var joueurs = require(PLAYERS_PATH);
 
 bot.on('message', message => {
 
