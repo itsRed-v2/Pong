@@ -1,7 +1,7 @@
 const fs = require('fs')
-const Discord = require('discord.js')
+const { Client, Intents } = require('discord.js')
 const exitHook = require('exit-hook')
-const bot = new Discord.Client()
+const bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES]})
 const DATA_PATH = process.env.PONG_DATA_PATH;
 const HIGHSCORE_PATH = DATA_PATH + '/highscores.js';
 const PLAYERS_PATH = DATA_PATH + '/players.js';
@@ -115,7 +115,7 @@ function saveJoueurs(joueurs) {
 
 var joueurs = require(PLAYERS_PATH);
 
-bot.on('message', message => {
+bot.on('messageCreate', message => {
 
   if (message.author.bot) {
     return
@@ -202,7 +202,7 @@ bot.on('message', message => {
 
 
 // COMMANDES INFORMATIVES
-bot.on('message', message => {
+bot.on('messageCreate', message => {
 
   if (message.author.bot) {
     return
@@ -257,7 +257,7 @@ Une partie commence avec un mode, et elle garde ce mode jusqu'a la fin.
 
 
 // PING CODE/DECODE
-bot.on('message', message => {
+bot.on('messageCreate', message => {
 
   if (message.author.bot) {
     return
@@ -294,7 +294,7 @@ ping (code|decode) <clé (1er ligne)>
 
 
 // COMMANDES ADMIN
-bot.on('message', commandesAdmin);
+bot.on('messageCreate', commandesAdmin);
 function commandesAdmin (message) {
   
   if (message.author.bot) {
