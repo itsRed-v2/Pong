@@ -1,7 +1,10 @@
 const fs = require('fs')
 const { Client, Intents } = require('discord.js')
 const exitHook = require('exit-hook')
-const bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES]})
+const bot = new Client({
+  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES],
+  partials: ['CHANNEL']
+})
 
 bot.on('ready', function () {
   console.log(`Logged in as ${bot.user.tag}!`)
