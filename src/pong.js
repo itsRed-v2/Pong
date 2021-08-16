@@ -84,9 +84,9 @@ function matchPing(contenu) {
     return ''
 }
 
-function reload(message, channel, joueurs, fs) {
+function reload(message, channel, joueurs, fs, PLAYERS_PATH) {
     message.channel.send(':repeat: Reloading!')
-    fs.writeFile("./data/players.js", stringifyForExport(joueurs), function (err) {
+    fs.writeFile(PLAYERS_PATH, stringifyForExport(joueurs), function (err) {
         if (err) return console.log(err)
     });
     channel.send(':repeat: Reloading').then(() => {
