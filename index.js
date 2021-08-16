@@ -27,7 +27,7 @@ const AIDE_UTILISATEUR = `**Liste des commandes**
 **Jeu:**
 \`ping règles\` donne les règles du jeu
 \`ping ?\` repose la question en cours
-\`ping\` commence une partie (si aucune partie n'est en cours)
+\`ping\` commence une partie
 \`ping help\` affiche cette liste
 \`ping highscores\` / \`ping hs\` affiche les meilleurs scores des joueurs
 \`ping mode <mode>\` choisir le mode de jeu parmi \`plus\`, \`moins\`, ou \`double\`
@@ -41,7 +41,7 @@ const AIDE_UTILISATEUR = `**Liste des commandes**
 // \`\`\`permet de crypter/décripter un message à partir d'une clé de cryptage`
 
 const AIDE_ADMIN = `**Admin:**
-\`ping reload\` recharge le code de pong (nécéssite de stopper toutes les parties)
+\`ping reload\` redémarre l'application
 \`ping tp <id> <score>\` set le score du joueur spécifié
 \`ping seths <id> <highscore> <plus|moins|double>\` set le highscore du joueur spécifié dans le mode spécifié
 \`ping addhs <id> <highscore> <plus|moins|double>\` ajoute le joueur à la liste dans le mode spécifié avec le score spécifié
