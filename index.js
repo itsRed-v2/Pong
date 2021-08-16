@@ -127,7 +127,7 @@ bot.on('messageCreate', message => {
   if(findOrCreateJoueur(message.author.id, getUsername(message.author.id), getDiscriminator(message.author.id), joueurs, newJoueur)) {
     saveJoueurs(joueurs)
   }
-  joueur = joueurs[message.author.id]
+  var joueur = joueurs[message.author.id]
 
   var partie = joueur.partie
 
