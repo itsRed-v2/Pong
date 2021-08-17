@@ -1,7 +1,8 @@
 const expect = require('chai').expect;
 const {
   newJoueur,
-  findOrCreateJoueur
+  createJoueurIfNeeded,
+  updateJoueur
 } = require('../src/joueur')
 const {
   newPartie,
@@ -57,14 +58,13 @@ describe('Pong', function () {
   describe('#afficheliste()', function () {
     it("affiche une liste de 1 joueur", function () {
       var liste = ['`joueurAvecPartie` - 0 point, Mode Addition'];
-      expect(afficheliste(liste)).to.eql([
-        '1 partie est en cours:', 
-        '`joueurAvecPartie` - 0 point, Mode Addition'
-      ]);
+      expect(afficheliste(liste)).to.eql(
+`1 partie est en cours:
+\`joueurAvecPartie\` - 0 point, Mode Addition`);
     });
     
     it("affiche si aucune partie en cours", function () {
-      expect(afficheliste([])).to.eql(["Aucune partie n'est en cours"]);
+      expect(afficheliste([])).to.eql("Aucune partie n'est en cours");
     });
 
     it("affiche plusieurs parties en cours", function () {
@@ -72,11 +72,11 @@ describe('Pong', function () {
         '`joueurAvecPartie2` - 0 point, Mode Addition',
         '`joueurAvecPartie` - 0 point, Mode Addition'
       ];
-      expect(afficheliste(liste)).to.eql([
-        '2 parties sont en cours:', 
-        '`joueurAvecPartie2` - 0 point, Mode Addition',
-        '`joueurAvecPartie` - 0 point, Mode Addition'
-      ]);
+      expect(afficheliste(liste)).to.eql(
+`2 parties sont en cours:
+\`joueurAvecPartie2\` - 0 point, Mode Addition
+\`joueurAvecPartie\` - 0 point, Mode Addition`
+      );
     });
   });
 
@@ -549,8 +549,8 @@ ligne2 du message`))
     });
   });
 
-  describe('#findOrCreateJoueur()', function () {
-    it("ajoute le joueur si il est inconnu", function () {
+  describe('#createJoueurIfNeeded()', function () {
+    it("ajoute le joueur si il n'est pas enregistré", function () {
       var joueurs = {
         "id1": {
           "mode": "mode_plus",
@@ -558,7 +558,7 @@ ligne2 du message`))
           "discriminator": "1111"
         }
       }
-      findOrCreateJoueur('id2', 'name2', '2222', joueurs, (pseudo, discriminator) => {
+      createJoueurIfNeeded('id2', 'name2', '2222', joueurs, (pseudo, discriminator) => {
         return {
           "mode": "mode_plus",
           "pseudo": pseudo,
@@ -577,6 +577,41 @@ ligne2 du message`))
         }
       });
     });
+    it("renvoie false si aucune modification n'a eu lieu", function () {
+      var joueurs = {
+        "id1": {
+          "mode": "mode_plus",
+          "pseudo": "name1",
+          "discriminator": "1111"
+        }
+      }
+      expect(createJoueurIfNeeded('id1', 'name1', '1111', joueurs, (pseudo, discriminator) => {
+        return {
+          "mode": "mode_plus",
+          "pseudo": pseudo,
+          "discriminator": discriminator
+        }
+      })).to.eql(false);
+    });
+    it("renvoie true si un joueur a été ajouté", function () {
+      var joueurs = {
+        "id1": {
+          "mode": "mode_plus",
+          "pseudo": "name1",
+          "discriminator": "1111"
+        }
+      }
+      expect(createJoueurIfNeeded('id2', 'name2', '2222', joueurs, (pseudo, discriminator) => {
+        return {
+          "mode": "mode_plus",
+          "pseudo": pseudo,
+          "discriminator": discriminator
+        }
+      })).to.eql(true);
+    });
+  });
+
+  describe('#updateJoueur', function () {
     it("modifie le nom du joueur s'il ne correspond plus", function () {
       var joueurs = {
         "id1": {
@@ -585,12 +620,7 @@ ligne2 du message`))
           "discriminator": "1111"
         }
       }
-      findOrCreateJoueur('id1', 'name1_v2', '1111', joueurs, (pseudo, discriminator) => {
-        return {
-          "mode": "mode_plus",
-          "pseudo": pseudo,
-          "discriminator": discriminator
-      }})
+      updateJoueur('id1', 'name1_v2', '1111', joueurs);
       expect(joueurs).to.eql({
         "id1": {
           "mode": "mode_plus",
@@ -607,12 +637,7 @@ ligne2 du message`))
           "discriminator": "1111"
         }
       }
-      findOrCreateJoueur('id1', 'name1', '1122', joueurs, (pseudo, discriminator) => {
-        return {
-          "mode": "mode_plus",
-          "pseudo": pseudo,
-          "discriminator": discriminator
-      }})
+      updateJoueur('id1', 'name1', '1122', joueurs)
       expect(joueurs).to.eql({
         "id1": {
           "mode": "mode_plus",
@@ -620,22 +645,6 @@ ligne2 du message`))
           "discriminator": "1122"
         }
       });
-    });
-    it("renvoie false si aucune modification n'a eu lieu", function () {
-      var joueurs = {
-        "id1": {
-          "mode": "mode_plus",
-          "pseudo": "name1",
-          "discriminator": "1111"
-        }
-      }
-      expect(findOrCreateJoueur('id1', 'name1', '1111', joueurs, (pseudo, discriminator) => {
-        return {
-          "mode": "mode_plus",
-          "pseudo": pseudo,
-          "discriminator": discriminator
-        }
-      })).to.eql(false);
     });
     it("renvoie true si une modification a eu lieu", function () {
       var joueurs = {
@@ -645,15 +654,9 @@ ligne2 du message`))
           "discriminator": "1111"
         }
       }
-      expect(findOrCreateJoueur('id1', 'name1_v2', '1111', joueurs, (pseudo, discriminator) => {
-        return {
-          "mode": "mode_plus",
-          "pseudo": pseudo,
-          "discriminator": discriminator
-        }
-      })).to.eql(true);
+      expect(updateJoueur('id1', 'name1_v2', '1111', joueurs)).to.eql(true);
     });
-    it("renvoie true si un joueur a été ajouté", function () {
+    it("renvoie false si aucune modification n'a eu lieu", function () {
       var joueurs = {
         "id1": {
           "mode": "mode_plus",
@@ -661,13 +664,7 @@ ligne2 du message`))
           "discriminator": "1111"
         }
       }
-      expect(findOrCreateJoueur('id2', 'name2', '2222', joueurs, (pseudo, discriminator) => {
-        return {
-          "mode": "mode_plus",
-          "pseudo": pseudo,
-          "discriminator": discriminator
-        }
-      })).to.eql(true);
+      expect(updateJoueur('id1', 'name1', '1111', joueurs)).to.eql(false);
     });
   });
 

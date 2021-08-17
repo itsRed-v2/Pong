@@ -35,7 +35,7 @@ function afficheliste(liste) {
     } else {
         liste.unshift(`Aucune partie n'est en cours`)
     }
-    return liste
+    return liste.join('\n');
 }
 
 function listeJoueursActifs(joueurs, info) {

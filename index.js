@@ -52,7 +52,8 @@ const AIDE_ADMIN = `**Admin:**
 
 const {
   newJoueur,
-  findOrCreateJoueur
+  createJoueurIfNeeded,
+  updateJoueur
 } = require('./src/joueur')
 const {
   newPartie,
@@ -117,25 +118,25 @@ var joueurs = require(PLAYERS_PATH);
 
 bot.on('messageCreate', message => {
 
-  if (message.author.bot) {
-    return
-  }
+  if (message.author.bot) return
 
   var contenu = message.content.toLowerCase()
   var arguments = matchPing(contenu)
-  if (arguments === null) {
-    return
-  }
-  
-  if(findOrCreateJoueur(message.author.id, getUsername(message.author.id), getDiscriminator(message.author.id), joueurs, newJoueur)) {
-    saveJoueurs(joueurs)
-  }
-  var joueur = joueurs[message.author.id]
+  if (arguments === null) return
 
-  var partie = joueur.partie
+  var id = message.author.id;
+  var joueur = joueurs[id]
+  if (joueur){
+    updateJoueur(id, getUsername(id), getDiscriminator(id), joueurs);
+    var partie = joueur.partie
+  }
 
   // ping mode
   if (arguments.match(/^mode/)) {
+    if(createJoueurIfNeeded(id, getUsername(id), getDiscriminator(id), joueurs, newJoueur)) {
+      saveJoueurs(joueurs);
+      joueur = joueurs[id];
+    }
     var plus = true
     var moins = false
     plus = arguments.includes('+')
@@ -150,6 +151,10 @@ bot.on('messageCreate', message => {
       message.reply('Une partie en ' + printMode(partie.mode) + ' est déjà en cours, tu as ' + score(partie) + ` et la question est: ` + question(partie) + `\nTu ne peux pas avoir plusieurs parties en même temps. Arrêter une partie en cours: \`ping stop\``)
     }
     else {
+      if(createJoueurIfNeeded(id, getUsername(id), getDiscriminator(id), joueurs, newJoueur)) {
+        saveJoueurs(joueurs);
+        joueur = joueurs[id];
+      }
       partie = demarrerPartie(message, joueur, newPartie)
       bot.channels.cache.get('763372739238559774').send(':white_check_mark:  `' + message.author.username + '` a commencé une partie en **' + printMode(partie.mode) + '**')
     }
@@ -158,14 +163,14 @@ bot.on('messageCreate', message => {
   else if (partie) {
     // test bonne réponse
     if (arguments == reponse(partie)) {
-      var highscore = allHighscores[partie.mode][message.author.id] || 0
+      var highscore = allHighscores[partie.mode][id] || 0
       partie.points++
       saveJoueurs(joueurs)
       message.reply(`Correct ! Tu as ${score(partie)}${partie.points > highscore ? ' **Meilleur score!**' : ''}`)
       pauseQuestion(message, partie)
       // maj highscore
       if (partie.points > highscore) {
-        allHighscores[partie.mode][message.author.id] = partie.points
+        allHighscores[partie.mode][id] = partie.points
         saveHighScores(allHighscores)
       }
     }
@@ -214,7 +219,7 @@ Une partie commence avec un mode, et elle garde ce mode jusqu'a la fin.
 
   // ping help
   if (arguments === 'help') {
-    if (message.author.id == 364820614990528522) {
+    if (id == 364820614990528522) {
       message.channel.send(AIDE_UTILISATEUR + '\n\n' + AIDE_ADMIN)
     } else {
       message.channel.send(AIDE_UTILISATEUR)
@@ -240,13 +245,10 @@ Une partie commence avec un mode, et elle garde ce mode jusqu'a la fin.
 // PING CODE/DECODE
 bot.on('messageCreate', message => {
 
-  if (message.author.bot) {
-    return
-  }
+  if (message.author.bot) return
+  
   var arguments = matchPing(message.content)
-  if (arguments === null) {
-    return
-  }
+  if (arguments === null) return
 
   var lignes = arguments.split('\n')
   var match = lignes[0].match(/^(code|decode) (.+)/i)
@@ -272,9 +274,10 @@ ping (code|decode) <clé (1er ligne)>
   }
 });
 
+// ***********************
+// *** COMMANDES ADMIN ***
+// ***********************
 
-
-// COMMANDES ADMIN
 bot.on('messageCreate', commandesAdmin);
 function commandesAdmin (message) {
   
@@ -355,6 +358,7 @@ function commandesAdmin (message) {
   // log joueurs
   if (arguments === 'log') {
     message.channel.send({
+      content: 'Voici les fichiers des joueurs et des highscores:',
       files: [
         {
           attachment: PLAYERS_PATH,
@@ -369,7 +373,7 @@ function commandesAdmin (message) {
   }
 
   if (arguments === 'listall') {
-    var msg = "";
+    var msg = "Liste des joueurs enregistrés:\n";
     Object.keys(joueurs).forEach(id =>{
       msg += `**${joueurs[id].pseudo}**\n`;
 
@@ -387,7 +391,7 @@ function commandesAdmin (message) {
 
   var splitargs = arguments.split(" ");
 
-  if (splitargs[0] === "rmPlayer") {
+  if (splitargs[0] === "rmplayer") {
     if (splitargs[1]) {
       if (joueurs[splitargs[1]]) {
         message.channel.send(`Joueur \`${splitargs[1]}\` supprimé

@@ -6,21 +6,28 @@ function newJoueur(pseudo, discriminator) {
   }
 }
 
-function findOrCreateJoueur(id, pseudo, discriminator, joueurs, newJoueur) {
-  var joueur = joueurs[id]
+function createJoueurIfNeeded(id, pseudo, discriminator, joueurs, newJoueur) {
+  var joueur = joueurs[id];
   if (joueur == undefined) {
-      joueur = newJoueur(pseudo, discriminator)
-      joueurs[id] = joueur
-      return true
-  } else if (pseudo !== joueur["pseudo"] || discriminator !== joueur["discriminator"]) {
-      joueur["pseudo"] = pseudo
-      joueur["discriminator"] = discriminator
-      return true
+      joueur = newJoueur(pseudo, discriminator);
+      joueurs[id] = joueur;
+      return true;
   }
-  return false
+  return false;
+}
+
+function updateJoueur(id, pseudo, discriminator, joueurs) {
+  var joueur = joueurs[id];
+  if (pseudo !== joueur["pseudo"] || discriminator !== joueur["discriminator"]) {
+    joueur["pseudo"] = pseudo;
+    joueur["discriminator"] = discriminator;
+    return true;
+  }
+  return false;
 }
 
 module.exports = {
   newJoueur,
-  findOrCreateJoueur
+  createJoueurIfNeeded,
+  updateJoueur
 }
