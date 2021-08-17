@@ -363,7 +363,7 @@ describe('Pong', function () {
         mode_moins: {},
         mode_double: {},
       }
-      expect(removeHs('364820614990528522','plus',allHighscores)).to.eql(true);
+      expect(removeHs('364820614990528522','mode_plus',allHighscores)).to.eql(true);
     });
     it("message erreur si le joueur n'est pas dans la liste", function () {
       allHighscores = {
@@ -373,7 +373,7 @@ describe('Pong', function () {
         mode_moins: {},
         mode_double: {},
       }
-      expect(removeHs('384139959059087362','plus',allHighscores)).to.eql(false);
+      expect(removeHs('384139959059087362','mode_plus',allHighscores)).to.eql(false);
     });
   });
 
