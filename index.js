@@ -339,16 +339,16 @@ function commandesAdmin (message) {
   // ping rmhs
   if (matchRmHs(arguments)) {
     var msg = matchRmHs(arguments)
-    if (bot.users.cache.get(msg[1])) {
-      var pseudo = bot.users.cache.get(msg[1]).username
-      if (removeHs(msg[1], msg[2], allHighscores)) {
-        message.channel.send(`Le highscore du joueur \`${pseudo}\` (\`${msg[1]}\`) en ${printMode('mode_'+msg[2])} a été supprimé`)
-      } else {
-        message.channel.send(`Le joueur \`${pseudo}\` (\`${msg[1]}\`) n'est pas présent dans la liste du ${printMode('mode_'+msg[2])}`)
-      }
-      saveHighScores(allHighscores)
+    
+    var id = msg[1]
+    var mode = 'mode_' + msg[2];
+    var pseudo = getUsername(id)
+    
+    if (removeHs(id, mode, allHighscores)) {
+      message.channel.send(`Le highscore du joueur \`${pseudo}\` (id: \`${id}\`) en ${printMode(mode)} a été supprimé`);
+      saveHighScores(allHighscores);
     } else {
-      message.channel.send(`Personne n'a été trouvé avec l'id \`${msg[1]}\``)
+      message.channel.send(`Le joueur \`${pseudo}\` (id :\`${id}\`) n'est pas présent dans la liste du ${printMode(mode)}`);
     }
   }
 

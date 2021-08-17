@@ -21,9 +21,8 @@ function ajouteHs(id, score, mode, allHighscores) {
 }
 
 function removeHs(id, mode, allHighscores) {
-    const clemode = 'mode_'+mode
-    if (allHighscores[clemode][id]) {
-        delete allHighscores[clemode][id]
+    if (allHighscores[mode][id]) {
+        delete allHighscores[mode][id]
         return true
     } else {
         return false
