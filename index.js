@@ -293,7 +293,7 @@ function commandesAdmin (message) {
 
   //ping reload
   if (arguments === 'reload') {
-    reload(message, bot.channels.cache.get('763372739238559774'), joueurs, fs)
+    reload(message, bot.channels.cache.get('763372739238559774'), joueurs, fs, PLAYERS_PATH)
   }
 
   // ping tp
@@ -354,6 +354,53 @@ function commandesAdmin (message) {
 
   // log joueurs
   if (arguments === 'log') {
-    message.channel.send('```json\n'+JSON.stringify(joueurs, null, "   ")+'\n```')
+    message.channel.send({
+      files: [
+        {
+          attachment: PLAYERS_PATH,
+          name: 'players.js'
+        },
+        {
+          attachment: HIGHSCORE_PATH,
+          name: 'highscores.js' 
+        }
+      ]
+    })
+  }
+
+  if (arguments === 'listall') {
+    var msg = "";
+    Object.keys(joueurs).forEach(id =>{
+      msg += `**${joueurs[id].pseudo}**\n`;
+
+      if (joueurs[id].partie) {
+        msg += ' => partie en cours\n';
+      }
+      var played = false;
+      for (var key in allHighscores){
+        if (allHighscores[key][id]) played = true;
+      }
+      if (!played) msg += ' => :x: jamais joué!\n'
+    })
+    message.channel.send(msg);
+  }
+
+  var splitargs = arguments.split(" ");
+
+  if (splitargs[0] === "rmPlayer") {
+    if (splitargs[1]) {
+      if (joueurs[splitargs[1]]) {
+        message.channel.send(`Joueur \`${splitargs[1]}\` supprimé
+\`\`\`json
+${JSON.stringify(joueurs[splitargs[1]], null, "   ")}
+\`\`\``);
+        delete joueurs[splitargs[1]]
+        saveJoueurs(joueurs);
+      } else {
+        message.channel.send(`Aucun joueur enregistré ne correspond à l'id \`${splitargs[1]}\``);
+      }
+    } else {
+      message.channel.send('Vous devez spécifier un id!');
+    }
   }
 };
