@@ -22,7 +22,9 @@ const {
   matchRmHs,
   listeJoueursActifs,
   matchPing,
-  stringifyForExport
+  stringifyForExport,
+  sendAsLog,
+  logReloadMessage
 } = require('../src/pong')
 const {
   changeHs,
@@ -772,5 +774,57 @@ ligne2 du message`))
       expect(partie.operation).to.eql('-');
     });
   });
+
+  // describe('#sendAsLog()', function () {
+  //   it("envoie le message dans le channel de log", function () {
+  //     expect(sendAsLog()).to.eql();
+  //   });
+  // });
+
+  describe('#logReloadMessage()', function () {
+    it("log premier reload message", function () {
+      const messages = {
+        first: () => {
+          return { content: 'Message quelconque' }
+        }
+      }
+      const logChannel = {
+        send: (s) => {
+          expect(s).to.eql(':repeat: Reloading');
+          return Promise.resolve();
+        }
+      }
+      return logReloadMessage(messages, logChannel);
+    });
+    it("log deuxième reload message", function () {
+      const messages = {
+        first: () => {
+          return {
+            content: ':repeat: Reloading',
+            edit: (s) => {
+              expect(s).to.eql(':repeat: Reloading (x2)');
+            }
+          }
+        }
+      }
+      const logChannel = {}
+      return logReloadMessage(messages, logChannel);
+    });
+    it("log 2+ reload message", function () {
+      const messages = {
+        first: () => {
+          return {
+            content: ':repeat: Reloading (x6)',
+            edit: (s) => {
+              expect(s).to.eql(':repeat: Reloading (x7)');
+            }
+          } 
+        }
+      }
+      const logChannel = {}
+      return logReloadMessage(messages, logChannel);
+    });
+  });
+
 
 });

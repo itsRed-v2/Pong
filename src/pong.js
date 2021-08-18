@@ -84,18 +84,42 @@ function matchPing(contenu) {
     return ''
 }
 
-function reload(message, channel, joueurs, fs, PLAYERS_PATH) {
-    message.channel.send(':repeat: Reloading!')
+function reload(message, logChannel, joueurs, fs, PLAYERS_PATH) {
     fs.writeFile(PLAYERS_PATH, stringifyForExport(joueurs), function (err) {
         if (err) return console.log(err)
     });
-    channel.send(':repeat: Reloading').then(() => {
-        process.exit()
-    })
+    Promise.all([
+        message.channel.send(':repeat: Reloading!'),
+        sendAsLog(logChannel, ':repeat: Reloading')
+    ]).then(() => {
+        process.exit();
+    });
 }
 
 function stringifyForExport(object) {
     return "module.exports = " + JSON.stringify(object, null, "  ") + ";"
+}
+
+function sendAsLog(logChannel, string) {
+    if (string === ':repeat: Reloading') {
+        return logChannel.messages.fetch({ limit: 1 }).then(messages => {
+            logReloadMessage(messages, logChannel);
+        });
+    } else {
+        return logChannel.send(string);
+    }
+}
+
+function logReloadMessage(messages, logChannel) {
+    var lastMessage = messages.first();
+    var content = lastMessage.content;
+    if (content.match(/^:repeat: Reloading/)) {
+        var match = content.match(/(\d*)\)$/);
+        if (match) return lastMessage.edit(`:repeat: Reloading (x${parseInt(10, match[1]) + 1})`);
+        else return lastMessage.edit(':repeat: Reloading (x2)');
+    } else {
+        return logChannel.send(':repeat: Reloading');
+    }
 }
 
 module.exports = {
@@ -109,5 +133,7 @@ module.exports = {
     matchRmHs, //==> match
     matchPing, //==> match
     reload,
-    stringifyForExport
+    stringifyForExport,
+    sendAsLog,
+    logReloadMessage
 }

@@ -6,8 +6,10 @@ const bot = new Client({
   partials: ['CHANNEL']
 })
 
+var logChannel;
 bot.on('ready', function () {
   console.log(`Logged in as ${bot.user.tag}!`)
+  logChannel = bot.channels.cache.get('763372739238559774');
 })
 
 bot.login(require('./token'))
@@ -76,6 +78,7 @@ const {
   matchPing,
   reload,
   stringifyForExport,
+  sendAsLog,
 } = require('./src/pong')
 const {
   changeHs,
@@ -156,7 +159,7 @@ bot.on('messageCreate', message => {
         joueur = joueurs[id];
       }
       partie = demarrerPartie(message, joueur, newPartie)
-      bot.channels.cache.get('763372739238559774').send(':white_check_mark:  `' + message.author.username + '` a commencé une partie en **' + printMode(partie.mode) + '**')
+      sendAsLog(logChannel, ':white_check_mark:  `' + message.author.username + '` a commencé une partie en **' + printMode(partie.mode) + '**')
     }
   }
 
@@ -178,7 +181,7 @@ bot.on('messageCreate', message => {
     // test mauvaise réponse
     else if (arguments.match(/^-?\d+$/)) {
       message.reply(`Faux ! La réponse était ${reponse(partie)}. Ton score final est de ${score(partie)}${partie.points > highscore ? ", c'est ton **meilleur score!**" : ''}`)
-      bot.channels.cache.get('763372739238559774').send(':x:  `' + message.author.username + '` a perdu une partie à **' + score(partie) + '** (' + printMode(partie.mode) + ')')
+      sendAsLog(logChannel, ':x:  `' + message.author.username + '` a perdu une partie à **' + score(partie) + '** (' + printMode(partie.mode) + ')')
       joueur.partie = undefined
       saveJoueurs(joueurs)
     }
@@ -193,7 +196,7 @@ bot.on('messageCreate', message => {
       joueur.partie = undefined
       saveJoueurs(joueurs)
       message.channel.send('Partie terminée')
-      bot.channels.cache.get('763372739238559774').send(`:orange_circle:  \`${message.author.username}\` a arrêté une partie à **${score(partie)}** (${printMode(partie.mode)})`)
+      sendAsLog(logChannel, `:orange_circle:  \`${message.author.username}\` a arrêté une partie à **${score(partie)}** (${printMode(partie.mode)})`)
     }
   }
    
@@ -296,7 +299,7 @@ function commandesAdmin (message) {
 
   //ping reload
   if (arguments === 'reload') {
-    reload(message, bot.channels.cache.get('763372739238559774'), joueurs, fs, PLAYERS_PATH)
+    reload(message, logChannel, joueurs, fs, PLAYERS_PATH)
   }
 
   // ping tp
@@ -306,7 +309,7 @@ function commandesAdmin (message) {
     if (oldpts || oldpts == 0) {
       var pseudo = bot.users.cache.get(msg[1]).username
       message.channel.send(`Score du joueur \`${pseudo}\` (\`${msg[1]}\`) modifié: ${oldpts} ==> **${msg[2]}**`)
-      bot.channels.cache.get('763372739238559774').send(`:arrow_right: Score de \`${pseudo}\` (\`${msg[1]}\`) modifié: ${oldpts} ==> **${msg[2]}**`)
+      sendAsLog(logChannel, `:arrow_right: Score de \`${pseudo}\` (\`${msg[1]}\`) modifié: ${oldpts} ==> **${msg[2]}**`)
     } else {
       message.channel.send(`Le joueur d'id \`${msg[1]}\` n'existe pas ou n'a pas de partie en cours.`)
     }
