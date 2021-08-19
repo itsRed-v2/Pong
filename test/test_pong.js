@@ -784,46 +784,80 @@ ligne2 du message`))
 
   describe('#logReloadMessage()', function () {
     it("log premier reload message", function () {
+      var editRuns = 0;
+      var sendRuns = 0;
       const messages = {
         first: () => {
           return { content: 'Message quelconque' }
+        },
+        edit: (s) => {
+          editRuns++;
+          return Promise.resolve();
         }
       }
       const logChannel = {
         send: (s) => {
           expect(s).to.eql(':repeat: Reloading');
+          sendRuns++;
           return Promise.resolve();
         }
       }
-      return logReloadMessage(messages, logChannel);
+      return logReloadMessage(messages, logChannel).then(() => {
+        expect(editRuns).to.eql(0);
+        expect(sendRuns).to.eql(1);
+      });
     });
     it("log deuxième reload message", function () {
+      var editRuns = 0;
+      var sendRuns = 0;
       const messages = {
         first: () => {
           return {
             content: ':repeat: Reloading',
             edit: (s) => {
               expect(s).to.eql(':repeat: Reloading (x2)');
+              editRuns++;
+              return Promise.resolve();
             }
           }
         }
       }
-      const logChannel = {}
-      return logReloadMessage(messages, logChannel);
+      const logChannel = {
+        send: (s) => {
+          sendRuns++;
+          return Promise.resolve();
+        }
+      }
+      return logReloadMessage(messages, logChannel).then(() => {
+        expect(editRuns).to.eql(1);
+        expect(sendRuns).to.eql(0);
+      });
     });
     it("log 2+ reload message", function () {
+      var editRuns = 0;
+      var sendRuns = 0;
       const messages = {
         first: () => {
           return {
             content: ':repeat: Reloading (x6)',
             edit: (s) => {
               expect(s).to.eql(':repeat: Reloading (x7)');
+              editRuns++;
+              return Promise.resolve();
             }
           } 
         }
       }
-      const logChannel = {}
-      return logReloadMessage(messages, logChannel);
+      const logChannel = {
+        send: (s) => {
+          sendRuns++;
+          return Promise.resolve();
+        }
+      }
+      return logReloadMessage(messages, logChannel).then(() => {
+        expect(editRuns).to.eql(1);
+        expect(sendRuns).to.eql(0);
+      });
     });
   });
 
