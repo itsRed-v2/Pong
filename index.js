@@ -358,7 +358,7 @@ bot.on('messageCreate', message => {
     }
   }
 
-  // log joueurs
+  // ping log
   if (arguments === 'log') {
     message.channel.send({
       content: 'Voici les fichiers des joueurs et des highscores:',
@@ -375,12 +375,14 @@ bot.on('messageCreate', message => {
     })
   }
 
+  // ping listall
   if (arguments === 'listall') {
     message.channel.send(listeJoueurs(joueurs, allHighscores));
   }
 
   var splitargs = arguments.split(" ");
 
+  // ping rmplayer
   if (splitargs[0] === "rmplayer") {
     if (splitargs[1]) {
       if (joueurs[splitargs[1]]) {
