@@ -122,6 +122,15 @@ function logReloadMessage(messages, logChannel) {
     }
 }
 
+function listeJoueurs(joueurs) {
+    var msg = ["**Liste des joueurs enregistrés:**"];
+    Object.keys(joueurs).forEach(id =>{
+      msg.push(joueurs[id].pseudo);
+      if (joueurs[id].partie) msg.push('> partie en cours');
+    })
+    return msg.join('\n');
+}
+
 module.exports = {
     code,
     decode,
@@ -135,5 +144,6 @@ module.exports = {
     reload,
     stringifyForExport,
     sendAsLog,
-    logReloadMessage
+    logReloadMessage,
+    listeJoueurs
 }

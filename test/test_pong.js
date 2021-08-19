@@ -24,7 +24,8 @@ const {
   matchPing,
   stringifyForExport,
   sendAsLog,
-  logReloadMessage
+  logReloadMessage,
+  listeJoueurs
 } = require('../src/pong')
 const {
   changeHs,
@@ -826,5 +827,49 @@ ligne2 du message`))
     });
   });
 
-
+  describe('#listeJoueurs()', function () {
+    it("liste les joueurs", function () {
+      var joueurs = {
+        'id1': {
+          "mode": "mode_plus",
+          "pseudo": "name1",
+          "discriminator": "1111"
+        },
+        'id2': {
+          "mode": "mode_plus",
+          "pseudo": "name2",
+          "discriminator": "2222"
+        }
+      };
+      expect(listeJoueurs(joueurs)).to.eql(
+`**Liste des joueurs enregistrés:**
+name1
+name2`
+      );
+    });
+    it("affiche si un joueur a une partie en cours", function () {
+      var joueurs = {
+        'id1': {
+          "mode": "mode_plus",
+          "pseudo": "name1",
+          "discriminator": "1111",
+          "partie": {
+            "points": 1,
+            "mode": "mode_plus"
+          }
+        },
+        'id2': {
+          "mode": "mode_plus",
+          "pseudo": "name2",
+          "discriminator": "2222"
+        }
+      };
+      expect(listeJoueurs(joueurs)).to.eql(
+`**Liste des joueurs enregistrés:**
+name1
+> partie en cours
+name2`
+      );
+    });
+  });
 });

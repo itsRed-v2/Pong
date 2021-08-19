@@ -79,6 +79,7 @@ const {
   reload,
   stringifyForExport,
   sendAsLog,
+  listeJoueurs
 } = require('./src/pong')
 const {
   changeHs,
@@ -281,8 +282,7 @@ ping (code|decode) <clé (1er ligne)>
 // *** COMMANDES ADMIN ***
 // ***********************
 
-bot.on('messageCreate', commandesAdmin);
-function commandesAdmin (message) {
+bot.on('messageCreate', message => {
   
   if (message.author.bot) {
     return
@@ -376,20 +376,7 @@ function commandesAdmin (message) {
   }
 
   if (arguments === 'listall') {
-    var msg = "Liste des joueurs enregistrés:\n";
-    Object.keys(joueurs).forEach(id =>{
-      msg += `**${joueurs[id].pseudo}**\n`;
-
-      if (joueurs[id].partie) {
-        msg += ' => partie en cours\n';
-      }
-      var played = false;
-      for (var key in allHighscores){
-        if (allHighscores[key][id]) played = true;
-      }
-      if (!played) msg += ' => :x: jamais joué!\n'
-    })
-    message.channel.send(msg);
+    message.channel.send(listeJoueurs(joueurs, allHighscores));
   }
 
   var splitargs = arguments.split(" ");
@@ -410,4 +397,4 @@ ${JSON.stringify(joueurs[splitargs[1]], null, "   ")}
       message.channel.send('Vous devez spécifier un id!');
     }
   }
-};
+});
