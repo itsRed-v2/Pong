@@ -26,7 +26,8 @@ const {
   sendAsLog,
   logReloadMessage,
   listeJoueurs,
-  isInteger
+  isInteger,
+  isPositiveInteger
 } = require('../src/pong')
 const {
   changeHs,
@@ -184,6 +185,7 @@ describe('Pong', function () {
     });
     it("renvoie false si la syntaxe est incorrecte", function () {
       expect(matchTp(['tp', 'id1', 'd56'])).to.eql(false);
+      expect(matchTp(['tp', 'id1', '-56'])).to.eql(false);
       expect(matchTp(['truc', 'id1', '56'])).to.eql(false);
     });
     it("renvoie false si la syntaxe est incomplète", function () {
@@ -231,20 +233,19 @@ describe('Pong', function () {
   });
 
   describe('#matchHs()', function () {
-    it("extraire informations", function () {
-      expect(matchHs('seths Nokari 56 plus')).to.eql([
-        'seths Nokari 56 plus',
-        'seths',
-        'Nokari',
-        '56',
-        'plus'
-      ]);
+    it("renvoie true si la syntaxe est correcte", function () {
+      expect(matchHs(['seths', 'Nokari', '56', 'plus'])).to.eql(true);
+      expect(matchHs(['seths', 'Nokari', '56', 'moins'])).to.eql(true);
+      expect(matchHs(['addhs', 'Nokari', '56', 'plus'])).to.eql(true);
     });
-    it("renvoie null si matche pas", function () {
-      expect(matchHs('seths Nokari d56 plus')).to.eql(null);
+    it("renvoie false la syntaxe est incorrecte", function () {
+      expect(matchHs(['seths', 'Nokari', 'd56', 'plus'])).to.eql(false);
+      expect(matchHs(['seths', 'Nokari', '56', 'pldes'])).to.eql(false);
+      expect(matchHs(['addss', 'Nokari', '56', 'plus'])).to.eql(false);
     });
-    it("fonctionne avec des maj", function () {
-      expect(matchHs('seths Nokari 56 plUs')).not.to.eql(null);
+    it("renvoie false la syntaxe est incomplète", function () {
+      expect(matchHs(['seths', 'Nokari', '56'])).to.eql(false);
+
     });
   });
 
@@ -914,6 +915,27 @@ name2`
     it("renvoie false si l'objet n'est pas un string", function () {
       expect(isInteger(4)).to.eql(false);
       expect(isInteger(['lol', 'truc'])).to.eql(false);
+    });
+  });
+  
+  describe('#isPositiveInteger()', function () {
+    it("renvoie le nombre correspondant au string", function () {
+      expect(isPositiveInteger('463')).to.eql(463);
+    });
+    it("renvoie false si le string n'est pas un nombre", function () {
+      expect(isPositiveInteger('542d')).to.eql(false);
+      expect(isPositiveInteger('h234')).to.eql(false);
+      expect(isPositiveInteger('-')).to.eql(false);
+    });
+    it("renvoie false si le string est un nombre négatif", function () {
+      expect(isPositiveInteger('-23')).to.eql(false);
+    });
+    it("renvoie false si le string est un nombre décimal", function () {
+      expect(isPositiveInteger('12.5')).to.eql(false);
+    });
+    it("renvoie false si l'objet n'est pas un string", function () {
+      expect(isPositiveInteger(4)).to.eql(false);
+      expect(isPositiveInteger(['lol', 'truc'])).to.eql(false);
     });
   });
 });

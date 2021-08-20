@@ -312,35 +312,34 @@ bot.on('messageCreate', message => {
       message.channel.send(`Le joueur d'id \`${id}\` n'existe pas ou n'a pas de partie en cours.`)
     }
   }
-  return;
   
   // modération highscores
   if (matchHs(arguments)) {
-    var msg = matchHs(arguments)
-    if (bot.users.cache.get(msg[2])) {
-      var pseudo = bot.users.cache.get(msg[2]).username
+    if (bot.users.cache.get(arguments[1])) {
+      var pseudo = bot.users.cache.get(arguments[1]).username
     }
-    if (msg[1] == 'seths') {
+    if (arguments[0] == 'seths') {
       // ping seths
-      if (changeHs(msg[2], msg[3], msg[4], allHighscores)) {
-        message.channel.send(`Le highscore du joueur \`${pseudo}\` (\`${msg[2]}\`) en ${printMode('mode_'+msg[4])} est maintenant ${msg[3]}`)
+      if (changeHs(arguments[1], arguments[2], arguments[3], allHighscores)) {
+        message.channel.send(`Le highscore du joueur \`${pseudo}\` (\`${arguments[1]}\`) en ${printMode('mode_'+arguments[3])} est maintenant ${arguments[2]}`)
       } else {
-        message.channel.send(`L'id \`${msg[2]}\` ne correspond à aucun joueur dans le mode spécifié`)
+        message.channel.send(`L'id \`${arguments[1]}\` ne correspond à aucun joueur dans le mode spécifié`)
       }
     } else {
       // ping addhs
-      if (bot.users.cache.get(msg[2])) {
-        if (ajouteHs(msg[2], msg[3], msg[4], allHighscores)) {
-          message.channel.send(`Le highscore du joueur \`${pseudo}\` (\`${msg[2]}\`) en ${printMode('mode_'+msg[4])} a été ajouté et sa valeur est ${msg[3]}`)
+      if (bot.users.cache.get(arguments[1])) {
+        if (ajouteHs(arguments[1], arguments[2], arguments[3], allHighscores)) {
+          message.channel.send(`Le highscore du joueur \`${pseudo}\` (\`${arguments[1]}\`) en ${printMode('mode_'+arguments[3])} a été ajouté et sa valeur est ${arguments[2]}`)
         } else {
-          message.channel.send(`Un joueur d'id \`${msg[2]}\` (\`${pseudo}\`) est déja présent dans la liste`)
+          message.channel.send(`Un joueur d'id \`${arguments[1]}\` (\`${pseudo}\`) est déja présent dans la liste`)
         }
       } else {
-        message.channel.send(`Personne n'a été trouvé avec l'id \`${msg[2]}\``)
+        message.channel.send(`Personne n'a été trouvé avec l'id \`${arguments[1]}\``)
       }
     }
     saveHighScores(allHighscores)
   }
+  return;
   // ping rmhs
   if (matchRmHs(arguments)) {
     var msg = matchRmHs(arguments)

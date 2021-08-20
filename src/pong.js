@@ -50,7 +50,7 @@ function listeJoueursActifs(joueurs, info) {
 
 function matchTp(arguments) {
     if (arguments[0] !== 'tp') return false;
-    if (!isInteger(arguments[2])) return false;
+    if (!isPositiveInteger(arguments[2])) return false;
     return true;
 }
 
@@ -64,8 +64,17 @@ function changeScore(id, score, joueurs) {
     }
 }
 
-function matchHs(arguments) {
-    return arguments.match(/^(seths|addhs) (.+) (\d*) (plus|moins|double)$/i)
+const MODES_SUFFIXES = new Set([
+    'plus',
+    'moins',
+    'double'
+]);
+
+function matchHs(args) {
+    if (!(args[0] === 'seths' || args[0] === 'addhs')) return false;
+    if (!isPositiveInteger(args[2])) return false;
+    if (!MODES_SUFFIXES.has(args[3])) return false;
+    return true;
 }
 
 function matchRmHs(arguments) {
@@ -133,6 +142,12 @@ function isInteger(string) {
     else return false;
 }
 
+function isPositiveInteger(string) {
+    if (typeof string !== 'string') return false;
+    if (string.match(/^\d+$/)) return +string;
+    else return false;
+}
+
 module.exports = {
     code,
     decode,
@@ -148,5 +163,6 @@ module.exports = {
     sendAsLog,
     logReloadMessage,
     listeJoueurs,
-    isInteger
+    isInteger,
+    isPositiveInteger
 }
