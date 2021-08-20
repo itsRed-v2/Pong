@@ -115,6 +115,11 @@ function getDiscriminator(id) {
   }
 }
 
+function isPlayerCached(id) {
+  if (bot.users.cache.get(id)) return true;
+  else return false;
+}
+
 //================================
 
 var joueurs = require(PLAYERS_PATH);
@@ -301,7 +306,7 @@ bot.on('messageCreate', message => {
     var id = arguments[1]
     var oldScore = changeScore(id, newScore, joueurs)
     if (oldScore || oldScore == 0) {
-      var pseudo = bot.users.cache.get(id).username
+      var pseudo = getUsername(id);
       message.channel.send(`Score du joueur \`${pseudo}\` (\`${id}\`) modifié: ${oldScore} ==> **${newScore}**`)
       sendAsLog(logChannel, `:arrow_right: Score de \`${pseudo}\` (\`${id}\`) modifié: ${oldScore} ==> **${newScore}**`)
     } else {
@@ -311,8 +316,8 @@ bot.on('messageCreate', message => {
   
   // modération highscores
   if (matchHs(arguments)) {
-    if (bot.users.cache.get(arguments[1])) {
-      var pseudo = bot.users.cache.get(arguments[1]).username
+    if (isPlayerCached(arguments[1])) {
+      var pseudo = getUsername(arguments[1]);
     }
     if (arguments[0] == 'seths') {
       // ping seths
@@ -323,7 +328,7 @@ bot.on('messageCreate', message => {
       }
     } else {
       // ping addhs
-      if (bot.users.cache.get(arguments[1])) {
+      if (isPlayerCached(arguments[1])) {
         if (ajouteHs(arguments[1], arguments[2], arguments[3], allHighscores)) {
           message.channel.send(`Le highscore du joueur \`${pseudo}\` (\`${arguments[1]}\`) en ${printMode('mode_'+arguments[3])} a été ajouté et sa valeur est ${arguments[2]}`)
         } else {
