@@ -26,7 +26,6 @@ const PLAYERS_PATH = DATA_PATH + '/players.js';
 const allHighscores = require(HIGHSCORE_PATH);
 
 const AIDE_UTILISATEUR = `**Liste des commandes**
-**Jeu:**
 \`ping règles\` donne les règles du jeu
 \`ping ?\` repose la question en cours
 \`ping\` commence une partie
@@ -42,7 +41,7 @@ const AIDE_UTILISATEUR = `**Liste des commandes**
 // <message (a partir de la 2e ligne)>
 // \`\`\`permet de crypter/décripter un message à partir d'une clé de cryptage`
 
-const AIDE_ADMIN = `**Admin:**
+const AIDE_ADMIN = `**Commandes Admin**
 \`ping reload\` redémarre l'application
 \`ping tp <id> <score>\` set le score du joueur spécifié
 \`ping seths <id> <highscore> <plus|moins|double>\` set le highscore du joueur spécifié dans le mode spécifié
@@ -223,11 +222,8 @@ Une partie commence avec un mode, et elle garde ce mode jusqu'a la fin.
 
   // ping help
   if (arguments[0] === 'help') {
-    if (id == 364820614990528522) {
-      message.channel.send(AIDE_UTILISATEUR + '\n\n' + AIDE_ADMIN)
-    } else {
-      message.channel.send(AIDE_UTILISATEUR)
-    }
+    if (id == 364820614990528522 && arguments[1] === 'admin') message.channel.send(AIDE_ADMIN);
+    else message.channel.send(AIDE_UTILISATEUR);
   }
 
   // ping highscores
