@@ -110,7 +110,7 @@ function stringifyForExport(object) {
 function sendAsLog(logChannel, string) { // non testé
     if (string === ':repeat: Reloading') {
         return logChannel.messages.fetch({ limit: 1 }).then(messages => {
-            logReloadMessage(messages, logChannel);
+            return logReloadMessage(messages, logChannel);
         });
     } else {
         return logChannel.send(string);
