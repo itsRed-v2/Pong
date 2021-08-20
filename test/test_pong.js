@@ -25,7 +25,8 @@ const {
   stringifyForExport,
   sendAsLog,
   logReloadMessage,
-  listeJoueurs
+  listeJoueurs,
+  isInteger
 } = require('../src/pong')
 const {
   changeHs,
@@ -178,18 +179,15 @@ describe('Pong', function () {
   });
 
   describe('#matchTp()', function () {
-    it("extraire informations", function () {
-      expect(matchTp('tp Nokari 56')).to.eql([
-        'tp Nokari 56',
-        'Nokari',
-        '56'
-      ]);
+    it("renvoie true si la syntaxe est correcte", function () {
+      expect(matchTp(['tp', 'id1', '56'])).to.eql(true);
     });
-    it("renvoie null si matche pas", function () {
-      expect(matchTp('tp Nokari d56')).to.eql(null);
+    it("renvoie false si la syntaxe est incorrecte", function () {
+      expect(matchTp(['tp', 'id1', 'd56'])).to.eql(false);
+      expect(matchTp(['truc', 'id1', '56'])).to.eql(false);
     });
-    it("fonctionne avec des maj", function () {
-      expect(matchTp('tp Nokari 56')).not.to.eql(null);
+    it("renvoie false si la syntaxe est incomplète", function () {
+      expect(matchTp(['tp', 'id1'])).to.eql(false);
     });
   });
 
@@ -382,30 +380,23 @@ describe('Pong', function () {
 
   describe('#matchPing()', function () {
     it("extraire les arguments", function () {
-      expect(matchPing('ping <argument> <avec des espaces>'))
-      .to.eql('<argument> <avec des espaces>');
+      expect(matchPing('ping arg1 arg2 arg3'))
+      .to.eql(['arg1', 'arg2', 'arg3']);
     });
-
-    it("extraire les arguments plus les autres lignes", function () {
+    it("ne prend en compte que la première ligne", function () {
       expect(matchPing(`ping code cle
-message
-ligne2 du message`))
-      .to.eql('code cle\nmessage\nligne2 du message');
+2e ligne`))
+      .to.eql(['code', 'cle']);
     });
-
     it("renvoie null si matche pas", function () {
       expect(matchPing('hey salut')).to.eql(null);
     });
-    it("fonctionne avec des maj", function () {
-      expect(matchPing('PinG <argument> <avec des espaces>'))
-      .to.eql('<argument> <avec des espaces>');
-    });
     it("fonctionne avec que ping", function () {
-      expect(matchPing('ping')).to.eql('');
+      expect(matchPing('ping')).to.eql([]);
     });
     it("fonctionne avec le prefix p", function () {
-      expect(matchPing('p <argument> <avec des espaces>'))
-      .to.eql('<argument> <avec des espaces>');
+      expect(matchPing('p arg1 arg2 arg3'))
+      .to.eql(['arg1', 'arg2', 'arg3']);
     });
   });
 
@@ -904,6 +895,25 @@ name1
 > partie en cours
 name2`
       );
+    });
+  });
+
+  describe('#isInteger()', function () {
+    it("renvoie le nombre correspondant au string", function () {
+      expect(isInteger('463')).to.eql(463);
+      expect(isInteger('-23')).to.eql(-23);
+    });
+    it("renvoie false si le string n'est pas un nombre", function () {
+      expect(isInteger('542d')).to.eql(false);
+      expect(isInteger('h234')).to.eql(false);
+      expect(isInteger('-')).to.eql(false);
+    });
+    it("renvoie false si le string est un nombre décimal", function () {
+      expect(isInteger('12.5')).to.eql(false);
+    });
+    it("renvoie false si l'objet n'est pas un string", function () {
+      expect(isInteger(4)).to.eql(false);
+      expect(isInteger(['lol', 'truc'])).to.eql(false);
     });
   });
 });

@@ -48,10 +48,10 @@ function listeJoueursActifs(joueurs, info) {
     return liste
 }
 
-
-
 function matchTp(arguments) {
-    return arguments.match(/^tp (.+) (\d*)$/i)
+    if (arguments[0] !== 'tp') return false;
+    if (!isInteger(arguments[2])) return false;
+    return true;
 }
 
 function changeScore(id, score, joueurs) {
@@ -73,15 +73,11 @@ function matchRmHs(arguments) {
 }
 
 function matchPing(contenu) {
-    lignes = contenu.split('\n')
-    match = lignes[0].match(/^(ping|p)( (.+))?/i)
-    if (!match) return null
-    if (match[3]) {
-        lignes.shift()
-        lignes.unshift(match[3])
-        return lignes.join('\n')
-    }
-    return ''
+    if (!(contenu.startsWith('ping') || contenu.startsWith('p'))) return null;
+    var lignes = contenu.split('\n')
+    var args = lignes[0].split(' ');
+    args.shift();
+    return args;
 }
 
 function reload(message, logChannel, joueurs, fs, PLAYERS_PATH) {
@@ -131,6 +127,12 @@ function listeJoueurs(joueurs) {
     return msg.join('\n');
 }
 
+function isInteger(string) {
+    if (typeof string !== 'string') return false;
+    if (string.match(/^-?\d+$/)) return +string;
+    else return false;
+}
+
 module.exports = {
     code,
     decode,
@@ -145,5 +147,6 @@ module.exports = {
     stringifyForExport,
     sendAsLog,
     logReloadMessage,
-    listeJoueurs
+    listeJoueurs,
+    isInteger
 }
