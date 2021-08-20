@@ -305,8 +305,9 @@ bot.on('messageCreate', message => {
     var newScore = arguments[2];
     var id = arguments[1]
     var oldScore = changeScore(id, newScore, joueurs)
-    if (oldScore || oldScore == 0) {
+    if (oldScore || oldScore === 0) {
       var pseudo = getUsername(id);
+      saveJoueurs(joueurs);
       message.channel.send(`Score du joueur \`${pseudo}\` (\`${id}\`) modifié: ${oldScore} ==> **${newScore}**`)
       sendAsLog(logChannel, `:arrow_right: Score de \`${pseudo}\` (\`${id}\`) modifié: ${oldScore} ==> **${newScore}**`)
     } else {
