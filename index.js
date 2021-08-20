@@ -78,7 +78,8 @@ const {
   reload,
   stringifyForExport,
   sendAsLog,
-  listeJoueurs
+  listeJoueurs,
+  isInteger
 } = require('./src/pong')
 const {
   changeHs,
@@ -184,7 +185,7 @@ bot.on('messageCreate', message => {
     }
 
     // test mauvaise réponse
-    else if (arguments[0].match(/^-?\d+$/)) {
+    else if (isInteger(arguments[0])) {
       message.reply(`Faux ! La réponse était ${reponse(partie)}. Ton score final est de ${score(partie)}${partie.points > highscore ? ", c'est ton **meilleur score!**" : ''}`)
       sendAsLog(logChannel, ':x:  `' + message.author.username + '` a perdu une partie à **' + score(partie) + '** (' + printMode(partie.mode) + ')')
       joueur.partie = undefined
@@ -206,7 +207,7 @@ bot.on('messageCreate', message => {
   }
    
   // réponse, "ping ?" ou "ping stop" mais aucune partie en cours
-  else if (arguments[0].match(/^-?\d+$/) || arguments[0] === '?' || arguments[0] === 'stop') {
+  else if (isInteger(arguments[0]) || arguments[0] === '?' || arguments[0] === 'stop') {
     message.reply('Aucune partie en cours. Tape `ping` pour lancer une partie')
   }
 
