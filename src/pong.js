@@ -77,8 +77,10 @@ function matchHs(args) {
     return true;
 }
 
-function matchRmHs(arguments) {
-    return arguments.match(/^rmhs (.+) (plus|moins|double)$/i)
+function matchRmHs(args) {
+    if (args[0] !== 'rmhs') return false;
+    if (!MODES_SUFFIXES.has(args[2])) return false;
+    return true;
 }
 
 function matchPing(contenu) {

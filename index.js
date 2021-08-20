@@ -339,14 +339,11 @@ bot.on('messageCreate', message => {
     }
     saveHighScores(allHighscores)
   }
-  return;
   // ping rmhs
   if (matchRmHs(arguments)) {
-    var msg = matchRmHs(arguments)
-    
-    var id = msg[1]
-    var mode = 'mode_' + msg[2];
-    var pseudo = getUsername(id)
+    var id = arguments[1];
+    var mode = 'mode_' + arguments[2];
+    var pseudo = getUsername(id);
     
     if (removeHs(id, mode, allHighscores)) {
       message.channel.send(`Le highscore du joueur \`${pseudo}\` (id: \`${id}\`) en ${printMode(mode)} a été supprimé`);
@@ -357,7 +354,7 @@ bot.on('messageCreate', message => {
   }
 
   // ping log
-  if (arguments === 'log') {
+  if (arguments[0] === 'log') {
     message.channel.send({
       content: 'Voici les fichiers des joueurs et des highscores:',
       files: [
@@ -374,24 +371,22 @@ bot.on('messageCreate', message => {
   }
 
   // ping listall
-  if (arguments === 'listall') {
+  if (arguments[0] === 'listall') {
     message.channel.send(listeJoueurs(joueurs, allHighscores));
   }
 
-  var splitargs = arguments.split(" ");
-
   // ping rmplayer
-  if (splitargs[0] === "rmplayer") {
-    if (splitargs[1]) {
-      if (joueurs[splitargs[1]]) {
-        message.channel.send(`Joueur \`${splitargs[1]}\` supprimé
+  if (arguments[0] === "rmplayer") {
+    if (arguments[1]) {
+      if (joueurs[arguments[1]]) {
+        message.channel.send(`Joueur \`${arguments[1]}\` supprimé
 \`\`\`json
-${JSON.stringify(joueurs[splitargs[1]], null, "   ")}
+${JSON.stringify(joueurs[arguments[1]], null, "   ")}
 \`\`\``);
-        delete joueurs[splitargs[1]]
+        delete joueurs[arguments[1]]
         saveJoueurs(joueurs);
       } else {
-        message.channel.send(`Aucun joueur enregistré ne correspond à l'id \`${splitargs[1]}\``);
+        message.channel.send(`Aucun joueur enregistré ne correspond à l'id \`${arguments[1]}\``);
       }
     } else {
       message.channel.send('Vous devez spécifier un id!');

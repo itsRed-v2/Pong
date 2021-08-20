@@ -245,23 +245,19 @@ describe('Pong', function () {
     });
     it("renvoie false la syntaxe est incomplète", function () {
       expect(matchHs(['seths', 'Nokari', '56'])).to.eql(false);
-
     });
   });
 
   describe('#matchRmHs()', function () {
-    it("extraire informations", function () {
-      expect(matchRmHs('rmhs Nokari plus')).to.eql([
-        'rmhs Nokari plus',
-        'Nokari',
-        'plus'
-      ]);
+    it("renvoie true si la syntaxe est correcte", function () {
+      expect(matchRmHs(['rmhs', 'Nokari', 'plus'])).to.eql(true);
     });
-    it("renvoie null si matche pas", function () {
-      expect(matchRmHs('rmhs Nokari eplus')).to.eql(null);
+    it("renvoie false la syntaxe est incorrecte", function () {
+      expect(matchRmHs(['rmhs', 'Nokari', 'dlus'])).to.eql(false);
+      expect(matchRmHs(['rdhs', 'Nokari', 'plus'])).to.eql(false);
     });
-    it("fonctionne avec des maj", function () {
-      expect(matchRmHs('rMHs Nokari plUs')).not.to.eql(null);
+    it("renvoie false la syntaxe est incomplète", function () {
+      expect(matchHs(['rmhs', 'Nokari'])).to.eql(false);
     });
   });
 
