@@ -107,7 +107,7 @@ function stringifyForExport(object) {
     return "module.exports = " + JSON.stringify(object, null, "  ") + ";"
 }
 
-function sendAsLog(logChannel, string) {
+function sendAsLog(logChannel, string) { // non testé
     if (string === ':repeat: Reloading') {
         return logChannel.messages.fetch({ limit: 1 }).then(messages => {
             logReloadMessage(messages, logChannel);

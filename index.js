@@ -33,7 +33,8 @@ const AIDE_UTILISATEUR = `**Liste des commandes**
 \`ping highscores\` / \`ping hs\` affiche les meilleurs scores des joueurs
 \`ping mode <mode>\` choisir le mode de jeu parmi \`plus\`, \`moins\`, ou \`double\`
 \`ping list\` liste toutes les parties en cours
-\`ping stop\` termine la partie en cours`
+\`ping stop\` termine la partie en cours
+Tu peux écrire \`p\` à la place de \`ping\` au début des commandes pour faire plus rapide!`
 
 // **Cryptage:**
 // \`\`\`
@@ -47,7 +48,10 @@ const AIDE_ADMIN = `**Commandes Admin**
 \`ping seths <id> <highscore> <plus|moins|double>\` set le highscore du joueur spécifié dans le mode spécifié
 \`ping addhs <id> <highscore> <plus|moins|double>\` ajoute le joueur à la liste dans le mode spécifié avec le score spécifié
 \`ping rmhs <id> <plus|moins|double>\` supprime le joueur de la liste dans le mode spécifié
-\`ping highscore info\` / \`ping hs info\` affiche les meilleurs scores et l'id des joueurs`
+\`ping rmplayer <id>\` supprime le joueur (**toutes** ses données seront supprimées)
+\`ping highscore info\` / \`ping hs info\` affiche les meilleurs scores et l'id des joueurs
+\`ping log\` upload les fichiers de données de pong
+\`ping listall\` donne la liste des joueurs enregistrés`
 
 //================================ fonctions
 
@@ -218,12 +222,13 @@ bot.on('messageCreate', message => {
   // ping règles
   if (arguments[0] == 'règles' || arguments[0] == 'regles') {
     message.channel.send(`Écris \`ping\` pour commencer une partie.
-Je vais alors te poser une question. Réponds par \`ping <reponse>\`
-Si ta réponse est correcte tu gagne un point et je te pose une nouvelle question.
-Si c'est faux, je te donne ton score et la partie se termine.
-La difficulté augmente en fonction du nombre de points.
-Une partie commence avec un mode, et elle garde ce mode jusqu'a la fin.
-Écris "ping help" pour la liste des commandes`)
+Je vais alors te poser une opération. Réponds par \`ping <réponse>\`
+Si ta réponse est correcte, tu gagne un point et je te pose une nouvelle opération.
+Si elle est fausse, tu perds et la partie se termine.
+- Plus tu as de points, plus les opérations sont difficiles.
+- Pas de stress! Tu as tout le temps que tu veux pour répondre.
+- Envie de faire une pause? Aucun problème! Tu peux laisser ta partie en plan, et la reprendre plus tard.
+- Écris \`ping help\` pour la liste des commandes. Certaines pourraient t'êtres utiles!`)
   }
 
   // ping help
