@@ -179,20 +179,6 @@ describe('Pong', function () {
     });
   });
 
-  describe('#matchTp()', function () {
-    it("renvoie true si la syntaxe est correcte", function () {
-      expect(matchTp(['tp', 'id1', '56'])).to.eql(true);
-    });
-    it("renvoie false si la syntaxe est incorrecte", function () {
-      expect(matchTp(['tp', 'id1', 'd56'])).to.eql(false);
-      expect(matchTp(['tp', 'id1', '-56'])).to.eql(false);
-      expect(matchTp(['truc', 'id1', '56'])).to.eql(false);
-    });
-    it("renvoie false si la syntaxe est incomplète", function () {
-      expect(matchTp(['tp', 'id1'])).to.eql(false);
-    });
-  });
-
   describe('#changeScore()', function () {
     it("retourne l'ancien score si joueur dans la liste avec une partie", function () {
       var Nokari = newJoueur();
@@ -229,6 +215,20 @@ describe('Pong', function () {
       };
       changeScore('Nokari',56,joueurs)
       expect(joueurs['Nokari'].partie.points).to.eql(56);
+    });
+  });
+
+  describe('#matchTp()', function () {
+    it("renvoie true si la syntaxe est correcte", function () {
+      expect(matchTp(['tp', 'id1', '56'])).to.eql(true);
+    });
+    it("renvoie false si la syntaxe est incorrecte", function () {
+      expect(matchTp(['tp', 'id1', 'd56'])).to.eql(false);
+      expect(matchTp(['tp', 'id1', '-56'])).to.eql(false);
+      expect(matchTp(['truc', 'id1', '56'])).to.eql(false);
+    });
+    it("renvoie false si la syntaxe est incomplète", function () {
+      expect(matchTp(['tp', 'id1'])).to.eql(false);
     });
   });
 

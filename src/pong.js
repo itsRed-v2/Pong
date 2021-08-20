@@ -3,6 +3,12 @@ const {
     printMode
 } = require('./partie')
 
+const MODES_SUFFIXES = new Set([
+    'plus',
+    'moins',
+    'double'
+]);
+
 function code(message, cle) {
     var messageCode = []
     for (var index = 0, icle = 0; index < message.length; index++, icle++) {
@@ -48,12 +54,6 @@ function listeJoueursActifs(joueurs, info) {
     return liste
 }
 
-function matchTp(arguments) {
-    if (arguments[0] !== 'tp') return false;
-    if (!isPositiveInteger(arguments[2])) return false;
-    return true;
-}
-
 function changeScore(id, score, joueurs) {
     if (joueurs[id] && joueurs[id].partie) {
         var oldpts = joueurs[id].partie.points
@@ -64,11 +64,11 @@ function changeScore(id, score, joueurs) {
     }
 }
 
-const MODES_SUFFIXES = new Set([
-    'plus',
-    'moins',
-    'double'
-]);
+function matchTp(arguments) {
+    if (arguments[0] !== 'tp') return false;
+    if (!isPositiveInteger(arguments[2])) return false;
+    return true;
+}
 
 function matchHs(args) {
     if (!(args[0] === 'seths' || args[0] === 'addhs')) return false;
@@ -155,8 +155,8 @@ module.exports = {
     decode,
     listeJoueursActifs, // ==> partie? joueur?
     afficheliste, // ==> partie? joueur?
-    matchTp, //==> match
     changeScore,
+    matchTp, //==> match
     matchHs, //==> match
     matchRmHs, //==> match
     matchPing, //==> match
