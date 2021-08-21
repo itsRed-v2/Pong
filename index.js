@@ -179,8 +179,7 @@ bot.on('messageCreate', message => {
       var highscore = allHighscores[partie.mode][id] || 0
       partie.points++
       saveJoueurs(joueurs)
-      message.reply(`Correct ! Tu as ${score(partie)}${partie.points > highscore ? ' **Meilleur score!**' : ''}`)
-      pauseQuestion(message, partie)
+      message.reply(`Correct ! Tu as ${score(partie)}.${partie.points > highscore ? ' **C\'est ton Meilleur score!**' : ''}\n${pauseQuestion(partie)}`)
       // maj highscore
       if (partie.points > highscore) {
         allHighscores[partie.mode][id] = partie.points

@@ -11,8 +11,7 @@ function newPartie(mode) {
 // NON TESTÉ (à cause de l'objet message)
 function demarrerPartie(message, joueur, newPartie) {
   joueur.partie = newPartie(joueur.mode);
-  message.reply("Démarrage d'une nouvelle partie en **" + printMode(joueur.mode) + "** !");
-  pauseQuestion(message, joueur.partie);
+  message.reply("Démarrage d'une nouvelle partie en **" + printMode(joueur.mode) + "** !\n" + pauseQuestion(joueur.partie));
   return joueur.partie;
 }
 
@@ -39,9 +38,9 @@ function tireAuSortDeuxNombres(partie) {
 }
 
 // NON TESTÉ
-function pauseQuestion (message, partie) {
+function pauseQuestion (partie) {
   tireAuSortDeuxNombres(partie);
-  message.reply('pong ' + question(partie) + ' !'); 
+  return 'pong ' + question(partie) + ' !';
 }
 
 function printMode(mode) {
