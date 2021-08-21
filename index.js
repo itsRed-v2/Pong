@@ -205,7 +205,7 @@ bot.on('messageCreate', message => {
     else if (arguments[0] === 'stop') {
       joueur.partie = undefined
       saveJoueurs(joueurs)
-      message.channel.send('Partie terminée')
+      message.reply('Partie terminée');
       sendAsLog(logChannel, `:orange_circle:  \`${message.author.username}\` a arrêté une partie à **${score(partie)}** (${printMode(partie.mode)})`)
     }
   }
