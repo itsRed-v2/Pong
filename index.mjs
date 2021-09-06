@@ -1,6 +1,6 @@
-const fs = require('fs')
-const { Client, Intents } = require('discord.js')
-const exitHook = require('exit-hook')
+import fs from 'fs';
+import { Client, Intents } from 'discord.js';
+import exitHook from 'exit-hook';
 const bot = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES],
   partials: ['CHANNEL']
@@ -12,7 +12,9 @@ bot.on('ready', function () {
   logChannel = bot.channels.cache.get('763372739238559774');
 })
 
-bot.login(require('./token'))
+import('./token.mjs').then(token => {
+  bot.login(token.default);
+});
 
 exitHook(() => {
   bot.destroy()
@@ -23,7 +25,7 @@ exitHook(() => {
 const DATA_PATH = process.env.PONG_DATA_PATH;
 const HIGHSCORE_PATH = DATA_PATH + '/highscores.js';
 const PLAYERS_PATH = DATA_PATH + '/players.js';
-const allHighscores = require(HIGHSCORE_PATH);
+const allHighscores = import(HIGHSCORE_PATH);
 
 const AIDE_UTILISATEUR = `**Liste des commandes**
 \`ping règles\` donne les règles du jeu
@@ -55,21 +57,9 @@ const AIDE_ADMIN = `**Commandes Admin**
 
 //================================ fonctions
 
-const {
-  newJoueur,
-  createJoueurIfNeeded,
-  updateJoueur
-} = require('./src/joueur')
-const {
-  newPartie,
-  demarrerPartie,
-  reponse,
-  score,
-  question,
-  pauseQuestion,
-  printMode
-} = require('./src/partie.js')
-const {
+import Joueur from './src/joueur.mjs';
+import Partie from './src/partie.mjs';
+import {
   code,
   decode,
   listeJoueursActifs,
@@ -83,14 +73,15 @@ const {
   stringifyForExport,
   sendAsLog,
   listeJoueurs,
-  isInteger
-} = require('./src/pong')
-const {
+  isInteger,
+  createJoueurIfNeeded
+} from './src/pong.mjs';
+import {
   changeHs,
   ajouteHs,
   removeHs,
   printHighscores
-} = require('./src/highscore')
+} from './src/highscore.mjs';
 
 function saveHighScores(allHighscores) {
   fs.writeFile(HIGHSCORE_PATH, stringifyForExport(allHighscores), function (err) {
@@ -127,33 +118,33 @@ function isPlayerCached(id) {
 
 //================================
 
-var joueurs = require(PLAYERS_PATH);
+var joueurs = import(PLAYERS_PATH);
 
 bot.on('messageCreate', message => {
 
   if (message.author.bot) return
 
   var contenu = message.content.toLowerCase()
-  var arguments = matchPing(contenu)
-  if (arguments === null) return
+  var args = matchPing(contenu)
+  if (args === null) return
 
   var id = message.author.id;
   var joueur = joueurs[id]
-  if (joueur){
+  if (joueur) {
     updateJoueur(id, getUsername(id), getDiscriminator(id), joueurs);
     var partie = joueur.partie
   }
 
   // ping mode
-  if (arguments[0] === 'mode') {
-    if(createJoueurIfNeeded(id, getUsername(id), getDiscriminator(id), joueurs, newJoueur)) {
+  if (args[0] === 'mode') {
+    if(createJoueurIfNeeded(id, getUsername(id), getDiscriminator(id), joueurs)) {
       saveJoueurs(joueurs);
       joueur = joueurs[id];
     }
     var plus = true
     var moins = false
-    plus = arguments[1].includes('+')
-    moins = arguments[1].includes('-')
+    plus = args[1].includes('+')
+    moins = args[1].includes('-')
     joueur.mode = (plus && moins ? 'mode_double' : (moins ? 'mode_moins' : 'mode_plus'))
     message.reply(printMode(joueur.mode))
   }
@@ -164,7 +155,7 @@ bot.on('messageCreate', message => {
       message.reply('Une partie en ' + printMode(partie.mode) + ' est déjà en cours, tu as ' + score(partie) + ` et la question est: ` + question(partie) + `\nTu ne peux pas avoir plusieurs parties en même temps. Arrêter une partie en cours: \`ping stop\``)
     }
     else {
-      if(createJoueurIfNeeded(id, getUsername(id), getDiscriminator(id), joueurs, newJoueur)) {
+      if(createJoueurIfNeeded(id, getUsername(id), getDiscriminator(id), joueurs)) {
         saveJoueurs(joueurs);
         joueur = joueurs[id];
       }
@@ -175,7 +166,7 @@ bot.on('messageCreate', message => {
 
   else if (partie) {
     // test bonne réponse
-    if (arguments[0] == reponse(partie)) {
+    if (args[0] == reponse(partie)) {
       var highscore = allHighscores[partie.mode][id] || 0
       partie.points++
       saveJoueurs(joueurs)
@@ -188,7 +179,7 @@ bot.on('messageCreate', message => {
     }
 
     // test mauvaise réponse
-    else if (isInteger(arguments[0])) {
+    else if (isInteger(args[0])) {
       message.reply(`Faux ! La réponse était ${reponse(partie)}. Ton score final est de ${score(partie)}${partie.points > highscore ? ", c'est ton **meilleur score!**" : ''}`)
       sendAsLog(logChannel, ':x:  `' + message.author.username + '` a perdu une partie à **' + score(partie) + '** (' + printMode(partie.mode) + ')')
       joueur.partie = undefined
@@ -196,12 +187,12 @@ bot.on('messageCreate', message => {
     }
 
     // ping ?
-    else if (arguments[0] === '?') {
+    else if (args[0] === '?') {
       message.reply(`pong ${question(partie)} ! (${score(partie)}, ${printMode(partie.mode)})`)
     }
 
     // ping stop
-    else if (arguments[0] === 'stop') {
+    else if (args[0] === 'stop') {
       joueur.partie = undefined
       saveJoueurs(joueurs)
       message.reply('Partie terminée');
@@ -210,7 +201,7 @@ bot.on('messageCreate', message => {
   }
    
   // réponse, "ping ?" ou "ping stop" mais aucune partie en cours
-  else if (isInteger(arguments[0]) || arguments[0] === '?' || arguments[0] === 'stop') {
+  else if (isInteger(args[0]) || args[0] === '?' || args[0] === 'stop') {
     message.reply('Aucune partie en cours. Tape `ping` pour lancer une partie')
   }
 
@@ -219,7 +210,7 @@ bot.on('messageCreate', message => {
   // ******************************
 
   // ping règles
-  if (arguments[0] == 'règles' || arguments[0] == 'regles') {
+  if (args[0] == 'règles' || args[0] == 'regles') {
     message.channel.send(`Écris \`ping\` pour commencer une partie.
 Je vais alors te poser une opération. Réponds par \`ping <réponse>\`
 Si ta réponse est correcte, tu gagne un point et je te pose une nouvelle opération.
@@ -231,19 +222,19 @@ Si elle est fausse, tu perds et la partie se termine.
   }
 
   // ping help
-  if (arguments[0] === 'help') {
-    if (id == 364820614990528522 && arguments[1] === 'admin') message.channel.send(AIDE_ADMIN);
+  if (args[0] === 'help') {
+    if (id == 364820614990528522 && args[1] === 'admin') message.channel.send(AIDE_ADMIN);
     else message.channel.send(AIDE_UTILISATEUR);
   }
 
   // ping highscores
-  if (arguments[0] === 'highscores' || arguments[0] === 'hs') {
-    message.channel.send(printHighscores(allHighscores, joueurs, arguments[1] === 'info', getUsername, getDiscriminator));
+  if (args[0] === 'highscores' || args[0] === 'hs') {
+    message.channel.send(printHighscores(allHighscores, joueurs, args[1] === 'info', getUsername, getDiscriminator));
   }
 
   // ping list
-  if (arguments[0] === 'list') {
-    message.channel.send(afficheliste(listeJoueursActifs(joueurs, arguments[1] === 'info')));
+  if (args[0] === 'list') {
+    message.channel.send(afficheliste(listeJoueursActifs(joueurs, args[1] === 'info')));
   }
 });
 
@@ -291,18 +282,18 @@ bot.on('messageCreate', message => {
   if (message.author.id != 364820614990528522) return;
   
   var contenu = message.content
-  var arguments = matchPing(contenu);
-  if (arguments === null) return;
+  var args = matchPing(contenu);
+  if (args === null) return;
 
   //ping reload
-  if (arguments[0] === 'reload') {
+  if (args[0] === 'reload') {
     reload(message, logChannel, joueurs, fs, PLAYERS_PATH)
   }
 
   // ping tp
-  if (matchTp(arguments)) {
-    var newScore = arguments[2];
-    var id = arguments[1]
+  if (matchTp(args)) {
+    var newScore = args[2];
+    var id = args[1]
     var oldScore = changeScore(id, newScore, joueurs)
     if (oldScore || oldScore === 0) {
       var pseudo = getUsername(id);
@@ -315,35 +306,35 @@ bot.on('messageCreate', message => {
   }
   
   // modération highscores
-  if (matchHs(arguments)) {
-    if (isPlayerCached(arguments[1])) {
-      var pseudo = getUsername(arguments[1]);
+  if (matchHs(args)) {
+    if (isPlayerCached(args[1])) {
+      var pseudo = getUsername(args[1]);
     }
-    if (arguments[0] == 'seths') {
+    if (args[0] == 'seths') {
       // ping seths
-      if (changeHs(arguments[1], arguments[2], arguments[3], allHighscores)) {
-        message.channel.send(`Le highscore du joueur \`${pseudo}\` (\`${arguments[1]}\`) en ${printMode('mode_'+arguments[3])} est maintenant ${arguments[2]}`)
+      if (changeHs(args[1], args[2], args[3], allHighscores)) {
+        message.channel.send(`Le highscore du joueur \`${pseudo}\` (\`${args[1]}\`) en ${printMode('mode_'+args[3])} est maintenant ${args[2]}`)
       } else {
-        message.channel.send(`L'id \`${arguments[1]}\` ne correspond à aucun joueur dans le mode spécifié`)
+        message.channel.send(`L'id \`${args[1]}\` ne correspond à aucun joueur dans le mode spécifié`)
       }
     } else {
       // ping addhs
-      if (isPlayerCached(arguments[1])) {
-        if (ajouteHs(arguments[1], arguments[2], arguments[3], allHighscores)) {
-          message.channel.send(`Le highscore du joueur \`${pseudo}\` (\`${arguments[1]}\`) en ${printMode('mode_'+arguments[3])} a été ajouté et sa valeur est ${arguments[2]}`)
+      if (isPlayerCached(args[1])) {
+        if (ajouteHs(args[1], args[2], args[3], allHighscores)) {
+          message.channel.send(`Le highscore du joueur \`${pseudo}\` (\`${args[1]}\`) en ${printMode('mode_'+args[3])} a été ajouté et sa valeur est ${args[2]}`)
         } else {
-          message.channel.send(`Un joueur d'id \`${arguments[1]}\` (\`${pseudo}\`) est déja présent dans la liste`)
+          message.channel.send(`Un joueur d'id \`${args[1]}\` (\`${pseudo}\`) est déja présent dans la liste`)
         }
       } else {
-        message.channel.send(`Personne n'a été trouvé avec l'id \`${arguments[1]}\``)
+        message.channel.send(`Personne n'a été trouvé avec l'id \`${args[1]}\``)
       }
     }
     saveHighScores(allHighscores)
   }
   // ping rmhs
-  if (matchRmHs(arguments)) {
-    var id = arguments[1];
-    var mode = 'mode_' + arguments[2];
+  if (matchRmHs(args)) {
+    var id = args[1];
+    var mode = 'mode_' + args[2];
     var pseudo = getUsername(id);
     
     if (removeHs(id, mode, allHighscores)) {
@@ -355,7 +346,7 @@ bot.on('messageCreate', message => {
   }
 
   // ping log
-  if (arguments[0] === 'log') {
+  if (args[0] === 'log') {
     message.channel.send({
       content: 'Voici les fichiers des joueurs et des highscores:',
       files: [
@@ -372,22 +363,22 @@ bot.on('messageCreate', message => {
   }
 
   // ping listall
-  if (arguments[0] === 'listall') {
+  if (args[0] === 'listall') {
     message.channel.send(listeJoueurs(joueurs, allHighscores));
   }
 
   // ping rmplayer
-  if (arguments[0] === "rmplayer") {
-    if (arguments[1]) {
-      if (joueurs[arguments[1]]) {
-        message.channel.send(`Joueur \`${arguments[1]}\` supprimé
+  if (args[0] === "rmplayer") {
+    if (args[1]) {
+      if (joueurs[args[1]]) {
+        message.channel.send(`Joueur \`${args[1]}\` supprimé
 \`\`\`json
-${JSON.stringify(joueurs[arguments[1]], null, "   ")}
+${JSON.stringify(joueurs[args[1]], null, "   ")}
 \`\`\``);
-        delete joueurs[arguments[1]]
+        delete joueurs[args[1]]
         saveJoueurs(joueurs);
       } else {
-        message.channel.send(`Aucun joueur enregistré ne correspond à l'id \`${arguments[1]}\``);
+        message.channel.send(`Aucun joueur enregistré ne correspond à l'id \`${args[1]}\``);
       }
     } else {
       message.channel.send('Vous devez spécifier un id!');

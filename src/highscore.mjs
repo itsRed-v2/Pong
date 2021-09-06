@@ -1,5 +1,3 @@
-const { printMode } = require('./partie')
-
 function changeHs(id, score, mode, allHighscores) {
     const clemode = 'mode_'+mode
     if (allHighscores[clemode][id]) {
@@ -39,6 +37,16 @@ function trieHighscores(highscores) {
     return sortable
 }
 
+const MODES = {
+    mode_plus: 'Mode Addition',
+    mode_moins: 'Mode Soustraction',
+    mode_double: 'Mode Double'
+}
+
+function printMode(mode) {
+    return MODES[mode];
+}
+
 function printHighscores(allHighscores, joueurs, printInfo, getUsername, getDiscriminator) {
     var contenu = ''
     for (var mode in allHighscores) {
@@ -46,8 +54,8 @@ function printHighscores(allHighscores, joueurs, printInfo, getUsername, getDisc
       var highscoresTriees = trieHighscores(allHighscores[mode])
       for (var index in highscoresTriees) {
         var highscore = highscoresTriees[index]
-        pseudo = getUsername(highscore[0])
-        discriminator = getDiscriminator(highscore[0])
+        var pseudo = getUsername(highscore[0]);
+        var discriminator = getDiscriminator(highscore[0]);
         var checked = false
         if (pseudo == 'UNKNOWN' && joueurs[highscore[0]]) {
             pseudo = joueurs[highscore[0]].pseudo
@@ -62,10 +70,10 @@ function printHighscores(allHighscores, joueurs, printInfo, getUsername, getDisc
     return contenu
 }
 
-module.exports = {
+export {
     changeHs,
     ajouteHs,
     removeHs,
     trieHighscores,
     printHighscores
-}
+};

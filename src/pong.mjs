@@ -1,7 +1,4 @@
-const {
-    score,
-    printMode
-} = require('./partie')
+import Joueur from './joueur.mjs';
 
 const MODES_SUFFIXES = new Set([
     'plus',
@@ -48,7 +45,7 @@ function listeJoueursActifs(joueurs, info) {
     var liste = []
     Object.keys(joueurs).forEach(id => {
         if (joueurs[id].partie) {
-            liste.push(`\`${joueurs[id].pseudo}${info ? '#'+joueurs[id].discriminator:''}\`${info ? ' \`'+id+'\`' : ''} - ${score(joueurs[id].partie)}, ${printMode(joueurs[id].partie.mode)}`)
+            liste.push(`\`${joueurs[id].pseudo}${info ? '#'+joueurs[id].discriminator:''}\`${info ? ' \`'+id+'\`' : ''} - ${joueurs[id].partie.printScore()}, ${joueurs[id].partie.printMode()}`)
         }
     });
     return liste
@@ -64,9 +61,9 @@ function changeScore(id, score, joueurs) {
     }
 }
 
-function matchTp(arguments) {
-    if (arguments[0] !== 'tp') return false;
-    if (!isPositiveInteger(arguments[2])) return false;
+function matchTp(args) {
+    if (args[0] !== 'tp') return false;
+    if (!isPositiveInteger(args[2])) return false;
     return true;
 }
 
@@ -150,7 +147,17 @@ function isPositiveInteger(string) {
     else return false;
 }
 
-module.exports = {
+function createJoueurIfNeeded(id, pseudo, discriminator, joueurs) {
+    var joueur = joueurs[id];
+    if (joueur == undefined) {
+        joueur = new Joueur(pseudo, discriminator);
+        joueurs[id] = joueur;
+        return true;
+    }
+    return false;
+}
+
+export {
     code,
     decode,
     listeJoueursActifs, // ==> partie? joueur?
@@ -166,5 +173,6 @@ module.exports = {
     logReloadMessage,
     listeJoueurs,
     isInteger,
-    isPositiveInteger
+    isPositiveInteger,
+    createJoueurIfNeeded
 }

@@ -1,18 +1,8 @@
-const expect = require('chai').expect;
-const {
-  newJoueur,
-  createJoueurIfNeeded,
-  updateJoueur
-} = require('../src/joueur')
-const {
-  newPartie,
-  demarrerPartie,
-  reponse,
-  score,
-  question,
-  tireAuSortDeuxNombres
-} = require('../src/partie')
-const {
+import chai from 'chai';
+const expect = chai.expect;
+import Partie from '../src/partie.mjs';
+import Joueur from '../src/joueur.mjs';
+import {
   code,
   decode,
   afficheliste,
@@ -27,15 +17,16 @@ const {
   logReloadMessage,
   listeJoueurs,
   isInteger,
-  isPositiveInteger
-} = require('../src/pong')
-const {
+  isPositiveInteger,
+  createJoueurIfNeeded
+} from '../src/pong.mjs';
+import {
   changeHs,
   ajouteHs,
   removeHs,
   trieHighscores,
   printHighscores
-} = require('../src/highscore')
+} from '../src/highscore.mjs';
 
 describe('Pong', function () {
   
@@ -88,21 +79,11 @@ describe('Pong', function () {
   describe('#listeJoueursActifs()', function () {
     it("liste les joueurs qui ont une partie en cours", function () {
       var joueurs = {
-        'id1': {
-          "mode": "mode_plus",
-          "pseudo": "name1",
-          "discriminator": "1111"
-        },
-        'id2': {
-          "mode": "mode_plus",
-          "pseudo": "name2",
-          "discriminator": "2222",
-          "partie": {
-            "points": 1,
-            "mode": "mode_plus"
-          }
-        }
+        'id1': new Joueur('name1', '1111'),
+        'id2': new Joueur('name2', '2222')
       };
+      joueurs['id2'].partie = new Partie('mode_plus');
+      joueurs['id2'].partie.points = 1;
       expect(listeJoueursActifs(joueurs, false)).to.eql([
         '`name2` - 1 point, Mode Addition'
       ]);
@@ -110,41 +91,21 @@ describe('Pong', function () {
     
     it("affiche si aucune partie en cours", function () {
       var joueurs = {
-        'id1': {
-          "mode": "mode_plus",
-          "pseudo": "name1",
-          "discriminator": "1111"
-        },
-        'id2': {
-          "mode": "mode_plus",
-          "pseudo": "name2",
-          "discriminator": "2222"
-        }
+        'id1': new Joueur('name1', '1111'),
+        'id2': new Joueur('name2', '2222')
       };
       expect(listeJoueursActifs(joueurs, false)).to.eql([]);
     });
 
     it("affiche la liste de plusieurs joueurs qui ont une partie en cours", function () {
       var joueurs = {
-        'id1': {
-          "mode": "mode_plus",
-          "pseudo": "name1",
-          "discriminator": "1111",
-          "partie": {
-            "points": 3,
-            "mode": "mode_moins"
-          }
-        },
-        'id2': {
-          "mode": "mode_plus",
-          "pseudo": "name2",
-          "discriminator": "2222",
-          "partie": {
-            "points": 1,
-            "mode": "mode_plus"
-          }
-        }
+        'id1': new Joueur('name1', '1111'),
+        'id2': new Joueur('name2', '2222')
       };
+      joueurs['id1'].partie = new Partie('mode_moins');
+      joueurs['id1'].partie.points = 3;
+      joueurs['id2'].partie = new Partie('mode_plus');
+      joueurs['id2'].partie.points = 1;
       expect(listeJoueursActifs(joueurs, false)).to.eql([
         '`name1` - 3 points, Mode Soustraction',
         '`name2` - 1 point, Mode Addition'
@@ -153,25 +114,11 @@ describe('Pong', function () {
 
     it("affiche la liste en mode info", function () {
       var joueurs = {
-        'id1': {
-          "mode": "mode_plus",
-          "pseudo": "name1",
-          "discriminator": "1111",
-          "partie": {
-            "points": 0,
-            "mode": "mode_plus"
-          }
-        },
-        'id2': {
-          "mode": "mode_plus",
-          "pseudo": "name2",
-          "discriminator": "2222",
-          "partie": {
-            "points": 0,
-            "mode": "mode_plus"
-          }
-        }
-      }
+        'id1': new Joueur('name1', '1111'),
+        'id2': new Joueur('name2', '2222')
+      };
+      joueurs['id1'].partie = new Partie('mode_plus');
+      joueurs['id2'].partie = new Partie('mode_plus');
       expect(listeJoueursActifs(joueurs, true)).to.eql([
         '`name1#1111` `id1` - 0 point, Mode Addition',
         '`name2#2222` `id2` - 0 point, Mode Addition'
@@ -181,39 +128,39 @@ describe('Pong', function () {
 
   describe('#changeScore()', function () {
     it("retourne l'ancien score si joueur dans la liste avec une partie", function () {
-      var Nokari = newJoueur();
-      Nokari.partie = newPartie('mode_plus');
-      Nokari.partie.points = 5
+      var Nokari = new Joueur('Nokari', '0450');
+      Nokari.partie = new Partie('mode_plus');
+      Nokari.partie.points = 5;
       var joueurs = {
-        'joueurSansPartie': newJoueur(),
+        'joueurSansPartie': new Joueur('J1', '0001'),
         'Nokari': Nokari,
       };
-      expect(changeScore('Nokari',56,joueurs)).to.eql(5);
+      expect(changeScore('Nokari', 56, joueurs)).to.eql(5);
     });
     it("retourne false si joueur dans la liste mais sans partie", function () {
       var joueurs = {
-        'joueurSansPartie': newJoueur(),
-        'Nokari': newJoueur(),
+        'joueurSansPartie': new Joueur('J1', '0001'),
+        'Nokari': new Joueur('Nokari', '0450'),
       };
-      expect(changeScore('Nokari',56,joueurs)).to.eql(false);
+      expect(changeScore('Nokari', 56, joueurs)).to.eql(false);
     });
     it("retourne false si aucun joueur correspond", function () {
-      var Joueur1 = newJoueur();
-      Joueur1.partie = newPartie('mode_plus');
+      var Joueur1 = new Joueur('J1', '0001');
+      Joueur1.partie = new Partie('mode_plus');
       var joueurs = {
-        'joueurSansPartie': newJoueur(),
-        'Joueur1': Joueur1,
+        'joueurSansPartie': new Joueur('J2', '0002'),
+        'Joueur1': Joueur1
       };
-      expect(changeScore('Nokari',56,joueurs)).to.eql(false);
+      expect(changeScore('Nokari', 56, joueurs)).to.eql(false);
     });
     it("change le score si joueur dans la liste avec une partie", function () {
-      var Nokari = newJoueur();
-      Nokari.partie = newPartie('mode_plus');
+      var Nokari = new Joueur('Nokari', '0450');
+      Nokari.partie = new Partie('mode_plus');
       var joueurs = {
-        'joueurSansPartie': newJoueur(),
+        'joueurSansPartie': new Joueur('J1', '0001'),
         'Nokari': Nokari,
       };
-      changeScore('Nokari',56,joueurs)
+      changeScore('Nokari', 56, joueurs)
       expect(joueurs['Nokari'].partie.points).to.eql(56);
     });
   });
@@ -263,7 +210,7 @@ describe('Pong', function () {
 
   describe('#changeHs()', function () {
     it("retourne true si score changé", function () {
-      allHighscores = {
+      var allHighscores = {
         mode_plus: {
         'itsRed_v2' : 10,
         },
@@ -273,17 +220,17 @@ describe('Pong', function () {
       expect(changeHs('itsRed_v2','20','plus',allHighscores)).to.eql(true);
     });
     it("message erreur si aucun joueur correspond", function () {
-      allHighscores = {
+      var allHighscores = {
         mode_plus: {
         'itsRed_v2' : 10,
         },
         mode_moins: {},
         mode_double: {},
       }
-      expect(changeHs('Nokari','20','plus',allHighscores)).to.eql(false);
+      expect(changeHs('Nokari', '20', 'plus', allHighscores)).to.eql(false);
     });
     it("message erreur si aucun joueur correspond dans le mode séléctionné", function () {
-      allHighscores = {
+      var allHighscores = {
         mode_plus: {
         'itsRed_v2' : 10,
         },
@@ -293,7 +240,7 @@ describe('Pong', function () {
       expect(changeHs('itsRed_v2','20','moins',allHighscores)).to.eql(false);
     });
     it("change le score d'un joueur si présent dans la liste", function () {
-      allHighscores = {
+      var allHighscores = {
         "mode_plus": {
           'itsRed_v2' : 10,
         },
@@ -313,7 +260,7 @@ describe('Pong', function () {
 
   describe('#ajouteHs()', function () {
     it("ajoute un joueur à la liste si il n'y est pas", function () {
-      allHighscores = {
+      var allHighscores = {
         mode_plus: {
         'id1' : 10,
         },
@@ -331,7 +278,7 @@ describe('Pong', function () {
       });
     });
     it("retourne true si le joueur est ajouté", function () {
-      allHighscores = {
+      var allHighscores = {
         mode_plus: {
         'id1' : 10,
         },
@@ -341,7 +288,7 @@ describe('Pong', function () {
       expect(ajouteHs('id2','20','plus',allHighscores)).to.eql(true);
     });
     it("message erreur si le joueur est déja dans la liste", function () {
-      allHighscores = {
+      var allHighscores = {
         mode_plus: {
         'id1' : 10,
         },
@@ -354,7 +301,7 @@ describe('Pong', function () {
 
   describe('#removeHs()', function () {
     it("supprime un joueur de la liste si il y est", function () {
-      allHighscores = {
+      var allHighscores = {
         mode_plus: {
         '364820614990528522' : 10,
         },
@@ -364,7 +311,7 @@ describe('Pong', function () {
       expect(removeHs('364820614990528522','mode_plus',allHighscores)).to.eql(true);
     });
     it("message erreur si le joueur n'est pas dans la liste", function () {
-      allHighscores = {
+      var allHighscores = {
         mode_plus: {
         '364820614990528522' : 10,
         },
@@ -472,7 +419,9 @@ describe('Pong', function () {
         },
       }
       var joueurs = {}
-      expect(printHighscores(allhighscores, joueurs, false, (id) => {return 'name_'+id}, () => {} )).to.eql(`**Mode Addition**
+      expect(printHighscores(allhighscores, joueurs, false, (id) => {
+        return 'name_'+id
+      }, () => {} )).to.eql(`**Mode Addition**
 \`1) 155 : name_id1\`
 \`2) 120 : name_id2\`
 \`3) 83 : name_id3\`
@@ -549,12 +498,7 @@ describe('Pong', function () {
           "discriminator": "1111"
         }
       }
-      createJoueurIfNeeded('id2', 'name2', '2222', joueurs, (pseudo, discriminator) => {
-        return {
-          "mode": "mode_plus",
-          "pseudo": pseudo,
-          "discriminator": discriminator
-      }})
+      createJoueurIfNeeded('id2', 'name2', '2222', joueurs);
       expect(joueurs).to.eql({
         "id1": {
           "mode": "mode_plus",
@@ -576,13 +520,8 @@ describe('Pong', function () {
           "discriminator": "1111"
         }
       }
-      expect(createJoueurIfNeeded('id1', 'name1', '1111', joueurs, (pseudo, discriminator) => {
-        return {
-          "mode": "mode_plus",
-          "pseudo": pseudo,
-          "discriminator": discriminator
-        }
-      })).to.eql(false);
+      expect(createJoueurIfNeeded('id1', 'name1', '1111', joueurs))
+        .to.eql(false);
     });
     it("renvoie true si un joueur a été ajouté", function () {
       var joueurs = {
@@ -592,70 +531,8 @@ describe('Pong', function () {
           "discriminator": "1111"
         }
       }
-      expect(createJoueurIfNeeded('id2', 'name2', '2222', joueurs, (pseudo, discriminator) => {
-        return {
-          "mode": "mode_plus",
-          "pseudo": pseudo,
-          "discriminator": discriminator
-        }
-      })).to.eql(true);
-    });
-  });
-
-  describe('#updateJoueur', function () {
-    it("modifie le nom du joueur s'il ne correspond plus", function () {
-      var joueurs = {
-        "id1": {
-          "mode": "mode_plus",
-          "pseudo": "name1",
-          "discriminator": "1111"
-        }
-      }
-      updateJoueur('id1', 'name1_v2', '1111', joueurs);
-      expect(joueurs).to.eql({
-        "id1": {
-          "mode": "mode_plus",
-          "pseudo": "name1_v2",
-          "discriminator": "1111"
-        }
-      });
-    });
-    it("modifie le tag du joueur s'il ne correspond plus", function () {
-      var joueurs = {
-        "id1": {
-          "mode": "mode_plus",
-          "pseudo": "name1",
-          "discriminator": "1111"
-        }
-      }
-      updateJoueur('id1', 'name1', '1122', joueurs)
-      expect(joueurs).to.eql({
-        "id1": {
-          "mode": "mode_plus",
-          "pseudo": "name1",
-          "discriminator": "1122"
-        }
-      });
-    });
-    it("renvoie true si une modification a eu lieu", function () {
-      var joueurs = {
-        "id1": {
-          "mode": "mode_plus",
-          "pseudo": "name1",
-          "discriminator": "1111"
-        }
-      }
-      expect(updateJoueur('id1', 'name1_v2', '1111', joueurs)).to.eql(true);
-    });
-    it("renvoie false si aucune modification n'a eu lieu", function () {
-      var joueurs = {
-        "id1": {
-          "mode": "mode_plus",
-          "pseudo": "name1",
-          "discriminator": "1111"
-        }
-      }
-      expect(updateJoueur('id1', 'name1', '1111', joueurs)).to.eql(false);
+      expect(createJoueurIfNeeded('id2', 'name2', '2222', joueurs))
+        .to.eql(true);
     });
   });
 
@@ -679,90 +556,6 @@ describe('Pong', function () {
   //     })).to.eql();
   //   });
   // });
-
-  describe('#reponse()', function () {
-    it("renvoie la réponse de la partie (opération: +)", function () {
-      var partie ={ 
-        "points": 0,
-        "mode": "mode_plus",
-        "N1": 2,
-        "N2": 9,
-        "operation": "+"
-      }
-      expect(reponse(partie)).to.eql(11);
-    });
-    it("renvoie la réponse de la partie (opération: -)", function () {
-      var partie ={ 
-        "points": 0,
-        "mode": "mode_plus",
-        "N1": 2,
-        "N2": 9,
-        "operation": "-"
-      }
-      expect(reponse(partie)).to.eql(-7);
-    });
-  });
-
-  describe('#score()', function () {
-    it("renvoie le score avec 'point' au singulier", function () {
-      var partie ={ 
-        "points": 1,
-        "mode": "mode_plus",
-        "N1": 2,
-        "N2": 9,
-        "operation": "+"
-      }
-      expect(score(partie)).to.eql('1 point');
-    });
-    it("renvoie le score avec 'points' au pluriel", function () {
-      var partie ={ 
-        "points": 5,
-        "mode": "mode_plus",
-        "N1": 2,
-        "N2": 9,
-        "operation": "+"
-      }
-      expect(score(partie)).to.eql('5 points');
-    });
-  });
-
-  describe('#question()', function () {
-    it("renvoie la question en cours", function () {
-      var partie ={ 
-        "points": 1,
-        "mode": "mode_plus",
-        "N1": 2,
-        "N2": 9,
-        "operation": "+"
-      }
-      expect(question(partie)).to.eql('2+9');
-    });
-  });
-
-  describe('#tireAuSortDeuxNombres()', function () {
-    it("choisit la bonne opération (mode_plus)", function () {
-      var partie ={ 
-        "points": 1,
-        "mode": "mode_plus",
-        "N1": 2,
-        "N2": 9,
-        "operation": "+"
-      }
-      tireAuSortDeuxNombres(partie)
-      expect(partie.operation).to.eql('+');
-    });
-    it("choisit la bonne opération (mode_moins)", function () {
-      var partie ={ 
-        "points": 1,
-        "mode": "mode_moins",
-        "N1": 2,
-        "N2": 9,
-        "operation": "+"
-      }
-      tireAuSortDeuxNombres(partie)
-      expect(partie.operation).to.eql('-');
-    });
-  });
 
   // describe('#sendAsLog()', function () {
   //   it("envoie le message dans le channel de log", function () {

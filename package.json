@@ -2,7 +2,7 @@
   "name": "pong",
   "version": "1.0.0",
   "description": "Discord bot test",
-  "main": "index.js",
+  "main": "index.mjs",
   "dependencies": {
     "discord.js": "^13.1.0",
     "exit-hook": "^2.2.0",
@@ -10,15 +10,17 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
+    "chai-match": "^1.1.1",
     "mocha": "^8.1.3"
   },
   "scripts": {
-    "start": "pm2 start --update-env --name pong index.js",
-    "restart": "pm2 restart --name pong index.js",
+    "start": "pm2 start --update-env --name pong index.mjs",
+    "restart": "pm2 restart --name pong index.mjs",
     "pm2": "pm2",
     "stop": "pm2 stop pong",
     "logs": "pm2 logs pong",
-    "test": "mocha"
+    "test": "mocha",
+    "env": "env"
   },
   "author": "Paul Charignon v2",
   "license": "ISC"
