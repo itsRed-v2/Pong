@@ -66,19 +66,4 @@ describe('Partie', function () {
             expect(partie.printScore()).to.eql('2 points');
         });
     });
-
-    describe('#printMode()', function () {
-        it("renvoie le string correspondant au mode_plus", function () {
-            let partie = new Partie(mode_plus);
-            expect(partie.printMode()).to.eql('Mode Addition');
-        });
-        it("renvoie le string correspondant au mode_moins", function () {
-            let partie = new Partie(mode_moins);
-            expect(partie.printMode()).to.eql('Mode Soustraction');
-        });
-        it("renvoie le string correspondant au mode_double", function () {
-            let partie = new Partie(mode_double);
-            expect(partie.printMode()).to.eql('Mode Double');
-        });
-    });
 });

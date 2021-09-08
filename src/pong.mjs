@@ -45,7 +45,7 @@ function listeJoueursActifs(joueurs, info) {
     var liste = []
     Object.keys(joueurs).forEach(id => {
         if (joueurs[id].partie) {
-            liste.push(`\`${joueurs[id].pseudo}${info ? '#'+joueurs[id].discriminator:''}\`${info ? ' \`'+id+'\`' : ''} - ${joueurs[id].partie.printScore()}, ${joueurs[id].partie.printMode()}`)
+            liste.push(`\`${joueurs[id].pseudo}${info ? '#'+joueurs[id].discriminator:''}\`${info ? ' \`'+id+'\`' : ''} - ${joueurs[id].partie.printScore()}, ${printMode(joueurs[id].partie.mode)}`)
         }
     });
     return liste
@@ -157,6 +157,15 @@ function createJoueurIfNeeded(id, pseudo, discriminator, joueurs) {
     return false;
 }
 
+function printMode(mode) {
+    const MODES = {
+        mode_plus: 'Mode Addition',
+        mode_moins: 'Mode Soustraction',
+        mode_double: 'Mode Double'
+    }
+    return MODES[mode];
+}
+
 export {
     code,
     decode,
@@ -174,5 +183,6 @@ export {
     listeJoueurs,
     isInteger,
     isPositiveInteger,
-    createJoueurIfNeeded
+    createJoueurIfNeeded,
+    printMode
 }

@@ -31,13 +31,4 @@ export default class Partie {
     printScore() {
         return this.points + ' point' + (this.points > 1 ? 's':'')
     }
-    
-    printMode() {
-        const MODES = {
-            mode_plus: 'Mode Addition',
-            mode_moins: 'Mode Soustraction',
-            mode_double: 'Mode Double'
-        }
-        return MODES[this.mode];
-    }
 }

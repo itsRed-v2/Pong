@@ -74,7 +74,8 @@ import {
   sendAsLog,
   listeJoueurs,
   isInteger,
-  createJoueurIfNeeded
+  createJoueurIfNeeded,
+  printMode
 } from './src/pong.mjs';
 import {
   changeHs,

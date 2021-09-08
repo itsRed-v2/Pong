@@ -1,4 +1,5 @@
 import Partie from './partie.mjs';
+import { printMode } from './pong.mjs';
 
 export default class Joueur {
     constructor(pseudo, discriminator) {
@@ -9,7 +10,7 @@ export default class Joueur {
 
     demarrerPartie(message) {
         this.partie = new Partie(this.mode);
-        message.reply("Démarrage d'une nouvelle partie en **" + this.partie.printMode(this.mode) + "** !\n" + this.partie.poseQuestion(this.partie));
+        message.reply("Démarrage d'une nouvelle partie en **" + printMode(this.mode) + "** !\n" + this.partie.poseQuestion(this.partie));
         return this.partie;
     }
 

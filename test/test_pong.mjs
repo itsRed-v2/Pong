@@ -18,7 +18,8 @@ import {
   listeJoueurs,
   isInteger,
   isPositiveInteger,
-  createJoueurIfNeeded
+  createJoueurIfNeeded,
+  printMode
 } from '../src/pong.mjs';
 import {
   changeHs,
@@ -727,4 +728,12 @@ name2`
       expect(isPositiveInteger(['lol', 'truc'])).to.eql(false);
     });
   });
+
+  describe('#printMode()', function () {
+    it("renvoie le string correspondant au mode", function () {
+        expect(printMode('mode_plus')).to.eql('Mode Addition');
+        expect(printMode('mode_moins')).to.eql('Mode Soustraction');
+        expect(printMode('mode_double')).to.eql('Mode Double');
+    });
+});
 });

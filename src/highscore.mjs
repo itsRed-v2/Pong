@@ -1,3 +1,5 @@
+import { printMode } from './pong.mjs';
+
 function changeHs(id, score, mode, allHighscores) {
     const clemode = 'mode_'+mode
     if (allHighscores[clemode][id]) {
@@ -35,16 +37,6 @@ function trieHighscores(highscores) {
 
     sortable.sort((hs1, hs2) => { return hs2[1] - hs1[1] });
     return sortable
-}
-
-const MODES = {
-    mode_plus: 'Mode Addition',
-    mode_moins: 'Mode Soustraction',
-    mode_double: 'Mode Double'
-}
-
-function printMode(mode) {
-    return MODES[mode];
 }
 
 function printHighscores(allHighscores, joueurs, printInfo, getUsername, getDiscriminator) {
