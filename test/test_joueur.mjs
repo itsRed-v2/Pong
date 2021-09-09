@@ -56,4 +56,91 @@ describe('Joueur', function () {
             expect(joueur.update('Nokari', '0450')).to.eql(false);
         });
     });
+
+    describe('#fromJsObject()', function () {
+        it('renvoie le joueur correspondant à l\'objet donné', function() {
+            let object = {
+                "pseudo": "Nokari",
+                "discriminator": "0450",
+                "mode": "mode_plus"
+            }
+            let joueur = Joueur.fromJsObject(object);
+            expect(joueur.pseudo).to.eql('Nokari');
+            expect(joueur.discriminator).to.eql('0450');
+            expect(joueur.mode).to.eql('mode_plus');
+            expect(joueur.partie).to.eql(undefined);
+        });
+        it('renvoie le joueur avec partie correspondant à l\'objet donné', function() {
+            let object = {
+                "pseudo": "Nokari",
+                "discriminator": "0450",
+                "mode": "mode_plus",
+                "partie": {
+                    "points": 53,
+                    "mode": "mode_plus",
+                    "n1": 3,
+                    "n2": 5,
+                    "signe": "+"
+                }
+            }
+            let joueur = Joueur.fromJsObject(object);
+            expect(joueur.partie.points).to.eql(53);
+        });
+        it('renvoie undefined si la partie du joueur est incorrecte', function() {
+            let object = {
+                "pseudo": "Nokari",
+                "discriminator": "0450",
+                "mode": "mode_plus",
+                "partie": {
+                    "points": 53,
+                    "mode": "mode_truc",
+                    "n1": 3,
+                    "n2": 5,
+                    "signe": "+"
+                }
+            }
+            expect(Joueur.fromJsObject(object)).to.eql(undefined);
+        });
+        it('renvoie undefined si il manque des éléments', function() {
+            let object = {
+                "discriminator": "0450",
+                "mode": "mode_plus"
+            }
+            expect(Joueur.fromJsObject(object)).to.eql(undefined);
+
+            object = {
+                "pseudo": "Nokari",
+                "mode": "mode_plus"
+            }
+            expect(Joueur.fromJsObject(object)).to.eql(undefined);
+            
+            object = {
+                "pseudo": "Nokari",
+                "discriminator": "0450"
+            }
+            expect(Joueur.fromJsObject(object)).to.eql(undefined);
+        });
+        it('renvoie undefined si les éléments sont incorrects', function() {
+            let object = {
+                "pseudo": 28,
+                "discriminator": "0450",
+                "mode": "mode_plus"
+            }
+            expect(Joueur.fromJsObject(object)).to.eql(undefined);
+
+            object = {
+                "pseudo": "Nokari",
+                "discriminator": 450,
+                "mode": "mode_plus"
+            }
+            expect(Joueur.fromJsObject(object)).to.eql(undefined);
+            
+            object = {
+                "pseudo": "Nokari",
+                "discriminator": "0450",
+                "mode": "mode_truc"
+            }
+            expect(Joueur.fromJsObject(object)).to.eql(undefined);
+        });
+    });
 });

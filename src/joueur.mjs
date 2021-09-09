@@ -22,4 +22,26 @@ export default class Joueur {
         }
         return false;
     }
+
+    static fromJsObject(object) {
+        const AvailableModes = new Set([
+            'mode_plus',
+            'mode_moins',
+            'mode_double'
+        ]);
+        if (typeof object['pseudo'] === 'string'
+            && typeof object['discriminator'] === 'string'
+            && AvailableModes.has(object['mode'])) {
+                let joueur = new Joueur(object['pseudo'], object['discriminator']);
+                joueur.mode = object['mode'];
+                if (object['partie']) {
+                    let partie = Partie.fromJsObject(object['partie']);
+                    if (partie) joueur.partie = partie;
+                    else return undefined;
+                }
+                return joueur;
+        } else {
+            return undefined;
+        }
+    }
 }

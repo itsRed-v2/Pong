@@ -31,4 +31,26 @@ export default class Partie {
     printScore() {
         return this.points + ' point' + (this.points > 1 ? 's':'')
     }
+
+    static fromJsObject(object) {
+        const AvailableModes = new Set([
+            'mode_plus',
+            'mode_moins',
+            'mode_double'
+        ]);
+        if (typeof object['n1'] === 'number'
+            && typeof object['n2'] === 'number'
+            && (object['signe'] === '+' || object['signe'] === '-')
+            && typeof object['points'] === 'number' && object['points'] >= 0
+            && AvailableModes.has(object['mode'])) {
+                let partie = new Partie(object['mode']);
+                partie.n1 = object['n1'];
+                partie.n2 = object['n2'];
+                partie.signe = object['signe'];
+                partie.points = object['points'];
+                return partie;
+        } else {
+            return undefined;
+        }
+    }
 }
