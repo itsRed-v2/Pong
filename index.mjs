@@ -163,7 +163,8 @@ bot.on('messageCreate', message => {
   // ping
   if (contenu === 'ping') {
     if (partie) {
-      message.reply('Une partie en ' + printMode(partie.mode) + ' est déjà en cours, tu as ' + partie.printScore() + ` et la question est: ` + partie.question() + `\nTu ne peux pas avoir plusieurs parties en même temps. Arrêter une partie en cours: \`ping stop\``)
+      message.reply(`Une partie en ${printMode(partie.mode)} est déjà en cours, tu as ${partie.printScore()} et la question est ${partie.question()}
+Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie en cours, utilise \`ping stop\``)
     }
     else {
       if(createJoueurIfNeeded(id, getUsername(id), getDiscriminator(id), joueurs)) {
