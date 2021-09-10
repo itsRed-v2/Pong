@@ -101,7 +101,7 @@ function reload(message, logChannel, joueurs, fs, PLAYERS_PATH) {
 }
 
 function stringifyForExport(object) {
-    return "module.exports = " + JSON.stringify(object, null, "  ") + ";"
+    return "export let data = " + JSON.stringify(object, null, "  ") + ";"
 }
 
 function sendAsLog(logChannel, string) { // non testé

@@ -363,7 +363,7 @@ describe('Pong', function () {
   });
 
   describe('#stringifyForExport()', function () {
-    it("convertis objet en string JSON", function () {
+    it("convertis objet en string JSON prêt pour l'exportation", function () {
       var allhighscores = {
         mode_1: {
         'id1' : 155,
@@ -375,7 +375,8 @@ describe('Pong', function () {
         'id2' : 27,
         },
         }
-      expect(stringifyForExport(allhighscores)).to.eql(`module.exports = {
+      expect(stringifyForExport(allhighscores)).to.eql(
+`export let data = {
   "mode_1": {
     "id1": 155,
     "id2": 120,

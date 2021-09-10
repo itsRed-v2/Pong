@@ -23,9 +23,13 @@ exitHook(() => {
 //================================ constantes
 
 const DATA_PATH = process.env.PONG_DATA_PATH;
-const HIGHSCORE_PATH = DATA_PATH + '/highscores.js';
-const PLAYERS_PATH = DATA_PATH + '/players.js';
-const allHighscores = import(HIGHSCORE_PATH);
+const HIGHSCORE_PATH = DATA_PATH + '/highscores.mjs';
+const PLAYERS_PATH = DATA_PATH + '/players.mjs';
+let allHighscores;
+import(HIGHSCORE_PATH).then((importedObject) => {
+  allHighscores = importedObject.obj;
+});
+
 
 const AIDE_UTILISATEUR = `**Liste des commandes**
 \`ping règles\` donne les règles du jeu
@@ -119,7 +123,13 @@ function isPlayerCached(id) {
 
 //================================
 
-var joueurs = import(PLAYERS_PATH);
+var joueurs = {};
+import(PLAYERS_PATH).then((importedObject) => {
+  let joueursJs = importedObject.obj;
+  Object.keys(joueursJs).forEach(id => {
+    joueurs[id] = Joueur.fromJsObject(joueursJs[id]);
+  });
+});
 
 bot.on('messageCreate', message => {
 
@@ -132,7 +142,7 @@ bot.on('messageCreate', message => {
   var id = message.author.id;
   var joueur = joueurs[id]
   if (joueur) {
-    updateJoueur(id, getUsername(id), getDiscriminator(id), joueurs);
+    joueur.update(getUsername(id), getDiscriminator(id));
     var partie = joueur.partie
   }
 
@@ -153,25 +163,25 @@ bot.on('messageCreate', message => {
   // ping
   if (contenu === 'ping') {
     if (partie) {
-      message.reply('Une partie en ' + printMode(partie.mode) + ' est déjà en cours, tu as ' + score(partie) + ` et la question est: ` + question(partie) + `\nTu ne peux pas avoir plusieurs parties en même temps. Arrêter une partie en cours: \`ping stop\``)
+      message.reply('Une partie en ' + printMode(partie.mode) + ' est déjà en cours, tu as ' + partie.printScore() + ` et la question est: ` + partie.question() + `\nTu ne peux pas avoir plusieurs parties en même temps. Arrêter une partie en cours: \`ping stop\``)
     }
     else {
       if(createJoueurIfNeeded(id, getUsername(id), getDiscriminator(id), joueurs)) {
-        saveJoueurs(joueurs);
         joueur = joueurs[id];
       }
-      partie = demarrerPartie(message, joueur, newPartie)
+      partie = joueur.demarrerPartie(message);
+      saveJoueurs(joueurs);
       sendAsLog(logChannel, ':white_check_mark:  `' + message.author.username + '` a commencé une partie en **' + printMode(partie.mode) + '**')
     }
   }
 
   else if (partie) {
     // test bonne réponse
-    if (args[0] == reponse(partie)) {
+    if (args[0] == partie.reponse()) {
       var highscore = allHighscores[partie.mode][id] || 0
       partie.points++
+      message.reply(`Correct ! Tu as ${partie.printScore()}.${partie.points > highscore ? ' **C\'est ton Meilleur score!**' : ''}\n${partie.poseQuestion()}`)
       saveJoueurs(joueurs)
-      message.reply(`Correct ! Tu as ${score(partie)}.${partie.points > highscore ? ' **C\'est ton Meilleur score!**' : ''}\n${pauseQuestion(partie)}`)
       // maj highscore
       if (partie.points > highscore) {
         allHighscores[partie.mode][id] = partie.points
@@ -181,15 +191,15 @@ bot.on('messageCreate', message => {
 
     // test mauvaise réponse
     else if (isInteger(args[0])) {
-      message.reply(`Faux ! La réponse était ${reponse(partie)}. Ton score final est de ${score(partie)}${partie.points > highscore ? ", c'est ton **meilleur score!**" : ''}`)
-      sendAsLog(logChannel, ':x:  `' + message.author.username + '` a perdu une partie à **' + score(partie) + '** (' + printMode(partie.mode) + ')')
+      message.reply(`Faux ! La réponse était ${partie.reponse()}. Ton score final est de ${partie.printScore()}${partie.points > highscore ? ", c'est ton **meilleur score!**" : ''}`)
+      sendAsLog(logChannel, ':x:  `' + message.author.username + '` a perdu une partie à **' + partie.printScore() + '** (' + printMode(partie.mode) + ')')
       joueur.partie = undefined
       saveJoueurs(joueurs)
     }
 
     // ping ?
     else if (args[0] === '?') {
-      message.reply(`pong ${question(partie)} ! (${score(partie)}, ${printMode(partie.mode)})`)
+      message.reply(`pong ${partie.question()} ! (${partie.printScore()}, ${printMode(partie.mode)})`)
     }
 
     // ping stop
@@ -197,7 +207,7 @@ bot.on('messageCreate', message => {
       joueur.partie = undefined
       saveJoueurs(joueurs)
       message.reply('Partie terminée');
-      sendAsLog(logChannel, `:orange_circle:  \`${message.author.username}\` a arrêté une partie à **${score(partie)}** (${printMode(partie.mode)})`)
+      sendAsLog(logChannel, `:orange_circle:  \`${message.author.username}\` a arrêté une partie à **${partie.printScore()}** (${printMode(partie.mode)})`)
     }
   }
    
