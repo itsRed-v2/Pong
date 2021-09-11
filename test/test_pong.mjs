@@ -397,8 +397,7 @@ describe('Pong', function () {
         'id2' : 27,
         },
       }
-      var joueurs = {}
-      expect(printHighscores(allhighscores, joueurs, false, (id) => {
+      expect(printHighscores(allhighscores, false, (id) => {
         return 'name_'+id
       }, () => {} )).to.eql(`**Mode Addition**
 \`1) 155 : name_id1\`
@@ -421,49 +420,13 @@ describe('Pong', function () {
         'id2' : 27,
         },
       }
-      var joueurs = {}
-      expect(printHighscores(allhighscores, joueurs, true, (id) => {return 'name_'+id}, (id) => {return id+'000'} )).to.eql(`**Mode Addition**
-\`1) 155 : name_id1#id1000\`    \`id1\`  ✓
-\`2) 120 : name_id2#id2000\`    \`id2\`  ✓
-\`3) 83 : name_id3#id3000\`    \`id3\`  ✓
+      expect(printHighscores(allhighscores, true, (id) => {return 'name_'+id}, (id) => {return id+'000'} )).to.eql(`**Mode Addition**
+\`1) 155 : name_id1#id1000\`    \`id1\`
+\`2) 120 : name_id2#id2000\`    \`id2\`
+\`3) 83 : name_id3#id3000\`    \`id3\`
 **Mode Soustraction**
-\`1) 50 : name_id1#id1000\`    \`id1\`  ✓
-\`2) 27 : name_id2#id2000\`    \`id2\`  ✓
-`);
-    });
-    it("utilise players.js pour les joueurs qui ne sont pas dans le cache", function () {
-      var allhighscores = {
-        mode_plus: {
-        'id1' : 155,
-        'id2' : 120,
-        'id3' : 83,
-        'id4' : 20
-        }
-      }
-      var names = {
-        id1: "name1",
-        id2: "name2",
-        id3: "UNKNOWN",
-        id4: "UNKNOWN"
-      }
-      var discriminators = {
-        id1: "1111",
-        id2: "2222",
-        id3: "----",
-        id4: "----"
-      }
-      var joueurs = {
-        "id3": {
-          "mode": "mode_plus",
-          "pseudo": "name3",
-          "discriminator": "3333"
-        }
-      }
-      expect(printHighscores(allhighscores, joueurs, true, (id) => {return names[id]}, (id) => {return discriminators[id]} )).to.eql(`**Mode Addition**
-\`1) 155 : name1#1111\`    \`id1\`  ✓
-\`2) 120 : name2#2222\`    \`id2\`  ✓
-\`3) 83 : name3#3333\`    \`id3\`
-\`4) 20 : UNKNOWN#----\`    \`id4\`
+\`1) 50 : name_id1#id1000\`    \`id1\`
+\`2) 27 : name_id2#id2000\`    \`id2\`
 `);
     });
   });

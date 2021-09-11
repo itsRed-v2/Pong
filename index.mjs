@@ -94,6 +94,8 @@ function saveJoueurs(joueurs) {
 function getUsername(id) {
   if (bot.users.cache.get(id)) {
     return bot.users.cache.get(id).username
+  } else if (joueurs[id]) {
+    return joueurs[id].pseudo;
   } else {
     return 'UNKNOWN'
   }
@@ -102,6 +104,8 @@ function getUsername(id) {
 function getDiscriminator(id) {
   if (bot.users.cache.get(id)) {
     return bot.users.cache.get(id).discriminator
+  } else if (joueurs[id]) {
+    return joueurs[id].discriminator;
   } else {
     return '----'
   }
@@ -237,7 +241,7 @@ Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie 
 
   // ping highscores
   if (args[0] === 'highscores' || args[0] === 'hs') {
-    message.channel.send(printHighscores(allHighscores, joueurs, args[1] === 'info', getUsername, getDiscriminator));
+    message.channel.send(printHighscores(allHighscores, args[1] === 'info', getUsername, getDiscriminator));
   }
 
   // ping list
@@ -281,9 +285,7 @@ bot.on('messageCreate', message => {
   
   // modération highscores
   if (matchHs(args)) {
-    if (isPlayerCached(args[1])) {
-      var pseudo = getUsername(args[1]);
-    }
+    var pseudo = getUsername(args[1]);
     if (args[0] == 'seths') {
       // ping seths
       if (changeHs(args[1], args[2], args[3], allHighscores)) {

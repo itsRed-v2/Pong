@@ -39,24 +39,19 @@ function trieHighscores(highscores) {
     return sortable
 }
 
-function printHighscores(allHighscores, joueurs, printInfo, getUsername, getDiscriminator) {
+function printHighscores(allHighscores, printInfo, getUsername, getDiscriminator) {
     var contenu = ''
     for (var mode in allHighscores) {
       contenu += '**' + printMode(mode) + '**\n'
       var highscoresTriees = trieHighscores(allHighscores[mode])
       for (var index in highscoresTriees) {
-        var highscore = highscoresTriees[index]
-        var pseudo = getUsername(highscore[0]);
-        var discriminator = getDiscriminator(highscore[0]);
-        var checked = false
-        if (pseudo == 'UNKNOWN' && joueurs[highscore[0]]) {
-            pseudo = joueurs[highscore[0]].pseudo
-            discriminator = joueurs[highscore[0]].discriminator
-        } else if (pseudo !== 'UNKNOWN') {
-            checked = true
-        }
+        var pair = highscoresTriees[index];
+        var id = pair[0];
+        var score = pair[1];
+        var pseudo = getUsername(id);
+        var discriminator = getDiscriminator(id);
         var position = parseInt(index) + 1
-        contenu += `\`${position}) ${highscore[1]} : ${pseudo}${printInfo ? '#'+discriminator : ''}\`${printInfo ? `    \`${highscore[0]}\``:''}${checked && printInfo ? '  ✓':''}\n`
+        contenu += `\`${position}) ${score} : ${pseudo}${printInfo ? '#'+discriminator : ''}\`${printInfo ? `    \`${id}\``:''}\n`
       }
     }
     return contenu
