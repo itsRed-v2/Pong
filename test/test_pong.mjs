@@ -478,27 +478,6 @@ describe('Pong', function () {
     });
   });
 
-  // describe('#demarrerPartie()', function () {
-  //   it("démarre une partie la renvoie", function () {
-  //     var joueur = {
-  //       "364820614990528522": {
-  //         "mode": "mode_plus",
-  //         "pseudo": "itsRed_v2",
-  //         "discriminator": "3793"
-  //       }
-  //     }
-  //     expect(demarrerPartie({}, joueur, (mode) => {
-  //       return {
-  //         "points": 0,
-  //         "mode": mode,
-  //         "N1": 4,
-  //         "N2": 7,
-  //         "operation": "+"
-  //       }
-  //     })).to.eql();
-  //   });
-  // });
-
   // describe('#sendAsLog()', function () {
   //   it("envoie le message dans le channel de log", function () {
   //     expect(sendAsLog()).to.eql();
