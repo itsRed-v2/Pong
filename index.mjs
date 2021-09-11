@@ -25,11 +25,6 @@ exitHook(() => {
 const DATA_PATH = process.env.PONG_DATA_PATH;
 const HIGHSCORE_PATH = DATA_PATH + '/highscores.mjs';
 const PLAYERS_PATH = DATA_PATH + '/players.mjs';
-let allHighscores;
-import(HIGHSCORE_PATH).then((importedObject) => {
-  allHighscores = importedObject.obj;
-});
-
 
 const AIDE_UTILISATEUR = `**Liste des commandes**
 \`ping règles\` donne les règles du jeu
@@ -123,12 +118,16 @@ function isPlayerCached(id) {
 
 //================================
 
-var joueurs = {};
+const joueurs = {};
 import(PLAYERS_PATH).then((importedObject) => {
-  let joueursJs = importedObject.obj;
+  let joueursJs = importedObject.data;
   Object.keys(joueursJs).forEach(id => {
     joueurs[id] = Joueur.fromJsObject(joueursJs[id]);
   });
+});
+let allHighscores;
+import(HIGHSCORE_PATH).then((importedObject) => {
+  allHighscores = importedObject.data;
 });
 
 bot.on('messageCreate', message => {
