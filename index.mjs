@@ -37,12 +37,6 @@ const AIDE_UTILISATEUR = `**Liste des commandes**
 \`ping stop\` termine la partie en cours
 Tu peux écrire \`p\` à la place de \`ping\` au début des commandes pour faire plus rapide!`
 
-// **Cryptage:**
-// \`\`\`
-// ping (code|decode) <clé (1er ligne)>
-// <message (a partir de la 2e ligne)>
-// \`\`\`permet de crypter/décripter un message à partir d'une clé de cryptage`
-
 const AIDE_ADMIN = `**Commandes Admin**
 \`ping reload\` redémarre l'application
 \`ping tp <id> <score>\` set le score du joueur spécifié
@@ -59,8 +53,6 @@ const AIDE_ADMIN = `**Commandes Admin**
 import Joueur from './src/joueur.mjs';
 import Partie from './src/partie.mjs';
 import {
-  code,
-  decode,
   listeJoueursActifs,
   afficheliste,
   matchTp,
@@ -248,40 +240,6 @@ Si elle est fausse, tu perds et la partie se termine.
     message.channel.send(afficheliste(listeJoueursActifs(joueurs, args[1] === 'info')));
   }
 });
-
-/*
-// PING CODE/DECODE
-bot.on('messageCreate', message => {
-
-  if (message.author.bot) return
-  
-  var arguments = matchPing(message.content)
-  if (arguments === null) return
-
-  var lignes = arguments.split('\n')
-  var match = lignes[0].match(/^(code|decode) (.+)/i)
-  if (match && lignes[1]) {
-    var cle = match[2]
-    lignes.shift()
-    var msg = lignes.join('\n')
-    var action = match[1].toLowerCase()
-    message.channel.send(`clé:\n\`${cle}\`\nmessage:`)
-
-    if (action === "code") {
-      var nombres = code(msg, cle)
-      message.channel.send("```\n" + Buffer.from(nombres).toString('base64') + "\n```")
-    } else {
-      message.channel.send("```\n" + decode(Buffer.from(msg, 'base64'), cle) + "\n```")
-    }
-  } else if (lignes[0].match(/^(code|decode)/)) {
-    message.channel.send(`Commande mal formée. Syntaxe:
-\`\`\`
-ping (code|decode) <clé (1er ligne)>
-<message (a partir de la 2e ligne)>
-\`\`\``)
-  }
-});
-*/
 
 // ***********************
 // *** COMMANDES ADMIN ***
