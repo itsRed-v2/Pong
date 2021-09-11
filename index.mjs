@@ -12,10 +12,6 @@ bot.on('ready', function () {
   logChannel = bot.channels.cache.get('763372739238559774');
 })
 
-import('./token.mjs').then(token => {
-  bot.login(token.default);
-});
-
 exitHook(() => {
   bot.destroy()
 })
@@ -119,15 +115,23 @@ function isPlayerCached(id) {
 //================================
 
 const joueurs = {};
-import(PLAYERS_PATH).then((importedObject) => {
+const player_promise = import(PLAYERS_PATH).then((importedObject) => {
   let joueursJs = importedObject.data;
   Object.keys(joueursJs).forEach(id => {
     joueurs[id] = Joueur.fromJsObject(joueursJs[id]);
   });
 });
 let allHighscores;
-import(HIGHSCORE_PATH).then((importedObject) => {
+const highscore_promise = import(HIGHSCORE_PATH).then((importedObject) => {
   allHighscores = importedObject.data;
+});
+Promise.all([
+  player_promise,
+  highscore_promise
+]).then(() => {
+  import('./token.mjs').then(token => {
+    bot.login(token.default);
+  });
 });
 
 bot.on('messageCreate', message => {
