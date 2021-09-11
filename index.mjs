@@ -149,7 +149,9 @@ bot.on('messageCreate', message => {
   var id = message.author.id;
   var joueur = joueurs[id]
   if (joueur) {
-    joueur.update(getUsername(id), getDiscriminator(id));
+    if (joueur.update(getUsername(id), getDiscriminator(id))) {
+      saveJoueurs(joueurs);
+    }
     var partie = joueur.partie
   }
 
