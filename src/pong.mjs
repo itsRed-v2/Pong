@@ -143,8 +143,8 @@ function printMode(mode) {
 }
 
 export {
-    listeJoueursActifs, // ==> partie? joueur?
-    afficheliste, // ==> partie? joueur?
+    listeJoueursActifs,
+    afficheliste,
     changeScore,
     matchTp, //==> match
     matchHs, //==> match
