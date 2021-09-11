@@ -290,7 +290,7 @@ ping (code|decode) <clé (1er ligne)>
 bot.on('messageCreate', message => {
   
   if (message.author.bot) return;
-  if (message.author.id != 364820614990528522) return;
+  if (message.author.id != "364820614990528522") return;
   
   var contenu = message.content
   var args = matchPing(contenu);
