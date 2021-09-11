@@ -5,10 +5,11 @@ const expect = chai.expect;
 import Joueur from '../src/joueur.mjs'
 
 describe('Joueur', function () {
-    it('a les propriétés pseudo et discriminator', function() {
+    it('a les propriétés pseudo, discriminator, et mode', function() {
         let joueur = new Joueur('Nokari', '0450');
         expect(joueur.pseudo).to.eql('Nokari');
         expect(joueur.discriminator).to.eql('0450');
+        expect(joueur.mode).to.eql('mode_plus');
     });
 
     describe('#demarrerPartie()', function () {
