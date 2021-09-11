@@ -1,4 +1,4 @@
-module.exports = {
+export let data = {
     "mode_plus": {
         "364820614990528522" : 155,
         "384139959059087362" : 127,
