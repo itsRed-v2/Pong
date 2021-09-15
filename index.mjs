@@ -1,19 +1,21 @@
 import fs from 'fs';
 import { Client, Intents } from 'discord.js';
+import { token } from'./config.mjs';
 import exitHook from 'exit-hook';
-const bot = new Client({
+
+const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES],
   partials: ['CHANNEL']
 })
 
 var logChannel;
-bot.on('ready', function () {
-  console.log(`Logged in as ${bot.user.tag}!`)
-  logChannel = bot.channels.cache.get('763372739238559774');
+client.once('ready', function () {
+  console.log(`Logged in as ${client.user.tag}!`)
+  logChannel = client.channels.cache.get('763372739238559774');
 })
 
 exitHook(() => {
-  bot.destroy()
+  client.destroy()
 })
 
 //================================ constantes
@@ -92,8 +94,8 @@ function saveJoueurs(joueurs) {
 }
 
 function getUsername(id) {
-  if (bot.users.cache.get(id)) {
-    return bot.users.cache.get(id).username
+  if (client.users.cache.get(id)) {
+    return client.users.cache.get(id).username
   } else if (joueurs[id]) {
     return joueurs[id].pseudo;
   } else {
@@ -102,8 +104,8 @@ function getUsername(id) {
 }
 
 function getDiscriminator(id) {
-  if (bot.users.cache.get(id)) {
-    return bot.users.cache.get(id).discriminator
+  if (client.users.cache.get(id)) {
+    return client.users.cache.get(id).discriminator
   } else if (joueurs[id]) {
     return joueurs[id].discriminator;
   } else {
@@ -112,7 +114,7 @@ function getDiscriminator(id) {
 }
 
 function isPlayerCached(id) {
-  if (bot.users.cache.get(id)) return true;
+  if (client.users.cache.get(id)) return true;
   else return false;
 }
 
@@ -133,12 +135,10 @@ Promise.all([
   player_promise,
   highscore_promise
 ]).then(() => {
-  import('./token.mjs').then(token => {
-    bot.login(token.default);
-  });
+  client.login(token);
 });
 
-bot.on('messageCreate', message => {
+client.on('messageCreate', message => {
 
   if (message.author.bot) return
 
@@ -256,7 +256,7 @@ Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie 
 // *** COMMANDES ADMIN ***
 // ***********************
 
-bot.on('messageCreate', message => {
+client.on('messageCreate', message => {
   
   if (message.author.bot) return;
   if (message.author.id != "364820614990528522") return;
