@@ -138,6 +138,13 @@ Promise.all([
   client.login(token);
 });
 
+client.on('interactionCreate', async interaction => {
+  if (!interaction.isCommand()) return;
+
+  interaction.reply("interacted")
+  console.log(interaction.commandName)
+});
+
 client.on('messageCreate', message => {
 
   if (message.author.bot) return
