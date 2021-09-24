@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { Client, Intents } from 'discord.js';
+import { Client, Collection, Intents } from 'discord.js';
 import { token } from'./config.mjs';
 import exitHook from 'exit-hook';
 
@@ -120,6 +120,16 @@ function isPlayerCached(id) {
 
 //================================
 
+client.commands = new Collection();
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.mjs'));
+
+(async () => {
+  for (const file of commandFiles) {
+    const command = (await import(`./commands/${file}`)).default;
+    client.commands.set(command.data.name, command);
+  }
+})();
+
 const joueurs = {};
 const player_promise = import(PLAYERS_PATH).then((importedObject) => {
   let joueursJs = importedObject.data;
@@ -131,6 +141,7 @@ let allHighscores;
 const highscore_promise = import(HIGHSCORE_PATH).then((importedObject) => {
   allHighscores = importedObject.data;
 });
+
 Promise.all([
   player_promise,
   highscore_promise
@@ -141,8 +152,15 @@ Promise.all([
 client.on('interactionCreate', async interaction => {
   if (!interaction.isCommand()) return;
 
-  interaction.reply("interacted")
-  console.log(interaction.commandName)
+  const command = client.commands.get(interaction.commandName);
+  if (!command) return;
+
+  try {
+    await command.execute(interaction);
+  } catch (error) {
+    console.error(error);
+    await interaction.reply({ content: "Une erreur est survenue durant l'execution de cette commande!", ephemeral: true })
+  }
 });
 
 client.on('messageCreate', message => {
