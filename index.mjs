@@ -55,6 +55,50 @@ Si elle est fausse, tu perds et la partie se termine.
 - Envie de faire une pause? Aucun problème! Tu peux laisser ta partie en plan, et la reprendre plus tard.
 - Écris \`ping help\` pour la liste des commandes. Certaines pourraient t'êtres utiles!`
 
+const PONG_DATA = {
+  joueurs: {},
+  highscores: {}
+};
+const joueurs = PONG_DATA.joueurs;
+const allHighscores = PONG_DATA.highscores;
+
+const load_promises = [];
+
+// loading data
+
+load_promises.push(import(PLAYERS_PATH).then((importedObject) => {
+  let joueursJs = importedObject.data;
+  Object.keys(joueursJs).forEach(id => {
+    joueurs[id] = Joueur.fromJsObject(joueursJs[id]);
+  });
+}));
+
+load_promises.push(import(HIGHSCORE_PATH).then((importedObject) => {
+  PONG_DATA.highscores = importedObject.data;
+}));
+
+// loading commands
+
+client.commands = new Collection();
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.mjs'));
+
+for (const fileName of commandFiles) {
+  const promise = import(`./commands/${fileName}`).then((file) => {
+    const command = file.default
+    client.commands.set(command.data.name, command);
+  }).catch((error) => {
+    console.error(`Erreur lors du chargement du fichier commande ${fileName} :`)
+    throw error;
+  });
+  load_promises.push(promise);
+}
+
+//================================ logging in when everything is loaded
+
+Promise.all(load_promises).then(() => {
+  client.login(token);
+});
+
 //================================ fonctions
 
 import Joueur from './src/joueur.mjs';
@@ -118,44 +162,7 @@ function isPlayerCached(id) {
   else return false;
 }
 
-//================================ loading commands
-
-const load_promises = [];
-
-client.commands = new Collection();
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.mjs'));
-
-for (const fileName of commandFiles) {
-  const promise = import(`./commands/${fileName}`).then((file) => {
-    const command = file.default
-    client.commands.set(command.data.name, command);
-  }).catch((error) => {
-    console.error(`Erreur lors du chargement du fichier commande ${fileName} :`)
-    throw error;
-  });
-  load_promises.push(promise);
-}
-
-//================================ loading data
-
-const joueurs = {};
-load_promises.push(import(PLAYERS_PATH).then((importedObject) => {
-  let joueursJs = importedObject.data;
-  Object.keys(joueursJs).forEach(id => {
-    joueurs[id] = Joueur.fromJsObject(joueursJs[id]);
-  });
-}));
-
-let allHighscores;
-load_promises.push(import(HIGHSCORE_PATH).then((importedObject) => {
-  allHighscores = importedObject.data;
-}));
-
 //================================
-
-Promise.all(load_promises).then(() => {
-  client.login(token);
-});
 
 client.on('interactionCreate', async interaction => {
   if (!interaction.isCommand()) return;
@@ -164,10 +171,10 @@ client.on('interactionCreate', async interaction => {
   if (!command) return;
 
   try {
-    await command.execute(interaction);
+    await command.execute(interaction, PONG_DATA);
   } catch (error) {
     console.error(error);
-    await interaction.reply({ content: "Une erreur est survenue durant l'execution de cette commande!", ephemeral: true })
+    await interaction.reply({ content: ":x: Une erreur est survenue durant l'execution de cette commande!", ephemeral: true })
   }
 });
 
