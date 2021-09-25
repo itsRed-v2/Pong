@@ -118,34 +118,42 @@ function isPlayerCached(id) {
   else return false;
 }
 
-//================================
+//================================ loading commands
+
+const load_promises = [];
 
 client.commands = new Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.mjs'));
 
-(async () => {
-  for (const file of commandFiles) {
-    const command = (await import(`./commands/${file}`)).default;
+for (const fileName of commandFiles) {
+  const promise = import(`./commands/${fileName}`).then((file) => {
+    const command = file.default
     client.commands.set(command.data.name, command);
-  }
-})();
+  }).catch((error) => {
+    console.error(`Erreur lors du chargement du fichier commande ${fileName} :`)
+    throw error;
+  });
+  load_promises.push(promise);
+}
+
+//================================ loading data
 
 const joueurs = {};
-const player_promise = import(PLAYERS_PATH).then((importedObject) => {
+load_promises.push(import(PLAYERS_PATH).then((importedObject) => {
   let joueursJs = importedObject.data;
   Object.keys(joueursJs).forEach(id => {
     joueurs[id] = Joueur.fromJsObject(joueursJs[id]);
   });
-});
-let allHighscores;
-const highscore_promise = import(HIGHSCORE_PATH).then((importedObject) => {
-  allHighscores = importedObject.data;
-});
+}));
 
-Promise.all([
-  player_promise,
-  highscore_promise
-]).then(() => {
+let allHighscores;
+load_promises.push(import(HIGHSCORE_PATH).then((importedObject) => {
+  allHighscores = importedObject.data;
+}));
+
+//================================
+
+Promise.all(load_promises).then(() => {
   client.login(token);
 });
 
