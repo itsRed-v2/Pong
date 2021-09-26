@@ -67,14 +67,17 @@ const load_promises = [];
 // loading data
 
 load_promises.push(import(PLAYERS_PATH).then((importedObject) => {
-  let joueursJs = importedObject.data;
+  const joueursJs = importedObject.data;
   Object.keys(joueursJs).forEach(id => {
     joueurs[id] = Joueur.fromJsObject(joueursJs[id]);
   });
 }));
 
 load_promises.push(import(HIGHSCORE_PATH).then((importedObject) => {
-  PONG_DATA.highscores = importedObject.data;
+  const highscoresJs = importedObject.data;
+  Object.keys(highscoresJs).forEach(mode => {
+    allHighscores[mode] = highscoresJs[mode];
+  });
 }));
 
 // loading commands
@@ -103,8 +106,6 @@ Promise.all(load_promises).then(() => {
 
 import Joueur from './src/joueur.mjs';
 import {
-  listeJoueursActifs,
-  afficheliste,
   matchTp,
   changeScore,
   matchHs,
@@ -284,11 +285,6 @@ Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie 
   // ping highscores
   if (args[0] === 'highscores' || args[0] === 'hs') {
     message.channel.send(printHighscores(allHighscores, args[1] === 'info', getUsername, getDiscriminator));
-  }
-
-  // ping list
-  if (args[0] === 'list') {
-    message.channel.send(afficheliste(listeJoueursActifs(joueurs, args[1] === 'info')));
   }
 });
 

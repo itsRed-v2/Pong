@@ -7,9 +7,16 @@ import {
 export default {
 	data: new SlashCommandBuilder()
 		.setName('list')
-		.setDescription('Donne la liste des gens qui ont une partie en cours'),
+		.setDescription('Donne la liste des gens qui ont une partie en cours')
+		.addBooleanOption(option =>
+			option.setName('info')
+				.setDescription('Donne des informations supplémentaires sur les joueurs')),
 	async execute(interaction, pong) {
-		let joueurs = pong.joueurs;
-		interaction.reply(afficheliste(listeJoueursActifs(joueurs, false)));
+		const JOUEURS = pong.joueurs;
+
+		let info = interaction.options.getBoolean('info');
+		if (!info) info = false;
+
+		interaction.reply(afficheliste(listeJoueursActifs(JOUEURS, info)));
 	}
 }
