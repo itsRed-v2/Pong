@@ -6,27 +6,6 @@ const MODES_SUFFIXES = new Set([
     'double'
 ]);
 
-function afficheliste(liste) {
-    if (liste.length > 1) {
-        liste.unshift(`${liste.length} parties sont en cours:`)
-    } else if (liste.length == 1) {
-        liste.unshift(`1 partie est en cours:`)
-    } else {
-        liste.unshift(`Aucune partie n'est en cours`)
-    }
-    return liste.join('\n');
-}
-
-function listeJoueursActifs(joueurs, info) {
-    var liste = []
-    Object.keys(joueurs).forEach(id => {
-        if (joueurs[id].partie) {
-            liste.push(`\`${joueurs[id].pseudo}${info ? '#'+joueurs[id].discriminator:''}\`${info ? ' \`'+id+'\`' : ''} - ${joueurs[id].partie.printScore()}, ${printMode(joueurs[id].partie.mode)}`)
-        }
-    });
-    return liste
-}
-
 function changeScore(id, score, joueurs) {
     if (joueurs[id] && joueurs[id].partie) {
         var oldpts = joueurs[id].partie.points
@@ -143,8 +122,6 @@ function printMode(mode) {
 }
 
 export {
-    listeJoueursActifs,
-    afficheliste,
     changeScore,
     matchTp, //==> match
     matchHs, //==> match
