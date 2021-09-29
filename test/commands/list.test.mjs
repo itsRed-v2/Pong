@@ -1,11 +1,11 @@
 import chai from 'chai';
 const expect = chai.expect;
-import Partie from '../src/partie.mjs';
-import Joueur from '../src/joueur.mjs';
+import Partie from '../../src/partie.mjs';
+import Joueur from '../../src/joueur.mjs';
 import {
 	listeJoueursActifs,
     afficheliste
-} from '../commands/list.mjs'
+} from '../../commands/list.mjs'
 
 describe('Command_list', function () {
 
