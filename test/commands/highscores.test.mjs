@@ -7,6 +7,7 @@ import {
 } from '../../commands/highscores.mjs'
 
 describe('/highscores', function () {
+	
 	describe('#trieHighscores()', function () {
 		it("trie les highscores d'un mode", function () {
 			let highscores = {
