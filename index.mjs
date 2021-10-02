@@ -56,11 +56,11 @@ Si elle est fausse, tu perds et la partie se termine.
 - Écris \`ping help\` pour la liste des commandes. Certaines pourraient t'êtres utiles!`
 
 const PONG_DATA = {
-  joueurs: {},
-  highscores: {}
+  JOUEURS: {},
+  HIGHSCORES: {}
 };
-const joueurs = PONG_DATA.joueurs;
-const allHighscores = PONG_DATA.highscores;
+const JOUEURS = PONG_DATA.JOUEURS;
+const allHighscores = PONG_DATA.HIGHSCORES;
 
 const load_promises = [];
 
@@ -69,7 +69,7 @@ const load_promises = [];
 load_promises.push(import(PLAYERS_PATH).then((importedObject) => {
   const joueursJs = importedObject.data;
   Object.keys(joueursJs).forEach(id => {
-    joueurs[id] = Joueur.fromJsObject(joueursJs[id]);
+    JOUEURS[id] = Joueur.fromJsObject(joueursJs[id]);
   });
 }));
 
@@ -131,8 +131,8 @@ function saveHighScores(allHighscores) {
   });
 }
 
-function saveJoueurs(joueurs) {
-  fs.writeFile(PLAYERS_PATH, stringifyForExport(joueurs), function (err) {
+function saveJoueurs(JOUEURS) {
+  fs.writeFile(PLAYERS_PATH, stringifyForExport(JOUEURS), function (err) {
     if (err) return console.log(err)
   });
 }
@@ -140,8 +140,8 @@ function saveJoueurs(joueurs) {
 function getUsername(id) {
   if (client.users.cache.get(id)) {
     return client.users.cache.get(id).username
-  } else if (joueurs[id]) {
-    return joueurs[id].pseudo;
+  } else if (JOUEURS[id]) {
+    return JOUEURS[id].pseudo;
   } else {
     return 'UNKNOWN'
   }
@@ -150,8 +150,8 @@ function getUsername(id) {
 function getDiscriminator(id) {
   if (client.users.cache.get(id)) {
     return client.users.cache.get(id).discriminator
-  } else if (joueurs[id]) {
-    return joueurs[id].discriminator;
+  } else if (JOUEURS[id]) {
+    return JOUEURS[id].discriminator;
   } else {
     return '----'
   }
@@ -187,19 +187,19 @@ client.on('messageCreate', message => {
   if (args === null) return
 
   var id = message.author.id;
-  var joueur = joueurs[id]
+  var joueur = JOUEURS[id]
   if (joueur) {
     if (joueur.update(getUsername(id), getDiscriminator(id))) {
-      saveJoueurs(joueurs);
+      saveJoueurs(JOUEURS);
     }
     var partie = joueur.partie
   }
 
   // ping mode
   if (args[0] === 'mode') {
-    if(createJoueurIfNeeded(id, getUsername(id), getDiscriminator(id), joueurs)) {
-      saveJoueurs(joueurs);
-      joueur = joueurs[id];
+    if(createJoueurIfNeeded(id, getUsername(id), getDiscriminator(id), JOUEURS)) {
+      saveJoueurs(JOUEURS);
+      joueur = JOUEURS[id];
     }
     var plus = true
     var moins = false
@@ -216,11 +216,11 @@ client.on('messageCreate', message => {
 Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie en cours, utilise \`ping stop\``)
     }
     else {
-      if(createJoueurIfNeeded(id, getUsername(id), getDiscriminator(id), joueurs)) {
-        joueur = joueurs[id];
+      if(createJoueurIfNeeded(id, getUsername(id), getDiscriminator(id), JOUEURS)) {
+        joueur = JOUEURS[id];
       }
       partie = joueur.demarrerPartie(message);
-      saveJoueurs(joueurs);
+      saveJoueurs(JOUEURS);
       sendAsLog(logChannel, ':white_check_mark:  `' + message.author.username + '` a commencé une partie en **' + printMode(partie.mode) + '**')
     }
   }
@@ -231,7 +231,7 @@ Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie 
       var highscore = allHighscores[partie.mode][id] || 0
       partie.points++
       message.reply(`Correct ! Tu as ${partie.printScore()}.${partie.points > highscore ? ' **C\'est ton Meilleur score!**' : ''}\n${partie.poseQuestion()}`)
-      saveJoueurs(joueurs)
+      saveJoueurs(JOUEURS)
       // maj highscore
       if (partie.points > highscore) {
         allHighscores[partie.mode][id] = partie.points
@@ -244,7 +244,7 @@ Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie 
       message.reply(`Faux ! La réponse était ${partie.reponse()}. Ton score final est de ${partie.printScore()}${partie.points > highscore ? ", c'est ton **meilleur score!**" : ''}`)
       sendAsLog(logChannel, ':x:  `' + message.author.username + '` a perdu une partie à **' + partie.printScore() + '** (' + printMode(partie.mode) + ')')
       joueur.partie = undefined
-      saveJoueurs(joueurs)
+      saveJoueurs(JOUEURS)
     }
 
     // ping ?
@@ -255,7 +255,7 @@ Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie 
     // ping stop
     else if (args[0] === 'stop') {
       joueur.partie = undefined
-      saveJoueurs(joueurs)
+      saveJoueurs(JOUEURS)
       message.reply('Partie terminée');
       sendAsLog(logChannel, `:orange_circle:  \`${message.author.username}\` a arrêté une partie à **${partie.printScore()}** (${printMode(partie.mode)})`)
     }
@@ -297,17 +297,17 @@ client.on('messageCreate', message => {
 
   //ping reload
   if (args[0] === 'reload') {
-    reload(message, logChannel, joueurs, fs, PLAYERS_PATH)
+    reload(message, logChannel, JOUEURS, fs, PLAYERS_PATH)
   }
 
   // ping tp
   if (matchTp(args)) {
     var newScore = args[2];
     var id = args[1]
-    var oldScore = changeScore(id, newScore, joueurs)
+    var oldScore = changeScore(id, newScore, JOUEURS)
     if (oldScore || oldScore === 0) {
       var pseudo = getUsername(id);
-      saveJoueurs(joueurs);
+      saveJoueurs(JOUEURS);
       message.channel.send(`Score du joueur \`${pseudo}\` (\`${id}\`) modifié: ${oldScore} ==> **${newScore}**`)
       sendAsLog(logChannel, `:arrow_right: Score de \`${pseudo}\` (\`${id}\`) modifié: ${oldScore} ==> **${newScore}**`)
     } else {
@@ -372,19 +372,19 @@ client.on('messageCreate', message => {
 
   // ping listall
   if (args[0] === 'listall') {
-    message.channel.send(listeJoueurs(joueurs, allHighscores));
+    message.channel.send(listeJoueurs(JOUEURS, allHighscores));
   }
 
   // ping rmplayer
   if (args[0] === "rmplayer") {
     if (args[1]) {
-      if (joueurs[args[1]]) {
+      if (JOUEURS[args[1]]) {
         message.channel.send(`Joueur \`${args[1]}\` supprimé
 \`\`\`json
-${JSON.stringify(joueurs[args[1]], null, "   ")}
+${JSON.stringify(JOUEURS[args[1]], null, "   ")}
 \`\`\``);
-        delete joueurs[args[1]]
-        saveJoueurs(joueurs);
+        delete JOUEURS[args[1]]
+        saveJoueurs(JOUEURS);
       } else {
         message.channel.send(`Aucun joueur enregistré ne correspond à l'id \`${args[1]}\``);
       }

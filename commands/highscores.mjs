@@ -8,9 +8,9 @@ export default {
         .addBooleanOption(option =>
             option.setName('info')
                 .setDescription('Donne des informations supplémentaires sur les joueurs')),
-    async execute(interaction, pong) {
-        const ALLHIGHSCORES = pong.highscores;
-        const JOUEURS = pong.joueurs;
+    async execute(interaction, PONG_DATA) {
+        const ALLHIGHSCORES = PONG_DATA.HIGHSCORES;
+        const JOUEURS = PONG_DATA.JOUEURS;
 
         let info = interaction.options.getBoolean('info');
         if (!info) info = false;
