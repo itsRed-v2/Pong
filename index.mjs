@@ -123,7 +123,6 @@ import {
   changeHs,
   ajouteHs,
   removeHs,
-  printHighscores
 } from './src/highscore.mjs';
 
 function saveHighScores(allHighscores) {
@@ -280,11 +279,6 @@ Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie 
   if (args[0] === 'help') {
     if (id == 364820614990528522 && args[1] === 'admin') message.channel.send(AIDE_ADMIN);
     else message.channel.send(AIDE_UTILISATEUR);
-  }
-
-  // ping highscores
-  if (args[0] === 'highscores' || args[0] === 'hs') {
-    message.channel.send(printHighscores(allHighscores, args[1] === 'info', getUsername, getDiscriminator));
   }
 });
 
