@@ -24,17 +24,6 @@ const DATA_PATH = process.env.PONG_DATA_PATH;
 const HIGHSCORE_PATH = DATA_PATH + '/highscores.mjs';
 const PLAYERS_PATH = DATA_PATH + '/players.mjs';
 
-const AIDE_UTILISATEUR = `**Liste des commandes**
-\`ping règles\` donne les règles du jeu
-\`ping ?\` repose la question en cours
-\`ping\` commence une partie
-\`ping help\` affiche cette liste
-\`ping highscores\` / \`ping hs\` affiche les meilleurs scores des joueurs
-\`ping mode <mode>\` choisir le mode de jeu parmi \`plus\`, \`moins\`, ou \`double\`
-\`ping list\` liste toutes les parties en cours
-\`ping stop\` termine la partie en cours
-Tu peux écrire \`p\` à la place de \`ping\` au début des commandes pour faire plus rapide!`
-
 const AIDE_ADMIN = `**Commandes Admin**
 \`ping reload\` redémarre l'application
 \`ping tp <id> <score>\` set le score du joueur spécifié
@@ -45,15 +34,6 @@ const AIDE_ADMIN = `**Commandes Admin**
 \`ping highscore info\` / \`ping hs info\` affiche les meilleurs scores et l'id des joueurs
 \`ping log\` upload les fichiers de données de pong
 \`ping listall\` donne la liste des joueurs enregistrés`
-
-const REGLES = `Écris \`ping\` pour commencer une partie.
-Je vais alors te poser une opération. Réponds par \`ping <réponse>\`
-Si ta réponse est correcte, tu gagne un point et je te pose une nouvelle opération.
-Si elle est fausse, tu perds et la partie se termine.
-- Plus tu as de points, plus les opérations sont difficiles.
-- Pas de stress! Tu as tout le temps que tu veux pour répondre.
-- Envie de faire une pause? Aucun problème! Tu peux laisser ta partie en plan, et la reprendre plus tard.
-- Écris \`ping help\` pour la liste des commandes. Certaines pourraient t'êtres utiles!`
 
 const PONG_DATA = {
   JOUEURS: {},
@@ -270,15 +250,9 @@ Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie 
   // *** COMMANDES INFORMATIVES ***
   // ******************************
 
-  // ping règles
-  if (args[0] == 'règles' || args[0] == 'regles') {
-    message.channel.send(REGLES);
-  }
-
   // ping help
-  if (args[0] === 'help') {
-    if (id == 364820614990528522 && args[1] === 'admin') message.channel.send(AIDE_ADMIN);
-    else message.channel.send(AIDE_UTILISATEUR);
+  if (args[0] === 'help' && args[1] === 'admin' && id === '364820614990528522') {
+    message.channel.send(AIDE_ADMIN);
   }
 });
 
