@@ -24,17 +24,6 @@ const DATA_PATH = process.env.PONG_DATA_PATH;
 const HIGHSCORE_PATH = DATA_PATH + '/highscores.mjs';
 const PLAYERS_PATH = DATA_PATH + '/players.mjs';
 
-const AIDE_ADMIN = `**Commandes Admin**
-\`ping reload\` redémarre l'application
-\`ping tp <id> <score>\` set le score du joueur spécifié
-\`ping seths <id> <highscore> <plus|moins|double>\` set le highscore du joueur spécifié dans le mode spécifié
-\`ping addhs <id> <highscore> <plus|moins|double>\` ajoute le joueur à la liste dans le mode spécifié avec le score spécifié
-\`ping rmhs <id> <plus|moins|double>\` supprime le joueur de la liste dans le mode spécifié
-\`ping rmplayer <id>\` supprime le joueur (**toutes** ses données seront supprimées)
-\`ping highscore info\` / \`ping hs info\` affiche les meilleurs scores et l'id des joueurs
-\`ping log\` upload les fichiers de données de pong
-\`ping listall\` donne la liste des joueurs enregistrés`
-
 const PONG_DATA = {
   JOUEURS: {},
   HIGHSCORES: {}
@@ -244,15 +233,6 @@ Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie 
   // réponse, "ping ?" ou "ping stop" mais aucune partie en cours
   else if (isInteger(args[0]) || args[0] === '?' || args[0] === 'stop') {
     message.reply('Aucune partie en cours. Tape `ping` pour lancer une partie')
-  }
-
-  // ******************************
-  // *** COMMANDES INFORMATIVES ***
-  // ******************************
-
-  // ping help
-  if (args[0] === 'help' && args[1] === 'admin' && id === '364820614990528522') {
-    message.channel.send(AIDE_ADMIN);
   }
 });
 
