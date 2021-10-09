@@ -24,6 +24,9 @@ const DATA_PATH = process.env.PONG_DATA_PATH;
 const HIGHSCORE_PATH = DATA_PATH + '/highscores.mjs';
 const PLAYERS_PATH = DATA_PATH + '/players.mjs';
 
+console.log('Fichier highscores: ' + HIGHSCORE_PATH);
+console.log('Fichier players: ' + PLAYERS_PATH);
+
 const PONG_DATA = {
   JOUEURS: {},
   HIGHSCORES: {}
@@ -81,7 +84,6 @@ import {
   matchRmHs,
   matchPing,
   reload,
-  stringifyForExport,
   sendAsLog,
   listeJoueurs,
   isInteger,
@@ -93,18 +95,10 @@ import {
   ajouteHs,
   removeHs,
 } from './src/highscore.mjs';
-
-function saveHighScores(allHighscores) {
-  fs.writeFile(HIGHSCORE_PATH, stringifyForExport(allHighscores), function (err) {
-    if (err) return console.log(err)
-  });
-}
-
-function saveJoueurs(JOUEURS) {
-  fs.writeFile(PLAYERS_PATH, stringifyForExport(JOUEURS), function (err) {
-    if (err) return console.log(err)
-  });
-}
+import {
+  saveHighScores,
+  saveJoueurs,
+} from './src/file-tools.mjs'
 
 function getUsername(id) {
   if (client.users.cache.get(id)) {
@@ -251,7 +245,7 @@ client.on('messageCreate', message => {
 
   //ping reload
   if (args[0] === 'reload') {
-    reload(message, logChannel, JOUEURS, fs, PLAYERS_PATH)
+    reload(message, logChannel, JOUEURS);
   }
 
   // ping tp

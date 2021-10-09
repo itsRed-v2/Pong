@@ -1,4 +1,5 @@
 import Joueur from './joueur.mjs';
+import { saveJoueurs } from './file-tools.mjs';
 
 const MODES_SUFFIXES = new Set([
     'plus',
@@ -43,20 +44,14 @@ function matchPing(contenu) {
     return args;
 }
 
-function reload(message, logChannel, joueurs, fs, PLAYERS_PATH) {
-    fs.writeFile(PLAYERS_PATH, stringifyForExport(joueurs), function (err) {
-        if (err) return console.log(err)
-    });
+function reload(message, logChannel, joueurs) {
+    saveJoueurs(joueurs);
     Promise.all([
         message.channel.send(':repeat: Reloading!'),
         sendAsLog(logChannel, ':repeat: Reloading')
     ]).then(() => {
         process.exit();
     });
-}
-
-function stringifyForExport(object) {
-    return "export let data = " + JSON.stringify(object, null, "  ") + ";"
 }
 
 function sendAsLog(logChannel, string) { // non testé
@@ -128,7 +123,6 @@ export {
     matchRmHs, //==> match
     matchPing, //==> match
     reload,
-    stringifyForExport,
     sendAsLog,
     logReloadMessage,
     listeJoueurs,

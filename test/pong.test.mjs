@@ -8,7 +8,6 @@ import {
   matchHs,
   matchRmHs,
   matchPing,
-  stringifyForExport,
   sendAsLog,
   logReloadMessage,
   listeJoueurs,
@@ -240,34 +239,6 @@ describe('Pong', function () {
     it("fonctionne avec le prefix p", function () {
       expect(matchPing('p arg1 arg2 arg3'))
       .to.eql(['arg1', 'arg2', 'arg3']);
-    });
-  });
-
-  describe('#stringifyForExport()', function () {
-    it("convertis objet en string JSON prêt pour l'exportation", function () {
-      var allhighscores = {
-        mode_1: {
-        'id1' : 155,
-        'id2' : 120,
-        'id3' : 83,
-        },
-        mode_2: {
-        'id1' : 50,
-        'id2' : 27,
-        },
-        }
-      expect(stringifyForExport(allhighscores)).to.eql(
-`export let data = {
-  "mode_1": {
-    "id1": 155,
-    "id2": 120,
-    "id3": 83
-  },
-  "mode_2": {
-    "id1": 50,
-    "id2": 27
-  }
-};`);
     });
   });
 
