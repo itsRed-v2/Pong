@@ -1,6 +1,6 @@
 import chai from 'chai';
 const expect = chai.expect;
-import Partie from '../src/partie.mjs'
+import Partie from '../../src/partie.mjs'
 
 describe('Partie', function () {
 

@@ -2,7 +2,7 @@ import chai from 'chai';
 import chai_match from 'chai-match';
 chai.use(chai_match);
 const expect = chai.expect;
-import Joueur from '../src/joueur.mjs'
+import Joueur from '../../src/joueur.mjs'
 
 describe('Joueur', function () {
     it('a les propriétés pseudo, discriminator, et mode', function() {
