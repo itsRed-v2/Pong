@@ -64,6 +64,17 @@ describe('Partie', function () {
         });
     });
 
+    describe('#printMode()', function () {
+        it("renvoie le string correspondant au mode de la partie", function () {
+            let partie = new Partie('mode_plus')
+            expect(partie.printMode()).to.eql('Mode Addition');
+            partie = new Partie('mode_moins')
+            expect(partie.printMode()).to.eql('Mode Soustraction');
+            partie = new Partie('mode_double')
+            expect(partie.printMode()).to.eql('Mode Double');
+        });
+    });
+
     describe('#fromJsObject()', function () {
         it("renvoie la partie correspondant à l'objet donné", function () {
             let object = {

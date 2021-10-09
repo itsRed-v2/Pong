@@ -175,7 +175,7 @@ client.on('messageCreate', message => {
   // ping
   if (contenu === 'ping') {
     if (partie) {
-      message.reply(`Une partie en ${printMode(partie.mode)} est déjà en cours, tu as ${partie.printScore()} et la question est ${partie.question()}
+      message.reply(`Une partie en ${partie.printMode()} est déjà en cours, tu as ${partie.printScore()} et la question est ${partie.question()}
 Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie en cours, utilise \`ping stop\``)
     }
     else {
@@ -184,7 +184,7 @@ Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie 
       }
       partie = joueur.demarrerPartie(message);
       saveJoueurs(JOUEURS);
-      sendAsLog(logChannel, ':white_check_mark:  `' + message.author.username + '` a commencé une partie en **' + printMode(partie.mode) + '**')
+      sendAsLog(logChannel, ':white_check_mark:  `' + message.author.username + '` a commencé une partie en **' + partie.printMode() + '**')
     }
   }
 
@@ -205,14 +205,14 @@ Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie 
     // test mauvaise réponse
     else if (isInteger(args[0])) {
       message.reply(`Faux ! La réponse était ${partie.reponse()}. Ton score final est de ${partie.printScore()}${partie.points > highscore ? ", c'est ton **meilleur score!**" : ''}`)
-      sendAsLog(logChannel, ':x:  `' + message.author.username + '` a perdu une partie à **' + partie.printScore() + '** (' + printMode(partie.mode) + ')')
+      sendAsLog(logChannel, ':x:  `' + message.author.username + '` a perdu une partie à **' + partie.printScore() + '** (' + partie.printMode() + ')')
       joueur.partie = undefined
       saveJoueurs(JOUEURS)
     }
 
     // ping ?
     else if (args[0] === '?') {
-      message.reply(`pong ${partie.question()} ! (${partie.printScore()}, ${printMode(partie.mode)})`)
+      message.reply(`pong ${partie.question()} ! (${partie.printScore()}, ${partie.printMode()})`)
     }
 
     // ping stop
@@ -220,7 +220,7 @@ Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie 
       joueur.partie = undefined
       saveJoueurs(JOUEURS)
       message.reply('Partie terminée');
-      sendAsLog(logChannel, `:orange_circle:  \`${message.author.username}\` a arrêté une partie à **${partie.printScore()}** (${printMode(partie.mode)})`)
+      sendAsLog(logChannel, `:orange_circle:  \`${message.author.username}\` a arrêté une partie à **${partie.printScore()}** (${partie.printMode()})`)
     }
   }
    

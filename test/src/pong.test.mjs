@@ -466,5 +466,5 @@ name2`
         expect(printMode('mode_moins')).to.eql('Mode Soustraction');
         expect(printMode('mode_double')).to.eql('Mode Double');
     });
-});
+  });
 });

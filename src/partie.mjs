@@ -1,3 +1,5 @@
+import { printMode as importedPrintMode } from './pong.mjs';
+
 export default class Partie {
 
     constructor(mode) {
@@ -30,6 +32,10 @@ export default class Partie {
 
     printScore() {
         return this.points + ' point' + (this.points > 1 ? 's':'')
+    }
+
+    printMode() {
+        return importedPrintMode(this.mode);
     }
 
     static fromJsObject(object) {

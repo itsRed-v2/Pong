@@ -1,5 +1,4 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { printMode } from '../src/pong.mjs'
 
 export default {
 	data: new SlashCommandBuilder()
@@ -32,8 +31,10 @@ function afficheliste(liste) {
 function listeJoueursActifs(joueurs, info) {
     var liste = []
     Object.keys(joueurs).forEach(id => {
-        if (joueurs[id].partie) {
-            liste.push(`\`${joueurs[id].pseudo}${info ? '#'+joueurs[id].discriminator:''}\`${info ? ' \`'+id+'\`' : ''} - ${joueurs[id].partie.printScore()}, ${printMode(joueurs[id].partie.mode)}`)
+        const joueur = joueurs[id];
+        const partie = joueur.partie;
+        if (partie) {
+            liste.push(`\`${joueur.pseudo}${info ? '#'+joueur.discriminator:''}\`${info ? ' \`'+id+'\`' : ''} - ${partie.printScore()}, ${partie.printMode()}`)
         }
     });
     return liste
