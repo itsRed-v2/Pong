@@ -1,4 +1,5 @@
 import Joueur from './joueur.mjs';
+import DiscordLogger from './discordLogger.mjs';
 import { saveJoueurs } from './file-tools.mjs';
 
 const MODES_SUFFIXES = new Set([
@@ -44,36 +45,11 @@ function matchPing(contenu) {
     return args;
 }
 
-function reload(message, logChannel, joueurs) {
+async function reload(message, joueurs) {
     saveJoueurs(joueurs);
-    Promise.all([
-        message.channel.send(':repeat: Reloading!'),
-        sendAsLog(logChannel, ':repeat: Reloading')
-    ]).then(() => {
-        process.exit();
-    });
-}
-
-function sendAsLog(logChannel, string) { // non testé
-    if (string === ':repeat: Reloading') {
-        return logChannel.messages.fetch({ limit: 1 }).then(messages => {
-            return logReloadMessage(messages, logChannel);
-        });
-    } else {
-        return logChannel.send(string);
-    }
-}
-
-function logReloadMessage(messages, logChannel) {
-    var lastMessage = messages.first();
-    var content = lastMessage.content;
-    if (content.match(/^:repeat: Reloading/)) {
-        var match = content.match(/(\d*)\)$/);
-        if (match) return lastMessage.edit(`:repeat: Reloading (x${parseInt(10, match[1]) + 1})`);
-        else return lastMessage.edit(':repeat: Reloading (x2)');
-    } else {
-        return logChannel.send(':repeat: Reloading');
-    }
+    await message.channel.send(':repeat: Reloading!');
+    await DiscordLogger.instance.logReloadMessage();
+    process.exit();
 }
 
 function listeJoueurs(joueurs) {
@@ -123,8 +99,6 @@ export {
     matchRmHs, //==> match
     matchPing, //==> match
     reload,
-    sendAsLog,
-    logReloadMessage,
     listeJoueurs,
     isInteger,
     isPositiveInteger,

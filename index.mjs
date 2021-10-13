@@ -2,16 +2,16 @@ import fs from 'fs';
 import { Client, Collection, Intents } from 'discord.js';
 import { token } from'./config.mjs';
 import exitHook from 'exit-hook';
+import DiscordLogger from './src/discordLogger.mjs';
 
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES],
   partials: ['CHANNEL']
 })
 
-var logChannel;
 client.once('ready', function () {
   console.log(`Logged in as ${client.user.tag}!`)
-  logChannel = client.channels.cache.get('763372739238559774');
+  DiscordLogger.instance.setLogChannel(client.channels.cache.get('763372739238559774'));
 })
 
 exitHook(() => {
@@ -84,7 +84,6 @@ import {
   matchRmHs,
   matchPing,
   reload,
-  sendAsLog,
   listeJoueurs,
   isInteger,
   createJoueurIfNeeded,
@@ -184,7 +183,7 @@ Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie 
       }
       partie = joueur.demarrerPartie(message);
       saveJoueurs(JOUEURS);
-      sendAsLog(logChannel, ':white_check_mark:  `' + message.author.username + '` a commencé une partie en **' + partie.printMode() + '**')
+      DiscordLogger.instance.sendAsLog(':white_check_mark:  `' + message.author.username + '` a commencé une partie en **' + partie.printMode() + '**')
     }
   }
 
@@ -205,7 +204,7 @@ Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie 
     // test mauvaise réponse
     else if (isInteger(args[0])) {
       message.reply(`Faux ! La réponse était ${partie.reponse()}. Ton score final est de ${partie.printScore()}${partie.points > highscore ? ", c'est ton **meilleur score!**" : ''}`)
-      sendAsLog(logChannel, ':x:  `' + message.author.username + '` a perdu une partie à **' + partie.printScore() + '** (' + partie.printMode() + ')')
+      DiscordLogger.instance.sendAsLog(':x:  `' + message.author.username + '` a perdu une partie à **' + partie.printScore() + '** (' + partie.printMode() + ')')
       joueur.partie = undefined
       saveJoueurs(JOUEURS)
     }
@@ -220,7 +219,7 @@ Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie 
       joueur.partie = undefined
       saveJoueurs(JOUEURS)
       message.reply('Partie terminée');
-      sendAsLog(logChannel, `:orange_circle:  \`${message.author.username}\` a arrêté une partie à **${partie.printScore()}** (${partie.printMode()})`)
+      DiscordLogger.instance.sendAsLog(`:orange_circle:  \`${message.author.username}\` a arrêté une partie à **${partie.printScore()}** (${partie.printMode()})`)
     }
   }
    
@@ -245,7 +244,7 @@ client.on('messageCreate', message => {
 
   //ping reload
   if (args[0] === 'reload') {
-    reload(message, logChannel, JOUEURS);
+    reload(message, JOUEURS);
   }
 
   // ping tp
@@ -257,7 +256,7 @@ client.on('messageCreate', message => {
       var pseudo = getUsername(id);
       saveJoueurs(JOUEURS);
       message.channel.send(`Score du joueur \`${pseudo}\` (\`${id}\`) modifié: ${oldScore} ==> **${newScore}**`)
-      sendAsLog(logChannel, `:arrow_right: Score de \`${pseudo}\` (\`${id}\`) modifié: ${oldScore} ==> **${newScore}**`)
+      DiscordLogger.instance.sendAsLog(`:arrow_right: Score de \`${pseudo}\` (\`${id}\`) modifié: ${oldScore} ==> **${newScore}**`)
     } else {
       message.channel.send(`Le joueur d'id \`${id}\` n'existe pas ou n'a pas de partie en cours.`)
     }
