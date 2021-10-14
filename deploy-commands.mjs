@@ -8,6 +8,7 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 
 for (const fileName of commandFiles) {
     try {
+        console.log("Loading: " + fileName)
         const command = (await import(`./commands/${fileName}`)).default;
         commands.push(command.data.toJSON());
     } catch (error) {
