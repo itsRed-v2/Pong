@@ -208,15 +208,10 @@ Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie 
       joueur.partie = undefined
       saveJoueurs(JOUEURS)
     }
-
-    // ping ?
-    else if (args[0] === '?') {
-      message.reply(`pong ${partie.question()} ! (${partie.printScore()}, ${partie.printMode()})`)
-    }
   }
    
-  // réponse ou "ping ?" mais aucune partie en cours
-  else if (isInteger(args[0]) || args[0] === '?') {
+  // réponse mais aucune partie en cours
+  else if (isInteger(args[0])) {
     message.reply('Aucune partie en cours. Tape `ping` pour lancer une partie')
   }
 });
