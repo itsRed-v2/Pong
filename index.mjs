@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { Client, Collection, Intents } from 'discord.js';
-import { token } from'./config.mjs';
+import { token, adminIds } from'./config.mjs';
 import exitHook from 'exit-hook';
 import DiscordLogger from './src/discordLogger.mjs';
 
@@ -223,7 +223,7 @@ Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie 
 client.on('messageCreate', message => {
   
   if (message.author.bot) return;
-  if (message.author.id != "364820614990528522") return;
+  if (!adminIds.has(message.author.id)) return;
   
   var contenu = message.content
   var args = matchPing(contenu);
