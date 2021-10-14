@@ -12,7 +12,7 @@ export default {
     async execute(interaction, PONG_DATA) {
 		const JOUEURS = PONG_DATA.JOUEURS;
 		const joueur = JOUEURS[interaction.user.id];
-		const partie = joueur.partie;
+		const partie = joueur?.partie;
 
 		if (partie) {
 
@@ -63,7 +63,7 @@ export default {
 				});
 			}
 		} else { // if !partie
-			await interaction.reply({
+			interaction.reply({
 				content: "Aucune partie en cours. Tape `ping` pour lancer une partie",
 				ephemeral: true
 			})
