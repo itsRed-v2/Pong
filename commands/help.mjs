@@ -6,6 +6,7 @@ export default {
 	data: new SlashCommandBuilder()
 		.setName('help')
 		.setDescription('Donne la liste des commandes'),
+
 	async execute(interaction, _PONG_DATA) {
 
 		if (adminIds.has(interaction.user.id)) {
@@ -28,7 +29,6 @@ export default {
 			})
 
 			const filter = buttonInteract => buttonInteract.customId === 'user_help_' + interaction.id || buttonInteract.customId === 'admin_help_' + interaction.id;
-
 			const collector = interaction.channel.createMessageComponentCollector({ filter, max: 1, time: 60000 });
 
 			collector.on('collect', async buttonInteract => {

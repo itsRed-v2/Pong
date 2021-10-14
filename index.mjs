@@ -213,18 +213,10 @@ Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie 
     else if (args[0] === '?') {
       message.reply(`pong ${partie.question()} ! (${partie.printScore()}, ${partie.printMode()})`)
     }
-
-    // ping stop
-    else if (args[0] === 'stop') {
-      joueur.partie = undefined
-      saveJoueurs(JOUEURS)
-      message.reply('Partie terminée');
-      DiscordLogger.instance.sendAsLog(`:orange_circle:  \`${message.author.username}\` a arrêté une partie à **${partie.printScore()}** (${partie.printMode()})`)
-    }
   }
    
-  // réponse, "ping ?" ou "ping stop" mais aucune partie en cours
-  else if (isInteger(args[0]) || args[0] === '?' || args[0] === 'stop') {
+  // réponse ou "ping ?" mais aucune partie en cours
+  else if (isInteger(args[0]) || args[0] === '?') {
     message.reply('Aucune partie en cours. Tape `ping` pour lancer une partie')
   }
 });
