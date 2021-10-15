@@ -136,7 +136,10 @@ client.on('interactionCreate', async interaction => {
     await command.execute(interaction, PONG_DATA);
   } catch (error) {
     console.error(error);
-    await interaction.reply({ content: ":x: Une erreur est survenue durant l'execution de cette commande!", ephemeral: true })
+    await interaction.reply({
+      content: ":x: Une erreur est survenue durant l'execution de cette commande!",
+      ephemeral: true
+    });
   }
 });
 
@@ -155,20 +158,6 @@ client.on('messageCreate', message => {
       saveJoueurs(JOUEURS);
     }
     var partie = joueur.partie
-  }
-
-  // ping mode
-  if (args[0] === 'mode') {
-    if(createJoueurIfNeeded(id, getUsername(id), getDiscriminator(id), JOUEURS)) {
-      saveJoueurs(JOUEURS);
-      joueur = JOUEURS[id];
-    }
-    var plus = true
-    var moins = false
-    plus = args[1].includes('+')
-    moins = args[1].includes('-')
-    joueur.mode = (plus && moins ? 'mode_double' : (moins ? 'mode_moins' : 'mode_plus'))
-    message.reply(printMode(joueur.mode))
   }
 
   // ping
