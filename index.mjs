@@ -24,8 +24,7 @@ const DATA_PATH = process.env.PONG_DATA_PATH;
 const HIGHSCORE_PATH = DATA_PATH + '/highscores.mjs';
 const PLAYERS_PATH = DATA_PATH + '/players.mjs';
 
-console.log('Fichier highscores: ' + HIGHSCORE_PATH);
-console.log('Fichier players: ' + PLAYERS_PATH);
+console.log('Dossier data: ' + DATA_PATH);
 
 const PONG_DATA = {
   JOUEURS: {},
