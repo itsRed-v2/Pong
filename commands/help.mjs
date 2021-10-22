@@ -48,17 +48,15 @@ export default {
 }
 
 const AIDE_UTILISATEUR = `**Commandes texte**
-\`ping ?\` repose la question en cours.
-\`ping\` commence une partie.
-\`ping mode <mode>\` choisir le mode de jeu parmi \`plus\`, \`moins\`, ou \`double\`.
-\`ping list\` liste toutes les parties en cours.
-\`ping stop\` termine la partie en cours.
-Conseil de pro: tu peux écrire \`p\` à la place de \`ping\` au début des commandes pour faire plus rapide!
+Écris \`ping\` pour commencer une partie.
 
 **Commandes slash**
+\`/help\` affiche cette liste.
 \`/regles\` donne les règles du jeu.
 \`/highscores\` affiche les highscores des meilleurs joueurs.
-\`/help\` affiche cette liste.`
+\`/mode\` change de mode de jeu.
+\`/abandon\` termine la partie en cours.
+\`/question\` repose la question en cours.`
 
 const AIDE_ADMIN = `**Commandes Admin**
 \`ping reload\` redémarre l'application
