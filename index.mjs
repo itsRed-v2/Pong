@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { Client, Collection, Intents } from 'discord.js';
-import { token, adminIds } from'./config.mjs';
+import { token, adminIds, logChannelId } from'./config.mjs';
 import exitHook from 'exit-hook';
 import DiscordLogger from './src/discordLogger.mjs';
 
@@ -11,7 +11,7 @@ const client = new Client({
 
 client.once('ready', function () {
   console.log(`Logged in as ${client.user.tag}!`)
-  DiscordLogger.instance.setLogChannel(client.channels.cache.get('763372739238559774'));
+  DiscordLogger.instance.setLogChannel(client.channels.cache.get(logChannelId));
 })
 
 exitHook(() => {
