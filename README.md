@@ -1,2 +1,2 @@
 # Pong
-Pong is a discord bot that likes math
+Pong is a discord bot that likes math and games
