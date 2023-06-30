@@ -4,7 +4,7 @@ export default {
 	data: new SlashCommandBuilder()
 		.setName('regles')
 		.setDescription('Donne les règles du jeu'),
-	async execute(interaction, _PONG_DATA) {
+	async execute(interaction) {
 
 		interaction.reply(REGLES);
 		

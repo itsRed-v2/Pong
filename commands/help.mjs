@@ -7,7 +7,7 @@ export default {
 		.setName('help')
 		.setDescription('Donne la liste des commandes'),
 
-	async execute(interaction, _PONG_DATA) {
+	async execute(interaction) {
 
 		if (adminIds.has(interaction.user.id)) {
 			const row = new MessageActionRow()

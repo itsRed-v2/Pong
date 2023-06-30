@@ -1,7 +1,8 @@
 import fs from 'fs';
+import exitHook from 'exit-hook';
+import 'dotenv/config';
 import { Client, Collection, Intents } from 'discord.js';
 import { token, adminIds, logChannelId } from'./config.mjs';
-import exitHook from 'exit-hook';
 import DiscordLogger from './src/discordLogger.mjs';
 
 const client = new Client({
@@ -15,11 +16,18 @@ client.once('ready', function () {
 })
 
 exitHook(() => {
-  client.destroy()
+  if (client.isReady()) {
+    client.destroy()
+    console.log("Client has been destroyed.")
+  }
 })
 
 //================================ constantes
 
+if (!process.env.PONG_DATA_PATH) {
+  console.error("The environment variable PONG_DATA_PATH is not defined. Use a .env file to set this variable.")
+  process.exit(1);
+}
 const DATA_PATH = process.env.PONG_DATA_PATH;
 const HIGHSCORE_PATH = DATA_PATH + '/highscores.mjs';
 const PLAYERS_PATH = DATA_PATH + '/players.mjs';
@@ -146,12 +154,12 @@ client.on('messageCreate', message => {
 
   if (message.author.bot) return
 
-  var contenu = message.content.toLowerCase()
-  var args = matchPing(contenu)
+  let contenu = message.content.toLowerCase()
+  let args = matchPing(contenu)
   if (args === null) return
 
-  var id = message.author.id;
-  var joueur = JOUEURS[id]
+  let id = message.author.id;
+  let joueur = JOUEURS[id]
   if (joueur) {
     if (joueur.update(getUsername(id), getDiscriminator(id))) {
       saveJoueurs(JOUEURS);
@@ -178,7 +186,7 @@ Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie 
   else if (partie) {
     // test bonne réponse
     if (args[0] == partie.reponse()) {
-      var highscore = allHighscores[partie.mode][id] || 0
+      let highscore = allHighscores[partie.mode][id] || 0
       partie.points++
       message.reply(`Correct ! Tu as ${partie.printScore()}.${partie.points > highscore ? ' **C\'est ton Meilleur score!**' : ''}\n${partie.poseQuestion()}`)
       saveJoueurs(JOUEURS)
@@ -191,7 +199,7 @@ Tu ne peux pas avoir plusieurs parties en même temps. Pour arrêter une partie 
 
     // test mauvaise réponse
     else if (isInteger(args[0])) {
-      message.reply(`Faux ! La réponse était ${partie.reponse()}. Ton score final est de ${partie.printScore()}${partie.points > highscore ? ", c'est ton **meilleur score!**" : ''}`)
+      message.reply(`Faux ! La réponse était ${partie.reponse()}. Ton score final est de ${partie.printScore()}.`)
       DiscordLogger.instance.sendAsLog(':x:  `' + message.author.username + '` a perdu une partie à **' + partie.printScore() + '** (' + partie.printMode() + ')')
       joueur.partie = undefined
       saveJoueurs(JOUEURS)
@@ -213,8 +221,8 @@ client.on('messageCreate', message => {
   if (message.author.bot) return;
   if (!adminIds.has(message.author.id)) return;
   
-  var contenu = message.content
-  var args = matchPing(contenu);
+  let contenu = message.content
+  let args = matchPing(contenu);
   if (args === null) return;
 
   //ping reload
@@ -224,11 +232,11 @@ client.on('messageCreate', message => {
 
   // ping tp
   if (matchTp(args)) {
-    var newScore = args[2];
-    var id = args[1]
-    var oldScore = changeScore(id, newScore, JOUEURS)
+    let newScore = args[2];
+    let id = args[1]
+    let oldScore = changeScore(id, newScore, JOUEURS)
     if (oldScore || oldScore === 0) {
-      var pseudo = getUsername(id);
+      let pseudo = getUsername(id);
       saveJoueurs(JOUEURS);
       message.channel.send(`Score du joueur \`${pseudo}\` (\`${id}\`) modifié: ${oldScore} ==> **${newScore}**`)
       DiscordLogger.instance.sendAsLog(`:arrow_right: Score de \`${pseudo}\` (\`${id}\`) modifié: ${oldScore} ==> **${newScore}**`)
@@ -239,7 +247,7 @@ client.on('messageCreate', message => {
   
   // modération highscores
   if (matchHs(args)) {
-    var pseudo = getUsername(args[1]);
+    let pseudo = getUsername(args[1]);
     if (args[0] == 'seths') {
       // ping seths
       if (changeHs(args[1], args[2], args[3], allHighscores)) {
@@ -263,9 +271,9 @@ client.on('messageCreate', message => {
   }
   // ping rmhs
   if (matchRmHs(args)) {
-    var id = args[1];
-    var mode = 'mode_' + args[2];
-    var pseudo = getUsername(id);
+    let id = args[1];
+    let mode = 'mode_' + args[2];
+    let pseudo = getUsername(id);
     
     if (removeHs(id, mode, allHighscores)) {
       message.channel.send(`Le highscore du joueur \`${pseudo}\` (id: \`${id}\`) en ${printMode(mode)} a été supprimé`);

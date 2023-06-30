@@ -34,7 +34,7 @@ function listeJoueursActifs(joueurs, info) {
         const joueur = joueurs[id];
         const partie = joueur.partie;
         if (partie) {
-            liste.push(`\`${joueur.pseudo}${info ? '#'+joueur.discriminator:''}\`${info ? ' \`'+id+'\`' : ''} - ${partie.printScore()}, ${partie.printMode()}`)
+            liste.push(`\`${joueur.pseudo}${info ? '#'+joueur.discriminator:''}\`${info ? ' `'+id+'`' : ''} - ${partie.printScore()}, ${partie.printMode()}`)
         }
     });
     return liste
