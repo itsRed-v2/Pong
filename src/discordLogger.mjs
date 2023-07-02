@@ -11,13 +11,17 @@ export default class DiscordLogger {
 	}
 
 	async logReloadMessage() {
-		let lastMessage = await this.getLastMessage();
-		let content = lastMessage.content;
+		const lastMessage = await this.getLastMessage();
+		const content = lastMessage.content;
 		if (content.match(/^:repeat: Reloading/)) {
-			var match = content.match(/(\d*)\)$/);
-			if (match) return lastMessage.edit(`:repeat: Reloading (x${parseInt(10, match[1]) + 1})`);
-			else return lastMessage.edit(':repeat: Reloading (x2)');
-		} else {
+			const match = content.match(/(\d*)\)$/);
+			if (match)
+				return lastMessage.edit(`:repeat: Reloading (x${parseInt(10, match[1]) + 1})`);
+			else
+				return lastMessage.edit(':repeat: Reloading (x2)');
+
+		}
+		else {
 			return this.logChannel.send(':repeat: Reloading');
 		}
 	}

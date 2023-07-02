@@ -1,7 +1,7 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
+import { SlashCommandBuilder } from '@discordjs/builders';
 
-import { createJoueurIfNeeded, printMode } from "../src/pong.mjs";
-import { saveJoueurs } from "../src/file-tools.mjs"
+import { createJoueurIfNeeded, printMode } from '../src/pong.mjs';
+import { saveJoueurs } from '../src/file-tools.mjs';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -20,13 +20,13 @@ export default {
 		const user = interaction.user;
 		let joueur = JOUEURS[user.id];
 
-		if(createJoueurIfNeeded(user.id, user.username, user.discriminator, JOUEURS)) {
+		if (createJoueurIfNeeded(user.id, user.username, user.discriminator, JOUEURS)) {
 			joueur = JOUEURS[user.id];
 		}
 
 		joueur.mode = interaction.options.getString('mode');
 		saveJoueurs(JOUEURS);
 
-		interaction.reply("Tu joues maintenant en " + printMode(joueur.mode))
-	}
-}
+		interaction.reply('Tu joues maintenant en ' + printMode(joueur.mode));
+	},
+};

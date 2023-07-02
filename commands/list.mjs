@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
+import { SlashCommandBuilder } from '@discordjs/builders';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -14,33 +14,35 @@ export default {
 		if (!info) info = false;
 
 		interaction.reply(afficheliste(listeJoueursActifs(JOUEURS, info)));
-	}
-}
+	},
+};
 
 function afficheliste(liste) {
-    if (liste.length > 1) {
-        liste.unshift(`${liste.length} parties sont en cours:`)
-    } else if (liste.length == 1) {
-        liste.unshift(`1 partie est en cours:`)
-    } else {
-        liste.unshift(`Aucune partie n'est en cours`)
-    }
-    return liste.join('\n');
+	if (liste.length > 1) {
+		liste.unshift(`${liste.length} parties sont en cours:`);
+	}
+	else if (liste.length == 1) {
+		liste.unshift('1 partie est en cours:');
+	}
+	else {
+		liste.unshift('Aucune partie n\'est en cours');
+	}
+	return liste.join('\n');
 }
 
 function listeJoueursActifs(joueurs, info) {
-    var liste = []
-    Object.keys(joueurs).forEach(id => {
-        const joueur = joueurs[id];
-        const partie = joueur.partie;
-        if (partie) {
-            liste.push(`\`${joueur.pseudo}${info ? '#'+joueur.discriminator:''}\`${info ? ' `'+id+'`' : ''} - ${partie.printScore()}, ${partie.printMode()}`)
-        }
-    });
-    return liste
+	const liste = [];
+	Object.keys(joueurs).forEach(id => {
+		const joueur = joueurs[id];
+		const partie = joueur.partie;
+		if (partie) {
+			liste.push(`\`${joueur.pseudo}${info ? '#' + joueur.discriminator : ''}\`${info ? ' `' + id + '`' : ''} - ${partie.printScore()}, ${partie.printMode()}`);
+		}
+	});
+	return liste;
 }
 
 export {
 	listeJoueursActifs,
-    afficheliste
-}
+	afficheliste,
+};

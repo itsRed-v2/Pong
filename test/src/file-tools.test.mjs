@@ -1,14 +1,14 @@
 import chai from 'chai';
 const expect = chai.expect;
 import {
-	stringifyForExport
+	stringifyForExport,
 } from '../../src/file-tools.mjs';
 
-describe('File tools', function () {
+describe('File tools', function() {
 
-	describe('#stringifyForExport()', function () {
-		it("convertis objet en string JSON prêt pour l'exportation", function () {
-			var allhighscores = {
+	describe('#stringifyForExport()', function() {
+		it("convertis objet en string JSON prêt pour l'exportation", function() {
+			const allhighscores = {
 				mode_1: {
 					'id1' : 155,
 					'id2' : 120,
@@ -17,10 +17,10 @@ describe('File tools', function () {
 				mode_2: {
 					'id1' : 50,
 					'id2' : 27,
-				}
-			}
+				},
+			};
 			expect(stringifyForExport(allhighscores)).to.eql(
-`export let data = {
+				`export let data = {
   "mode_1": {
     "id1": 155,
     "id2": 120,
@@ -33,4 +33,4 @@ describe('File tools', function () {
 };`);
 		});
 	});
-})
+});
