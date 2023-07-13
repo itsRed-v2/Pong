@@ -2,7 +2,7 @@ import chai from 'chai';
 const expect = chai.expect;
 import {
 	stringifyForExport,
-} from '../../src/file-tools.mjs';
+} from '../src/file-tools.mjs';
 
 describe('File tools', function() {
 

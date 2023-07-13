@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { printMode } from '../src/pong.mjs';
+import { printMode } from '../pong.mjs';
 
 export default {
 	data: new SlashCommandBuilder()

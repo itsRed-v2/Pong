@@ -1,7 +1,7 @@
 import chai from 'chai';
 const expect = chai.expect;
-import Partie from '../../src/partie.mjs';
-import Joueur from '../../src/joueur.mjs';
+import Partie from '../src/partie.mjs';
+import Joueur from '../src/joueur.mjs';
 import {
 	matchTp,
 	changeScore,
@@ -13,12 +13,12 @@ import {
 	isPositiveInteger,
 	createJoueurIfNeeded,
 	printMode,
-} from '../../src/pong.mjs';
+} from '../src/pong.mjs';
 import {
 	changeHs,
 	ajouteHs,
 	removeHs,
-} from '../../src/highscore.mjs';
+} from '../src/highscore.mjs';
 
 describe('Pong', function() {
 

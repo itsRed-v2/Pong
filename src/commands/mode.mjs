@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 
-import { createJoueurIfNeeded, printMode } from '../src/pong.mjs';
-import { saveJoueurs } from '../src/file-tools.mjs';
+import { createJoueurIfNeeded, printMode } from '../pong.mjs';
+import { saveJoueurs } from '../file-tools.mjs';
 
 export default {
 	data: new SlashCommandBuilder()

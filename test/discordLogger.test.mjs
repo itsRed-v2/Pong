@@ -1,6 +1,6 @@
 import chai from 'chai';
 const expect = chai.expect;
-import DiscordLogger from '../../src/discordLogger.mjs';
+import DiscordLogger from '../src/discordLogger.mjs';
 
 describe('DiscordLogger', function() {
 

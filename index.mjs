@@ -62,10 +62,10 @@ load_promises.push(import(HIGHSCORE_PATH).then((importedObject) => {
 // loading commands
 
 client.commands = new Collection();
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.mjs'));
+const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.mjs'));
 
 for (const fileName of commandFiles) {
-	const promise = import(`./commands/${fileName}`).then((file) => {
+	const promise = import(`./src/commands/${fileName}`).then((file) => {
 		const command = file.default;
 		client.commands.set(command.data.name, command);
 	}).catch((error) => {

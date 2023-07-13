@@ -4,7 +4,7 @@ import Joueur from '../../src/joueur.mjs';
 import {
 	printHighscores,
 	trieHighscores,
-} from '../../commands/highscores.mjs';
+} from '../../src/commands/highscores.mjs';
 
 describe('/highscores', function() {
 

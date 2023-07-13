@@ -1,8 +1,8 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { MessageActionRow, MessageButton } from 'discord.js';
 
-import { saveJoueurs } from '../src/file-tools.mjs';
-import DiscordLogger from '../src/discordLogger.mjs';
+import { saveJoueurs } from '../file-tools.mjs';
+import DiscordLogger from '../discordLogger.mjs';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -27,7 +27,7 @@ export default {
 						new MessageButton()
 							.setCustomId('confirm_abandon' + interaction.id)
 							.setLabel('Abandonner')
-							.setStyle('DANGER'),
+							.setStyle('DANGER')
 					);
 
 				await interaction.reply({

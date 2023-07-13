@@ -5,7 +5,7 @@ import Joueur from '../../src/joueur.mjs';
 import {
 	listeJoueursActifs,
 	afficheliste,
-} from '../../commands/list.mjs';
+} from '../../src/commands/list.mjs';
 
 describe('/list', function() {
 

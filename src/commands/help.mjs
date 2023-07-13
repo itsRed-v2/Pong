@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { MessageActionRow, MessageButton } from 'discord.js';
-import { adminIds } from '../config.mjs';
+import { adminIds } from '../../config.mjs';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -19,7 +19,7 @@ export default {
 					new MessageButton()
 						.setCustomId('admin_help_' + interaction.id)
 						.setLabel('Aide admisistrateur')
-						.setStyle('PRIMARY'),
+						.setStyle('PRIMARY')
 				);
 
 			await interaction.reply({
