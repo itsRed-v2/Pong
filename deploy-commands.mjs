@@ -4,12 +4,12 @@ import { Routes } from 'discord-api-types/v9';
 import { clientId, guildId, token } from './config.mjs';
 
 const commands = [];
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.mjs'));
+const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.mjs'));
 
 for (const fileName of commandFiles) {
 	try {
 		console.log('Loading: ' + fileName);
-		const command = (await import(`./commands/${fileName}`)).default;
+		const command = (await import(`./src/commands/${fileName}`)).default;
 		commands.push(command.data.toJSON());
 	}
 	catch (error) {
