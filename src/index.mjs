@@ -2,8 +2,8 @@ import fs from 'fs';
 import exitHook from 'exit-hook';
 import 'dotenv/config';
 import { Client, Collection, Intents } from 'discord.js';
-import { token, adminIds, logChannelId } from './config.mjs';
-import DiscordLogger from './src/discordLogger.mjs';
+import { token, adminIds, logChannelId } from '../config.mjs';
+import DiscordLogger from './discordLogger.mjs';
 
 const client = new Client({
 	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES],
@@ -62,10 +62,10 @@ load_promises.push(import(HIGHSCORE_PATH).then((importedObject) => {
 // loading commands
 
 client.commands = new Collection();
-const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.mjs'));
+const commandFiles = fs.readdirSync(new URL('commands', import.meta.url)).filter(file => file.endsWith('.mjs'));
 
 for (const fileName of commandFiles) {
-	const promise = import(`./src/commands/${fileName}`).then((file) => {
+	const promise = import(`./commands/${fileName}`).then((file) => {
 		const command = file.default;
 		client.commands.set(command.data.name, command);
 	}).catch((error) => {
@@ -83,7 +83,7 @@ Promise.all(load_promises).then(() => {
 
 // ================================ fonctions
 
-import Joueur from './src/joueur.mjs';
+import Joueur from './joueur.mjs';
 import {
 	matchTp,
 	changeScore,
@@ -95,16 +95,16 @@ import {
 	isInteger,
 	createJoueurIfNeeded,
 	printMode,
-} from './src/pong.mjs';
+} from './pong.mjs';
 import {
 	changeHs,
 	ajouteHs,
 	removeHs,
-} from './src/highscore.mjs';
+} from './highscore.mjs';
 import {
 	saveHighScores,
 	saveJoueurs,
-} from './src/file-tools.mjs';
+} from './file-tools.mjs';
 
 function getUsername(id) {
 	if (client.users.cache.get(id)) {

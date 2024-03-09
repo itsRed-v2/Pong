@@ -1,15 +1,17 @@
 import fs from 'fs';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
-import { clientId, guildId, token } from './config.mjs';
+import { clientId, guildId, token } from '../config.mjs';
+
+const commandsFolderUrl = new URL('commands/', import.meta.url);
 
 const commands = [];
-const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.mjs'));
+const commandFiles = fs.readdirSync(commandsFolderUrl).filter(file => file.endsWith('.mjs'));
 
 for (const fileName of commandFiles) {
 	try {
 		console.log('Loading: ' + fileName);
-		const command = (await import(`./src/commands/${fileName}`)).default;
+		const command = (await import(new URL(fileName, commandsFolderUrl))).default;
 		commands.push(command.data.toJSON());
 	}
 	catch (error) {
