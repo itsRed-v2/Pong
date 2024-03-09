@@ -1,0 +1,9 @@
+services:
+  pong:
+    build: "."
+    restart: always
+    volumes:
+      - "./src:/code/src"
+      - "./.env:/code/.env"
+      - "./config.mjs:/code/config.mjs"
+      - "./data:/data"
